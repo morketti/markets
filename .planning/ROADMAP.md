@@ -10,7 +10,7 @@
 | # | Phase | Goal | Requirements | Success Criteria | Dependencies |
 |---|-------|------|--------------|------------------|--------------|
 | 1 | Foundation — Watchlist + Per-Ticker Config (5/5 plans, Complete) | Complete    | 2026-05-01 | 4 | — |
-| 2 | Ingestion — Keyless Data Plane (3/6 plans, In Progress) | All data fetched without API keys, validated, with fallbacks | DATA-01..08 | 5 | Phase 1 |
+| 2 | 4/6 | In Progress|  | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Scheduled routine produces full TickerDecisions and commits snapshots | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
@@ -67,7 +67,7 @@ Plans:
 
 **Pitfalls addressed:** #1 (yfinance silent breakage — sanity checks + fallback), #2 (EDGAR User-Agent compliance)
 
-**Plans:** 3/6 plans complete
+**Plans:** 4/6 plans executed
 
 Plans:
 - [x] 02-01-foundation-PLAN.md — ingestion/http.py + errors + analysts/data/ schemas + Wave-0 fixtures + responses dep
