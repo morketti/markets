@@ -297,7 +297,7 @@ def test_filings_429_retry(edgar_tickers_json: str, edgar_submissions_aapl_json:
 
 @responses.activate
 def test_filings_schema_drift(edgar_tickers_json: str):
-    """Probe-adjacent: 200 with malformed shape raises SchemaDriftError."""
+    """Probe-adjacent: 200 with malformed shape raises SchemaDriftError (no `filings` key)."""
     responses.add(
         responses.GET,
         EDGAR_TICKERS_URL,
@@ -315,3 +315,236 @@ def test_filings_schema_drift(edgar_tickers_json: str):
 
     with pytest.raises(SchemaDriftError):
         fetch_filings("AAPL")
+
+
+# ---------------- coverage / hardening ----------------
+
+
+def test_lookup_cik_invalid_ticker_returns_none_no_network():
+    """A non-string / unparseable ticker returns None without touching the network."""
+    # No responses.activate / no mocks — confirms zero network calls.
+    assert lookup_cik("") is None
+    assert lookup_cik("not a ticker!!") is None
+    assert lookup_cik(123) is None  # type: ignore[arg-type]
+
+
+def test_fetch_filings_invalid_ticker_returns_empty_no_network():
+    """Invalid ticker shape → [] before any network call."""
+    assert fetch_filings("") == []
+    assert fetch_filings("not a ticker!!") == []
+
+
+@responses.activate
+def test_lookup_cik_index_500_raises_network_error():
+    """company_tickers index returning 500 (after retries) raises NetworkError."""
+    # Register 4 times: shared-session retry policy will exhaust 3 retries + initial = 4 calls.
+    for _ in range(4):
+        responses.add(
+            responses.GET,
+            EDGAR_TICKERS_URL,
+            body="server error",
+            status=500,
+            content_type="text/plain",
+        )
+
+    with pytest.raises(NetworkError) as exc_info:
+        lookup_cik("AAPL")
+    assert "500" in str(exc_info.value)
+
+
+@responses.activate
+def test_lookup_cik_index_not_json_raises_schema_drift():
+    """company_tickers returning 200 but non-JSON body raises SchemaDriftError."""
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body="<html>not json</html>",
+        status=200,
+        content_type="text/html",
+    )
+
+    with pytest.raises(SchemaDriftError):
+        lookup_cik("AAPL")
+
+
+@responses.activate
+def test_lookup_cik_index_top_level_list_raises_schema_drift():
+    """company_tickers returning a JSON list (not dict) raises SchemaDriftError."""
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body="[]",
+        status=200,
+        content_type="application/json",
+    )
+
+    with pytest.raises(SchemaDriftError):
+        lookup_cik("AAPL")
+
+
+@responses.activate
+def test_lookup_cik_skips_malformed_entries():
+    """Entries with missing/bad keys or non-normalizable tickers are skipped silently."""
+    bad_index = json.dumps({
+        "0": {"cik_str": 320193, "ticker": "AAPL", "title": "Apple Inc."},
+        "1": {"cik_str": "not-an-int", "ticker": "BAD1", "title": "Bad CIK"},
+        "2": {"ticker": "BAD2", "title": "Missing CIK"},
+        "3": {"cik_str": 999, "ticker": "!!@@", "title": "Non-normalizable"},
+        "4": {"cik_str": 12345, "ticker": "GOOD", "title": "Good Co"},
+    })
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body=bad_index,
+        status=200,
+        content_type="application/json",
+    )
+
+    assert lookup_cik("AAPL") == "0000320193"
+    assert lookup_cik("GOOD") == "0000012345"
+    assert lookup_cik("BAD1") is None
+    assert lookup_cik("BAD2") is None
+
+
+@responses.activate
+def test_filings_500_raises_network_error(edgar_tickers_json: str):
+    """Submissions endpoint returning 500 after retries raises NetworkError."""
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body=edgar_tickers_json,
+        status=200,
+        content_type="application/json",
+    )
+    # 4 attempts: 1 + 3 retries
+    for _ in range(4):
+        responses.add(
+            responses.GET,
+            EDGAR_SUBMISSIONS_URL.format(cik="0000320193"),
+            body="server error",
+            status=500,
+            content_type="text/plain",
+        )
+
+    with pytest.raises(NetworkError) as exc_info:
+        fetch_filings("AAPL")
+    assert "500" in str(exc_info.value)
+
+
+@responses.activate
+def test_filings_submissions_not_json_raises_schema_drift(edgar_tickers_json: str):
+    """Submissions endpoint returning 200 but non-JSON body raises SchemaDriftError."""
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body=edgar_tickers_json,
+        status=200,
+        content_type="application/json",
+    )
+    responses.add(
+        responses.GET,
+        EDGAR_SUBMISSIONS_URL.format(cik="0000320193"),
+        body="<html>oops</html>",
+        status=200,
+        content_type="text/html",
+    )
+
+    with pytest.raises(SchemaDriftError):
+        fetch_filings("AAPL")
+
+
+@responses.activate
+def test_filings_missing_recent_subkey_raises_schema_drift(edgar_tickers_json: str):
+    """`filings` key present but `filings.recent` missing → SchemaDriftError."""
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body=edgar_tickers_json,
+        status=200,
+        content_type="application/json",
+    )
+    responses.add(
+        responses.GET,
+        EDGAR_SUBMISSIONS_URL.format(cik="0000320193"),
+        body=json.dumps({"cik": "320193", "filings": {"older": []}}),
+        status=200,
+        content_type="application/json",
+    )
+
+    with pytest.raises(SchemaDriftError) as exc_info:
+        fetch_filings("AAPL")
+    assert "recent" in str(exc_info.value)
+
+
+@responses.activate
+def test_filings_skips_bad_filing_date(edgar_tickers_json: str):
+    """A row with an unparseable filingDate is skipped, not fatal."""
+    payload = {
+        "cik": "320193",
+        "name": "Apple Inc.",
+        "filings": {
+            "recent": {
+                "accessionNumber": ["0000320193-26-000001", "0000320193-26-000002"],
+                "filingDate": ["not-a-date", "2026-04-30"],
+                "form": ["10-K", "10-Q"],
+                "primaryDocument": ["bad.htm", "good.htm"],
+                "primaryDocDescription": ["FORM 10-K", "FORM 10-Q"],
+            }
+        },
+    }
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body=edgar_tickers_json,
+        status=200,
+        content_type="application/json",
+    )
+    responses.add(
+        responses.GET,
+        EDGAR_SUBMISSIONS_URL.format(cik="0000320193"),
+        body=json.dumps(payload),
+        status=200,
+        content_type="application/json",
+    )
+
+    result = fetch_filings("AAPL")
+    # Only the 10-Q with the valid date survives.
+    assert len(result) == 1
+    assert result[0].form_type == "10-Q"
+    assert result[0].accession_number == "0000320193-26-000002"
+
+
+@responses.activate
+def test_filings_maps_unknown_form_to_other_when_requested(edgar_tickers_json: str):
+    """If the caller requests an unusual form, it is mapped through; unknown forms → OTHER."""
+    payload = {
+        "cik": "320193",
+        "name": "Apple Inc.",
+        "filings": {
+            "recent": {
+                "accessionNumber": ["0000320193-26-000001"],
+                "filingDate": ["2026-04-30"],
+                "form": ["WEIRD-FORM"],
+                "primaryDocument": ["weird.htm"],
+                "primaryDocDescription": ["UNKNOWN"],
+            }
+        },
+    }
+    responses.add(
+        responses.GET,
+        EDGAR_TICKERS_URL,
+        body=edgar_tickers_json,
+        status=200,
+        content_type="application/json",
+    )
+    responses.add(
+        responses.GET,
+        EDGAR_SUBMISSIONS_URL.format(cik="0000320193"),
+        body=json.dumps(payload),
+        status=200,
+        content_type="application/json",
+    )
+
+    result = fetch_filings("AAPL", forms=("WEIRD-FORM",))
+    assert len(result) == 1
+    assert result[0].form_type == "OTHER"
