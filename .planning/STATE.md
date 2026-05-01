@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 5
-status: executing
-last_updated: "2026-05-01T04:17:52.444Z"
+current_plan: 05 — CLI readonly + example
+status: verifying
+last_updated: "2026-05-01T04:26:16.918Z"
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # State: Markets
@@ -20,21 +20,21 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 1 in progress — Plans 01 (scaffold), 02 (schemas), 03 (loader), and 04 (CLI core) complete; Plan 05 (CLI readonly + example) is next.
+**Current focus:** Phase 1 complete (5/5 plans). Ready for `/gmd:verify-work` then `/gmd:plan-phase 2` (Ingestion — Keyless Data Plane).
 
 ## Current Phase
 
 **Phase:** 01-foundation-watchlist-per-ticker-config
-**Status:** In Progress (4 of 5 plans complete)
-**Current Plan:** 05 — CLI readonly + example
+**Status:** Phase complete — ready for verification
+**Current Plan:** 05 — CLI readonly + example (complete)
 **Total Plans in Phase:** 5
-**Next:** `/gmd:execute-plan` with `01-05-cli-readonly-and-example-PLAN.md`
+**Next:** `/gmd:verify-work` to confirm all 21 Phase 1 probes pass, then `/gmd:plan-phase 2`.
 
 ## Phase Status
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | Foundation — Watchlist + Per-Ticker Config | In Progress |
+| 1 | Foundation — Watchlist + Per-Ticker Config | Complete (5/5 plans) — pending verify |
 | 2 | Ingestion — Keyless Data Plane | Pending |
 | 3 | Analytical Agents — Deterministic Scoring | Pending |
 | 4 | Position-Adjustment Radar | Pending |
@@ -55,6 +55,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **2026-05-01 (Phase 1 / Plan 02 — schemas)**: Pydantic v2 schemas locked. `analysts/schemas.py` (171 lines) ships `TechnicalLevels`, `FundamentalTargets`, `TickerConfig`, `Watchlist` + module-level `normalize_ticker(s)` helper. 8/8 schema tests green; coverage 99% line / 98.89% branch (gate ≥95%). Hyphen-form normalization verified (BRK.B/BRK_B/BRK/B/brk-b → BRK-B). All cross-field rules use `@model_validator(mode='after')`. **Decision:** `normalize_ticker` extracted to module level (single source of truth) — Plans 04/05 will `from analysts.schemas import normalize_ticker` and reuse directly, no duplication. **Decision:** Strict watchlist key mode — dict-key/value.ticker mismatch raises `ValidationError` naming the offender, never silently rewrites. WATCH-04 + WATCH-05 covered (already marked `[x]` in REQUIREMENTS.md from Plan 01 over-attribution; behavior now actually delivered). Plan-level commits: `66795a2` (RED test), `87aaa4e` (GREEN impl). Zero deviations from plan.
 - **2026-05-01 (Phase 1 / Plan 03 — loader)**: Stdlib atomic-write loader landed. `watchlist/loader.py` (69 lines) ships `load_watchlist(path)` + `save_watchlist(wl, path)` + `DEFAULT_PATH`. **Decision:** stdlib `json.dumps(model_dump(mode="json"), indent=2, sort_keys=True) + "\n"` for serialization (NOT `model_dump_json`) per CONTEXT.md correction #3 / Pydantic v2 issue #7424 — guarantees byte-identical round-trip and stable git diffs. **Decision:** `tempfile.NamedTemporaryFile(delete=False, dir=parent) ... with-block-exit ... os.replace(tmp_path, path)` per Pitfall #2 (Windows file-lock release); on OSError, `tmp_path.unlink(missing_ok=True)` then re-raise. **Decision:** `load_watchlist` on missing path returns empty `Watchlist()` (not an error) — drives first-run CLI UX. **Decision:** save_watchlist re-validates the model before persistence (defense-in-depth). 7/7 loader tests green (15/15 combined with schemas); coverage 100% line+branch (gate ≥90%); 50-ticker load measured 6.18ms (<<100ms gate); round-trip byte-identical confirmed; no orphan tmp files in any test path. **Deviation (Rule 2):** Added 7th test `test_save_cleanup_on_replace_failure` (monkeypatched `os.replace` raises OSError → asserts cleanup + re-raise) to lock the failure-cleanup contract and close the coverage gap on lines 67-69 (originally-specified 6 tests came in at 88.89% coverage). No implementation deviation from `01-RESEARCH.md` "Loader / atomic save" example. Plan-level commits: `7c1bf15` (RED), `e40f0eb` (GREEN). WATCH-01, WATCH-02, WATCH-05 confirmed covered.
 - **2026-05-01 (Phase 1 / Plan 04 — CLI core)**: argparse dispatcher + add/remove + format_validation_error shipped. `cli/main.py` (71 lines), `cli/_errors.py` (38), `cli/add_ticker.py` (102), `cli/remove_ticker.py` (73) — 284 production lines total. **Decision:** SUBCOMMANDS dict-of-tuples pattern in `cli/main.py` is Plan 05's documented extension surface (4-line patch: 2 imports + 2 dict entries; zero modifications to existing lines). **Decision:** `cli/remove_ticker.py` imports `normalize_ticker` from `analysts.schemas` (zero inline regex; closes Plan 02's deferred decision). **Decision:** ISO 8601 timestamps stick with `+00:00` form (NOT `Z`) per Pitfall #3 — round-trips natively through `datetime.fromisoformat`. **Decision:** Optional groups (TechnicalLevels, FundamentalTargets) constructed only when at least one of their flags is passed (no `null` clutter in watchlist.json). **Decision:** ValidationError caught in main() → format_validation_error → stderr → exit 2 (no raw tracebacks); FileNotFoundError → stderr → exit 1; other exceptions propagate (debug-friendly). 9/9 CLI tests green (probes 1-W3-01..09); combined Wave 1+2+3 24/24 green; coverage 85.62% on the four cli/* files (gate ≥85%). BRK.B → BRK-B verified end-to-end via `test_add_brk_normalizes_to_hyphen` AND smoke test. ValidationError surfaces cleanly via smoke test (`markets add AAPL --thesis -1` → `validation failed (1 error): - thesis_price: ... (got: -1.0)` exit 2, no file created). Plan-level commits: `4a3ae49` (RED), `0446715` (GREEN). WATCH-02, WATCH-03, WATCH-04, WATCH-05 confirmed covered. **Zero deviations** from plan.
+- **2026-05-01 (Phase 1 / Plan 05 — CLI readonly + example)**: Read-only CLI surface shipped. `cli/list_watchlist.py` (45 lines) + `cli/show_ticker.py` (83 lines) + `watchlist.example.json` (5 tickers, 4 lenses, BRK-B hyphenated) + `README.md` (88 lines, quick-start + schema table + provenance). **Decision (locked):** `cli/_errors.py:suggest_ticker(unknown, known)` is the single source of truth for did-you-mean across show + remove — closes Plan 04's deferred decision. Plan 04's remove tests stay green with no test changes (refactor is internal). **Decision (locked):** `cli/show_ticker.py` imports `normalize_ticker` from `analysts.schemas` — same pattern as Plan 04 remove. **Decision:** `markets list` empty watchlist exits 0 (mirrors loader contract); show error codes mirror remove (0/1/2). **Decision:** Notes column truncated at 40 chars in list output. **Decision:** `watchlist.example.json` generated via dogfooded `markets add` (not hand-crafted) — exercises full add → schema → loader → save pipeline. WATCH-01 user-facing demo proven (`test_list_30_plus_tickers` over 35-ticker fixture); WATCH-03 ergonomics extended to show (`markets show AAPK` → did-you-mean AAPL). 33/33 Phase 1 tests pass; coverage 94% global, 100% list_watchlist.py, 98% show_ticker.py — well above the ≥90% gate. Plan-level commits: `6f555d3` (RED), `ba679ce` (GREEN). **Zero deviations** from plan (3 extra coverage tests added to clear the gate are documented in SUMMARY).
 
 ## Context Notes
 
@@ -81,4 +82,4 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 ## Last Touched
 
-2026-05-01 after Plan 04 (CLI core) execution complete; commits `4a3ae49` (RED), `0446715` (GREEN). Next: Plan 05 (CLI readonly + example).
+2026-05-01 after Plan 05 (CLI readonly + example) execution complete; commits `6f555d3` (RED), `ba679ce` (GREEN). Phase 1 complete (5/5 plans). Next: `/gmd:verify-work` to confirm all 21 Phase 1 probes pass, then `/gmd:plan-phase 2` (Ingestion — Keyless Data Plane).

@@ -9,7 +9,7 @@
 
 | # | Phase | Goal | Requirements | Success Criteria | Dependencies |
 |---|-------|------|--------------|------------------|--------------|
-| 1 | Foundation — Watchlist + Per-Ticker Config (4/5 plans, In Progress) | User can declare a watchlist with rich per-ticker configuration that drives all downstream analysis | WATCH-01..05 | 4 | — |
+| 1 | Foundation — Watchlist + Per-Ticker Config (5/5 plans, Complete) | User can declare a watchlist with rich per-ticker configuration that drives all downstream analysis | WATCH-01..05 | 4 | — |
 | 2 | Ingestion — Keyless Data Plane | All data fetched without API keys, validated, with fallbacks | DATA-01..08 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |
@@ -39,14 +39,14 @@
 
 **Pitfalls addressed:** #10 (premature abstraction — keep watchlist simple, no plugin system)
 
-**Plans:** 3/5 plans executed
+**Plans:** 5/5 plans executed (Phase 1 complete — pending `/gmd:verify-work`)
 
 Plans:
 - [x] 01-01-scaffold-PLAN.md — pyproject.toml, packages, conftest fixtures, placeholder CLI dispatcher
 - [x] 01-02-schemas-PLAN.md — analysts/schemas.py: TickerConfig + Watchlist + nested models, all validators
 - [x] 01-03-loader-PLAN.md — watchlist/loader.py: load_watchlist + atomic save_watchlist with sort_keys serialization
-- [ ] 01-04-cli-core-PLAN.md — cli/main.py dispatcher + add/remove subcommands + format_validation_error
-- [ ] 01-05-cli-readonly-and-example-PLAN.md — list/show subcommands + watchlist.example.json + README
+- [x] 01-04-cli-core-PLAN.md — cli/main.py dispatcher + add/remove subcommands + format_validation_error
+- [x] 01-05-cli-readonly-and-example-PLAN.md — list/show subcommands + watchlist.example.json + README
 
 ---
 
