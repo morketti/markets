@@ -20,7 +20,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **DATA-01**: System fetches daily OHLC + current price for each watchlist ticker via yfinance
 - [x] **DATA-02**: System fetches latest fundamentals (P/E, P/S, ROE, debt/equity, margins, FCF) per ticker via yfinance
 - [x] **DATA-03**: System fetches latest 10-K, 10-Q, 8-K filings from SEC EDGAR with compliant `User-Agent: <name> <email>` header
-- [ ] **DATA-04**: System fetches news headlines per ticker from RSS (Yahoo Finance, Google News per-ticker, FinViz, press wires)
+- [x] **DATA-04**: System fetches news headlines per ticker from RSS (Yahoo Finance, Google News per-ticker, FinViz, press wires)
 - [x] **DATA-05**: System fetches social signal per ticker via anonymous Reddit RSS endpoints + StockTwits unauthenticated trending
 - [x] **DATA-06**: All ingestion modules emit Pydantic-validated objects; sanity checks (price > 0, expected fields present) fail loudly
 - [x] **DATA-07**: When yfinance returns empty/invalid data for a ticker, the ticker is flagged `data_unavailable: true`; downstream agents skip; frontend renders limited-data badge
@@ -161,7 +161,7 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | DATA-01 | Phase 2 | Complete |
 | DATA-02 | Phase 2 | Complete |
 | DATA-03 | Phase 2 | Complete |
-| DATA-04 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Complete |
 | DATA-05 | Phase 2 | Complete |
 | DATA-06 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Complete |
@@ -220,4 +220,4 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-04-30 after initial definition*
+*Last updated: 2026-05-01 — Phase 2 complete: DATA-01..08 all marked complete after Plan 02-06 refresh orchestrator shipped*

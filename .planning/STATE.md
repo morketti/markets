@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 4
+current_plan: 6
 status: executing
-last_updated: "2026-05-01T12:07:25.843Z"
+last_updated: "2026-05-01T12:30:00.000Z"
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # State: Markets
@@ -20,22 +20,22 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 2 Wave 2 nearly complete. Plans 02-01 (foundation), 02-02 (prices/fundamentals), 02-03 (EDGAR filings), 02-05 (social) shipped. Plan 02-04 (news/RSS) still in flight (parallel). Plan 02-06 (refresh orchestrator) gates on 02-04 finishing.
+**Current focus:** Phase 2 COMPLETE. All 6 plans shipped (02-01 foundation, 02-02 prices/fundamentals, 02-03 EDGAR filings, 02-04 news, 02-05 social, 02-06 refresh orchestrator). DATA-01..08 all marked complete. Next: Phase 3 (Analytical Agents — Deterministic Scoring) consumes the per-ticker Snapshot schema produced by Plan 02-06.
 
 ## Current Phase
 
 **Phase:** 02-ingestion-keyless-data-plane
-**Status:** Ready to execute
-**Current Plan:** 4
+**Status:** Complete (6/6 plans — pending verify)
+**Current Plan:** 6
 **Total Plans in Phase:** 6
-**Next:** Wait for 02-04 + 02-05 parallel execution to complete, then run 02-06 (refresh orchestrator) to integrate all four Wave-2 sources.
+**Next:** Begin Phase 3 (Analytical Agents — Deterministic Scoring) — fundamentals analyst, technicals analyst, news/sentiment analyst, valuation analyst all consuming the per-ticker Snapshot schema from Plan 02-06.
 
 ## Phase Status
 
 | # | Phase | Status |
 |---|-------|--------|
 | 1 | Foundation — Watchlist + Per-Ticker Config | Complete (5/5 plans) — pending verify |
-| 2 | Ingestion — Keyless Data Plane | In progress (3/6 plans — Wave 1 + 02-02 + 02-03 done; 02-04 + 02-05 parallel) |
+| 2 | Ingestion — Keyless Data Plane | Complete (6/6 plans — pending verify) |
 | 3 | Analytical Agents — Deterministic Scoring | Pending |
 | 4 | Position-Adjustment Radar | Pending |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Pending |
@@ -85,4 +85,6 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 ## Last Touched
 
-2026-05-01 after Phase 2 / Plan 05 (social ingestion) execution complete; commits `8ed1a9c` (RED 14 tests + 3 fixtures), `284c168` (GREEN ingestion/social.py + 11 coverage-completing tests). Phase 2 progress: 4/6 plans complete (Wave 1 + 02-02 + 02-03 + 02-05; 02-04 still in parallel; 02-06 gated). Coverage on ingestion/social.py: 94% line / 96% branch. Plan-scoped suite (tests/ingestion/) 120/120 green. Next: wait for Plan 02-04 (news/RSS) parallel completion, then Plan 02-06 (refresh orchestrator) integrates all four Wave-2 sources.
+2026-05-01 after Phase 2 / Plan 06 (refresh orchestrator) execution complete; commits `13b8b41` (combined RED — Snapshot+Manifest schema tests + orchestrator probe tests), `ee32f98` (Task 1 GREEN — Snapshot + Manifest Pydantic models with atomic writer), `38c0ae5` (Task 2 GREEN — run_refresh orchestrator with partial-failure isolation + deterministic snapshot writes), `7c9358d` (Task 3 RED — markets refresh CLI tests), `30eaea3` (Task 3 GREEN — cli/refresh.py + cli/main.py SUBCOMMANDS extension via the documented +4-line precedent). 22 new tests across both test files (16 in tests/ingestion/test_refresh.py + 6 in tests/test_cli_refresh.py); coverage: snapshot.py 100%/100%, manifest.py 100% line, refresh.py 91%/100%, cli/refresh.py 100%/100%. Full repo suite 177/177 green. **Phase 2 status: COMPLETE** — DATA-01..08 all flipped to `[x]` in REQUIREMENTS.md (DATA-04 had been pending; flipped during this Phase-2 closeout pass). Next: Phase 3 (Analytical Agents) kickoff.
+
+- **2026-05-01 (Phase 2 / Plan 06 — refresh orchestrator)**: Plan integrates all 5 Wave-2 ingestion modules into a single end-to-end refresh routine with deterministic JSON output. `analysts/data/snapshot.py` (71 lines) ships `Snapshot` per-ticker aggregate (prices/fundamentals/filings/news/social + errors list). `ingestion/manifest.py` (105 lines) ships `Manifest`/`TickerOutcome` + symmetric `write_manifest`/`read_manifest` (atomic-write parity with `watchlist/loader.save_watchlist`). `ingestion/refresh.py` (261 lines) ships `run_refresh(*, watchlist_path, snapshots_root, only_ticker, now)`: per-source try/except isolation in `_fetch_one`, snapshot atomic writer in `_write_snapshot`, deterministic-clock contract (`now if now is not None else datetime.now(timezone.utc)` for both run_started_at AND run_completed_at when `now` is supplied — frozen-time runs produce byte-identical files). `cli/refresh.py` (80 lines) ships the thin shim → run_refresh; ticker normalized at the CLI layer (un-normalizable → exit 1, no orchestrator call); summary printed; errors echoed to stderr; exit 0 always (errors are data, not faults). `cli/main.py` SUBCOMMANDS extended via the documented +4-line precedent (1 import + 1 dict entry, zero dispatcher edits). **Decisions:** (1) Snapshot.errors is list[str] (not dict) — source attribution encoded in the string. (2) data_unavailable propagates iff every sub-source returns nothing useful (DATA-07 contract). (3) TickerOutcome.success couples to the same any_useful predicate; per-source weather doesn't flip success when other sources produced. (4) manifest.errors is run-level only (failed-to-load-watchlist, only_ticker miss); per-ticker errors stay in TickerOutcome. (5) Snapshot-write OSError is caught at orchestrator level → converts to outcome.error="snapshot write failed: ..."; the run keeps moving. (6) `read_manifest` shipped alongside `write_manifest` (Rule 2 — symmetric reader locks the schema; Phase 8 mid-day refresh will need it for staleness checks). 22 tests green, coverage gates cleared (snapshot 100%/100%, manifest 100% line, refresh 91%/100%, cli/refresh 100%/100%); full repo 177/177. **Probes:** 2-W3-01 (`test_full_refresh` + `test_only_ticker`), 2-W3-02 (`test_partial_failure` + `test_partial_failure_all_sources_fail`), 2-W3-03 (`test_manifest_schema` + `test_write_manifest_atomic` + `test_read_manifest_round_trip`), 2-W3-04 (`test_determinism`), 2-W3-05 (`test_refresh_no_arg_invokes_full_refresh` + 5 CLI siblings). DATA-06 + DATA-07 marked complete; DATA-04 (news, shipped earlier under 02-04 but not previously ticked) flipped to `[x]` during this Phase-2 closeout. **Deviations:** 2 auto-fixed (1 cosmetic — Task 1 RED + Task 2 RED tests committed together as `13b8b41` since they share fixtures; 1 Rule 2 — added `read_manifest` symmetric reader for schema-locking). Plan-level commits: `13b8b41` / `ee32f98` / `38c0ae5` / `7c9358d` / `30eaea3`.
