@@ -50,7 +50,7 @@ Wave 0 installs: `responses>=0.25` (HTTP mocking lib for ingestion tests). Exist
 | 2-W2-05 | 02-02 | 2 | DATA-06 (fundamentals missing keys) | unit | `uv run pytest tests/ingestion/test_fundamentals.py::test_fund_missing -v` | ❌ W0 | ⬜ pending |
 | 2-W2-06 | 02-03 | 2 | DATA-03 (EDGAR happy) | unit | `uv run pytest tests/ingestion/test_filings.py::test_filings_happy -v` | ❌ W0 | ⬜ pending |
 | 2-W2-07 | 02-03 | 2 | DATA-03 (EDGAR 403 without UA) | unit | `uv run pytest tests/ingestion/test_filings.py::test_filings_403 -v` | ❌ W0 | ⬜ pending |
-| 2-W2-08 | 02-03 | 2 | DATA-03 (EDGAR 429 retry) | unit | `uv run pytest tests/ingestion/test_filings.py::test_filings_429 -v` | ❌ W0 | ⬜ pending |
+| 2-W2-08 | 02-03 | 2 | DATA-03 (EDGAR 429 retry) | unit | `uv run pytest tests/ingestion/test_filings.py::test_filings_429_retry -v` | ❌ W0 | ⬜ pending |
 | 2-W2-09 | 02-04 | 2 | DATA-04 (Yahoo RSS parse) | unit | `uv run pytest tests/ingestion/test_news.py::test_yahoo_rss -v` | ❌ W0 | ⬜ pending |
 | 2-W2-10 | 02-04 | 2 | DATA-04 (Google News parse) | unit | `uv run pytest tests/ingestion/test_news.py::test_google_news -v` | ❌ W0 | ⬜ pending |
 | 2-W2-11 | 02-04 | 2 | DATA-04 (cross-source dedup) | unit | `uv run pytest tests/ingestion/test_news.py::test_dedup -v` | ❌ W0 | ⬜ pending |

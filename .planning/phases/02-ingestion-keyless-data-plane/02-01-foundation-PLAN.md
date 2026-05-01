@@ -285,7 +285,8 @@ class SocialSignal(BaseModel):
     9. Run `uv sync --reinstall-package markets` (per STATE.md hatchling gotcha — reinstall the editable wheel because new packages were added). If `uv` is not on PATH, prepend `C:/Users/Mohan/AppData/Roaming/Python/Python314/Scripts/` per STATE.md note.
   </action>
   <verify>
-    <automated>uv sync --reinstall-package markets &amp;&amp; uv run python -c "import ingestion; import ingestion.http; import ingestion.errors; import analysts.data; from analysts.data import prices, fundamentals, filings, news, social" 2>&amp;1 || echo "EXPECTED-PARTIAL: prices/fundamentals/etc don't exist yet — that's fine, they land in Task 3"</automated>
+    <automated>uv sync --reinstall-package markets &amp;&amp; uv run python -c "import ingestion; import ingestion.http; import ingestion.errors"</automated>
+    <note>The `analysts.data.*` submodules don't exist until Task 3 — they are NOT verified at Task 1 time. The Task-1 verify must FAIL LOUDLY if `uv sync` fails (don't mask it with `|| echo`). Submodule imports are reverified in Task 3's automated check.</note>
   </verify>
   <done>pyproject.toml updated with 5 runtime + 1 dev dep + ingestion package + coverage source. uv sync reinstalls the wheel cleanly. ingestion/http.py + ingestion/errors.py importable. tests/ingestion/ skeleton in place with fixtures/ dir.</done>
 </task>

@@ -296,8 +296,8 @@ def refresh_command(args: argparse.Namespace) -> int:
          - if only_ticker: normalized = normalize_ticker(only_ticker); if normalized not in tickers_to_process: errors_run.append(f"ticker {only_ticker} not in watchlist"); tickers_to_process = []; else: tickers_to_process = [normalized]
          - outcomes: list[TickerOutcome] = []
          - for t in tickers_to_process: snap, outcome = _fetch_one(t, now); _write_snapshot(snap, snapshot_dir); outcomes.append(outcome)
-         - manifest = Manifest(schema_version=1, run_started_at=run_started_at, run_completed_at=datetime.now(timezone.utc) if now else now, snapshot_date=snapshot_date, tickers=outcomes, errors=errors_run)
-           — IMPORTANT for determinism (probe 2-W3-04): when `now` is supplied (test mode), set run_completed_at = now too (no real clock). When `now` is None (production), use the real clock.
+         - manifest = Manifest(schema_version=1, run_started_at=run_started_at, run_completed_at=(now if now is not None else datetime.now(timezone.utc)), snapshot_date=snapshot_date, tickers=outcomes, errors=errors_run)
+           — IMPORTANT for determinism (probe 2-W3-04): when `now` is supplied (test mode), set run_completed_at=now too (no real clock). When `now` is None (production), use the real clock. The expression `(now if now is not None else datetime.now(...))` honors this — do NOT write `datetime.now(...) if now else now` (inverted: yields None when now is None and breaks Pydantic validation).
          - write_manifest(manifest, snapshot_dir)
          - return manifest.
     5. Run `uv run pytest tests/ingestion/test_refresh.py -v` → all green.
