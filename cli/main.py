@@ -1,21 +1,70 @@
-"""CLI dispatcher entry point for the `markets` console script.
+"""CLI dispatcher entry point — `markets` console script.
 
-This is a placeholder. The full argparse subcommand dispatcher lands in
-Plan 04 (CLI Core). See ../analysts/schemas.py and ../watchlist/loader.py
-for the underlying data layer (Plans 02 and 03).
+Subcommands register via the SUBCOMMANDS dict. Plan 05 will extend this with
+`list` and `show` by appending two entries; the rest of the dispatcher stays
+unchanged. This is the documented extension point — see PLAN.md frontmatter
+key_links.
+
+Exception strategy:
+- pydantic.ValidationError → format_validation_error → stderr → exit 2
+- FileNotFoundError → simple stderr message → exit 1
+- Other exceptions propagate (debug-friendly during development)
 """
 from __future__ import annotations
 
+import argparse
 import sys
+from typing import Callable
+
+from pydantic import ValidationError
+
+from cli._errors import format_validation_error
+from cli.add_ticker import add_command, build_add_parser
+from cli.remove_ticker import build_remove_parser, remove_command
+
+# Plan 05 will append two more entries (list, show) to this dict.
+# Each value is (parser_builder, command_handler).
+SUBCOMMANDS: dict[
+    str,
+    tuple[
+        Callable[[argparse.ArgumentParser], None],
+        Callable[[argparse.Namespace], int],
+    ],
+] = {
+    "add": (build_add_parser, add_command),
+    "remove": (build_remove_parser, remove_command),
+}
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the argparse parser with all registered subcommands."""
+    parser = argparse.ArgumentParser(
+        prog="markets",
+        description="watchlist management — add/remove tickers and per-ticker config",
+    )
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    for name, (build, _handler) in SUBCOMMANDS.items():
+        build(sub.add_parser(name, help=f"{name} subcommand"))
+    return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Console-script entry point. Returns a process exit code.
+    """Console-script entry. Returns process exit code.
 
-    Replaced in Plan 04 with the full argparse dispatcher (add/remove/list/show).
+    `argv=None` lets argparse use `sys.argv[1:]`; explicit-None enables
+    test injection (pass a list of args directly).
     """
-    print("markets: CLI not yet implemented (Phase 1 Plan 04)", file=sys.stderr)
-    return 1
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    try:
+        _build, handler = SUBCOMMANDS[args.cmd]
+        return handler(args)
+    except ValidationError as e:
+        print(format_validation_error(e), file=sys.stderr)
+        return 2
+    except FileNotFoundError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
