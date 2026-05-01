@@ -1,0 +1,10 @@
+{
+  "response": {"status": 200},
+  "symbols": [
+    {"symbol": "TSLA", "title": "Tesla, Inc.", "id": 8849, "watchlist_count": 1500000},
+    {"symbol": "AAPL", "title": "Apple Inc.", "id": 686, "watchlist_count": 2000000},
+    {"symbol": "NVDA", "title": "NVIDIA Corporation", "id": 3735, "watchlist_count": 1200000},
+    {"symbol": "GME", "title": "GameStop Corp.", "id": 33179, "watchlist_count": 500000},
+    {"symbol": "AMC", "title": "AMC Entertainment Holdings Inc", "id": 26430, "watchlist_count": 400000}
+  ]
+}

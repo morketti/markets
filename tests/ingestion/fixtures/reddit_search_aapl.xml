@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <category term="search" label="search results"/>
+  <updated>2026-04-30T15:30:00+00:00</updated>
+  <id>/search.rss?q=AAPL+OR+%24AAPL</id>
+  <link rel="self" href="https://www.reddit.com/search.rss?q=AAPL+OR+%24AAPL&amp;sort=new&amp;t=day"/>
+  <title>search results for AAPL OR $AAPL</title>
+  <entry>
+    <author>
+      <name>/u/wsb_user_one</name>
+      <uri>https://www.reddit.com/user/wsb_user_one</uri>
+    </author>
+    <category term="wallstreetbets" label="r/wallstreetbets"/>
+    <content type="html">&lt;p&gt;Yolo on AAPL puts before earnings, what could go wrong&lt;/p&gt;</content>
+    <id>t3_aaa111</id>
+    <link href="https://www.reddit.com/r/wallstreetbets/comments/aaa111/aapl_earnings_yolo/"/>
+    <updated>2026-04-30T15:00:00+00:00</updated>
+    <published>2026-04-30T15:00:00+00:00</published>
+    <title>AAPL earnings yolo - puts or calls?</title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/stocks_user_two</name>
+      <uri>https://www.reddit.com/user/stocks_user_two</uri>
+    </author>
+    <category term="stocks" label="r/stocks"/>
+    <content type="html">&lt;p&gt;AAPL services revenue continues to grow, long-term thesis intact&lt;/p&gt;</content>
+    <id>t3_bbb222</id>
+    <link href="https://www.reddit.com/r/stocks/comments/bbb222/aapl_services_growth/"/>
+    <updated>2026-04-30T14:30:00+00:00</updated>
+    <published>2026-04-30T14:30:00+00:00</published>
+    <title>AAPL services revenue growth analysis</title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/investing_user_three</name>
+      <uri>https://www.reddit.com/user/investing_user_three</uri>
+    </author>
+    <category term="investing" label="r/investing"/>
+    <content type="html">&lt;p&gt;Apple's capital return program details&lt;/p&gt;</content>
+    <id>t3_ccc333</id>
+    <link href="https://www.reddit.com/r/investing/comments/ccc333/aapl_buybacks/"/>
+    <updated>2026-04-30T14:00:00+00:00</updated>
+    <published>2026-04-30T14:00:00+00:00</published>
+    <title>AAPL buyback authorization analysis</title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/wsb_user_four</name>
+      <uri>https://www.reddit.com/user/wsb_user_four</uri>
+    </author>
+    <category term="wallstreetbets" label="r/wallstreetbets"/>
+    <content type="html">&lt;p&gt;AAPL chart breakout watch&lt;/p&gt;</content>
+    <id>t3_ddd444</id>
+    <link href="https://www.reddit.com/r/wallstreetbets/comments/ddd444/aapl_breakout/"/>
+    <updated>2026-04-30T13:00:00+00:00</updated>
+    <published>2026-04-30T13:00:00+00:00</published>
+    <title>$AAPL technical breakout incoming?</title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/stocks_user_five</name>
+      <uri>https://www.reddit.com/user/stocks_user_five</uri>
+    </author>
+    <category term="stocks" label="r/stocks"/>
+    <content type="html">&lt;p&gt;Apple supplier news&lt;/p&gt;</content>
+    <id>t3_eee555</id>
+    <link href="https://www.reddit.com/r/stocks/comments/eee555/aapl_supplier_news/"/>
+    <updated>2026-04-30T12:30:00+00:00</updated>
+    <published>2026-04-30T12:30:00+00:00</published>
+    <title>AAPL supplier capacity expansion confirmed</title>
+  </entry>
+  <entry>
+    <author>
+      <name>/u/investing_user_six</name>
+      <uri>https://www.reddit.com/user/investing_user_six</uri>
+    </author>
+    <category term="investing" label="r/investing"/>
+    <content type="html">&lt;p&gt;DCF for AAPL&lt;/p&gt;</content>
+    <id>t3_fff666</id>
+    <link href="https://www.reddit.com/r/investing/comments/fff666/aapl_dcf/"/>
+    <updated>2026-04-30T12:00:00+00:00</updated>
+    <published>2026-04-30T12:00:00+00:00</published>
+    <title>AAPL DCF — what discount rate are you using?</title>
+  </entry>
+</feed>
