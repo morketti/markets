@@ -9,7 +9,7 @@
 
 | # | Phase | Goal | Requirements | Success Criteria | Dependencies |
 |---|-------|------|--------------|------------------|--------------|
-| 1 | 1/5 | In Progress|  | 4 | — |
+| 1 | 2/5 | In Progress|  | 4 | — |
 | 2 | Ingestion — Keyless Data Plane | All data fetched without API keys, validated, with fallbacks | DATA-01..08 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |

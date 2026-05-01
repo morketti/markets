@@ -1,3 +1,17 @@
+---
+gmd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+current_plan: 3
+status: executing
+last_updated: "2026-05-01T04:03:25.641Z"
+progress:
+  total_phases: 9
+  completed_phases: 0
+  total_plans: 5
+  completed_plans: 2
+---
+
 # State: Markets
 
 ## Project Reference
@@ -6,15 +20,15 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 1 in progress — Plan 01 (scaffold) complete; Plan 02 (schemas) is next.
+**Current focus:** Phase 1 in progress — Plans 01 (scaffold) and 02 (schemas) complete; Plan 03 (loader) is next.
 
 ## Current Phase
 
 **Phase:** 01-foundation-watchlist-per-ticker-config
-**Status:** In Progress (1 of 5 plans complete)
-**Current Plan:** 02 — schemas
+**Status:** In Progress (2 of 5 plans complete)
+**Current Plan:** 03 — loader
 **Total Plans in Phase:** 5
-**Next:** `/gmd:execute-plan` with `01-02-schemas-PLAN.md`
+**Next:** `/gmd:execute-plan` with `01-03-loader-PLAN.md`
 
 ## Phase Status
 
@@ -38,6 +52,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **2026-04-30**: Research completed inline (parallel research-agent spawns hit Opus quota; agents resumable at 3:50pm Chicago via SendMessage to agent IDs `ad9c4b82904461fce`, `a78c5f332fe5fa097`, `a14f95a61bb93489b` if cross-check desired). Five research docs produced: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md, SUMMARY.md.
 - **2026-05-01 (Phase 1 / Plan 01 — scaffold)**: uv-managed Python project bootstrapped. Pydantic 2.13.3, pytest 9.0.3, pytest-cov 7.1.0, ruff 0.15.12 installed. Three importable packages (analysts/, watchlist/, cli/) created. `markets` console script wired end-to-end (verified). `tests/conftest.py` exposes empty/seeded/large watchlist fixtures with lazy schema imports. Pytest framework wired (collect-only exits 5, no ImportError). Plan-level commits: `fb3fad7`, `d3794ce`, `758a2fb`. Five WATCH-0* requirements marked complete in REQUIREMENTS.md.
 - **2026-05-01 (deviations during Plan 01)**: (1) `uv` not installed on host — installed via `python -m pip install --user uv` to `C:/Users/Mohan/AppData/Roaming/Python/Python314/Scripts/`. (2) `uv run markets` failed after Task 2 with `ModuleNotFoundError: No module named 'cli'` — initial wheel was built before package directories existed; fixed with `uv sync --reinstall-package markets`. Both Rule 3 (blocking environmental) auto-fixes — no design changes.
+- **2026-05-01 (Phase 1 / Plan 02 — schemas)**: Pydantic v2 schemas locked. `analysts/schemas.py` (171 lines) ships `TechnicalLevels`, `FundamentalTargets`, `TickerConfig`, `Watchlist` + module-level `normalize_ticker(s)` helper. 8/8 schema tests green; coverage 99% line / 98.89% branch (gate ≥95%). Hyphen-form normalization verified (BRK.B/BRK_B/BRK/B/brk-b → BRK-B). All cross-field rules use `@model_validator(mode='after')`. **Decision:** `normalize_ticker` extracted to module level (single source of truth) — Plans 04/05 will `from analysts.schemas import normalize_ticker` and reuse directly, no duplication. **Decision:** Strict watchlist key mode — dict-key/value.ticker mismatch raises `ValidationError` naming the offender, never silently rewrites. WATCH-04 + WATCH-05 covered (already marked `[x]` in REQUIREMENTS.md from Plan 01 over-attribution; behavior now actually delivered). Plan-level commits: `66795a2` (RED test), `87aaa4e` (GREEN impl). Zero deviations from plan.
 
 ## Context Notes
 
@@ -64,4 +79,4 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 ## Last Touched
 
-2026-05-01 after Plan 01 (scaffold) execution complete; commits `fb3fad7`, `d3794ce`, `758a2fb`
+2026-05-01 after Plan 02 (schemas) execution complete; commits `66795a2` (RED), `87aaa4e` (GREEN). Next: Plan 03 (loader).
