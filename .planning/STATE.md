@@ -2,9 +2,9 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 05 — CLI readonly + example
-status: verifying
-last_updated: "2026-05-01T04:26:16.918Z"
+current_plan: Not started
+status: planning
+last_updated: "2026-05-01T04:42:21.091Z"
 progress:
   total_phases: 9
   completed_phases: 1
@@ -25,8 +25,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 01-foundation-watchlist-per-ticker-config
-**Status:** Phase complete — ready for verification
-**Current Plan:** 05 — CLI readonly + example (complete)
+**Status:** Ready to plan
+**Current Plan:** Not started
 **Total Plans in Phase:** 5
 **Next:** `/gmd:verify-work` to confirm all 21 Phase 1 probes pass, then `/gmd:plan-phase 2`.
 
