@@ -21,6 +21,7 @@ from pydantic import ValidationError
 from cli._errors import format_validation_error
 from cli.add_ticker import add_command, build_add_parser
 from cli.list_watchlist import build_list_parser, list_command
+from cli.refresh import build_refresh_parser, refresh_command
 from cli.remove_ticker import build_remove_parser, remove_command
 from cli.show_ticker import build_show_parser, show_command
 
@@ -37,6 +38,7 @@ SUBCOMMANDS: dict[
     "remove": (build_remove_parser, remove_command),
     "list": (build_list_parser, list_command),
     "show": (build_show_parser, show_command),
+    "refresh": (build_refresh_parser, refresh_command),
 }
 
 
