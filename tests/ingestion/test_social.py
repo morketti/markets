@@ -370,3 +370,240 @@ def test_fetch_social_invalid_ticker():
     assert sig.reddit_posts == []
     assert sig.stocktwits_posts == []
     assert sig.trending_rank is None
+
+
+# ---------------------------------------------------------------------------
+# Coverage-completing tests — defensive paths
+# ---------------------------------------------------------------------------
+
+
+@responses.activate
+def test_reddit_http_layer_exception(monkeypatch):
+    """A requests-layer exception (connection error) → empty list."""
+    from ingestion import social as social_module
+
+    class _BoomSession:
+        headers = {"User-Agent": "test"}
+
+        def get(self, *args, **kwargs):
+            raise ConnectionError("DNS exploded")
+
+    monkeypatch.setattr(social_module, "get_session", lambda: _BoomSession())
+    assert _fetch_reddit_search("AAPL") == []
+
+
+def test_stocktwits_trending_http_layer_exception(monkeypatch):
+    """A requests-layer exception on trending → empty list."""
+    from ingestion import social as social_module
+
+    class _BoomSession:
+        def get(self, *args, **kwargs):
+            raise ConnectionError("network down")
+
+    monkeypatch.setattr(social_module, "get_session", lambda: _BoomSession())
+    assert _fetch_stocktwits_trending() == []
+
+
+def test_stocktwits_stream_http_layer_exception(monkeypatch):
+    """A requests-layer exception on stream → empty list."""
+    from ingestion import social as social_module
+
+    class _BoomSession:
+        def get(self, *args, **kwargs):
+            raise ConnectionError("network down")
+
+    monkeypatch.setattr(social_module, "get_session", lambda: _BoomSession())
+    assert _fetch_stocktwits_stream("AAPL") == []
+
+
+@responses.activate
+def test_stocktwits_stream_malformed_json():
+    """200 with non-JSON body on stream → empty list."""
+    responses.add(
+        responses.GET,
+        _stream_url_for("AAPL"),
+        body="not json at all",
+        status=200,
+        content_type="application/json",
+    )
+    assert _fetch_stocktwits_stream("AAPL") == []
+
+
+@responses.activate
+def test_stocktwits_trending_top_level_not_dict():
+    """200 with JSON array (not dict) on trending → empty list."""
+    responses.add(
+        responses.GET,
+        STOCKTWITS_TRENDING_URL,
+        body='["TSLA", "AAPL"]',
+        status=200,
+        content_type="application/json",
+    )
+    assert _fetch_stocktwits_trending() == []
+
+
+@responses.activate
+def test_stocktwits_trending_drops_malformed_entries():
+    """Entries that are not dicts or lack 'symbol' key are filtered out."""
+    body = (
+        '{"response": {"status": 200}, "symbols": ['
+        '"not_a_dict",'
+        '{"no_symbol": "TSLA"},'
+        '{"symbol": null},'
+        '{"symbol": ""},'
+        '{"symbol": "valid"}'
+        ']}'
+    )
+    responses.add(
+        responses.GET,
+        STOCKTWITS_TRENDING_URL,
+        body=body,
+        status=200,
+        content_type="application/json",
+    )
+    assert _fetch_stocktwits_trending() == ["VALID"]
+
+
+@responses.activate
+def test_stocktwits_stream_top_level_not_dict():
+    """200 with JSON array (not dict) on stream → empty list."""
+    responses.add(
+        responses.GET,
+        _stream_url_for("AAPL"),
+        body='["whatever"]',
+        status=200,
+        content_type="application/json",
+    )
+    assert _fetch_stocktwits_stream("AAPL") == []
+
+
+@responses.activate
+def test_stocktwits_stream_drops_malformed_messages():
+    """Messages missing body / non-dict / empty body are skipped; valid ones survive."""
+    body = (
+        '{"response": {"status": 200}, "messages": ['
+        '"not_a_dict",'
+        '{"id": 1},'
+        '{"id": 2, "body": ""},'
+        '{"id": 3, "body": "   "},'
+        '{"id": 4, "body": "good post", "created_at": "not-an-iso", "entities": null},'
+        '{"id": 5, "body": "novel sentiment", "entities": {"sentiment": {"basic": "Neutral"}}},'
+        '{"id": 6, "body": "non-dict sentiment", "entities": {"sentiment": "weird"}},'
+        '{"id": 7, "body": "non-string basic", "entities": {"sentiment": {"basic": 42}}}'
+        ']}'
+    )
+    responses.add(
+        responses.GET,
+        _stream_url_for("AAPL"),
+        body=body,
+        status=200,
+        content_type="application/json",
+    )
+    posts = _fetch_stocktwits_stream("AAPL")
+    # All 4 well-formed bodies (ids 4,5,6,7) survive; sentiment normalizes to None for non-bull/bear
+    assert len(posts) == 4
+    assert all(p.sentiment is None for p in posts)
+    # The bad created_at on id=4 falls back to None
+    assert posts[0].created_at is None
+
+
+@responses.activate
+def test_reddit_drops_entries_without_subreddit_or_link():
+    """Entries with empty title, missing link, non-http link, or no subreddit get skipped."""
+    bad_xml = """<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>broken results</title>
+  <entry>
+    <title></title>
+    <link href="https://www.reddit.com/r/wallstreetbets/comments/x/y/"/>
+    <id>t3_empty_title</id>
+  </entry>
+  <entry>
+    <title>Valid title but no link</title>
+    <id>t3_no_link</id>
+  </entry>
+  <entry>
+    <title>Title with non-http link</title>
+    <link href="ftp://reddit.com/foo"/>
+    <id>t3_bad_scheme</id>
+  </entry>
+  <entry>
+    <title>Title with link but no subreddit</title>
+    <link href="https://www.reddit.com/some/other/path/"/>
+    <id>t3_no_subreddit</id>
+  </entry>
+  <entry>
+    <title>Falls back to category tag</title>
+    <link href="https://www.reddit.com/some/other/path/"/>
+    <category term="stocks" label="r/stocks"/>
+    <id>t3_category_fallback</id>
+    <updated>2026-04-30T15:00:00+00:00</updated>
+    <published>2026-04-30T15:00:00+00:00</published>
+  </entry>
+  <entry>
+    <title>Valid normal entry</title>
+    <link href="https://www.reddit.com/r/investing/comments/abc/def/"/>
+    <id>t3_normal</id>
+  </entry>
+</feed>
+"""
+    responses.add(
+        responses.GET,
+        _reddit_url_for("AAPL"),
+        body=bad_xml,
+        status=200,
+        content_type="application/atom+xml",
+    )
+    posts = _fetch_reddit_search("AAPL")
+    # 2 should survive: the category-fallback one and the normal one
+    titles = [p.title for p in posts]
+    subs = [p.subreddit for p in posts]
+    assert "Falls back to category tag" in titles
+    assert "Valid normal entry" in titles
+    assert "stocks" in subs
+    assert "investing" in subs
+    # The 4 broken entries are filtered out
+    assert len(posts) == 2
+
+
+@responses.activate
+def test_reddit_long_title_truncated_not_rejected():
+    """A title over 500 chars is sliced to 500 (max_length) — not dropped."""
+    long_title = "AAPL " * 200  # 1000 chars
+    long_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>long-title test</title>
+  <entry>
+    <title>{long_title}</title>
+    <link href="https://www.reddit.com/r/wallstreetbets/comments/abc/def/"/>
+    <id>t3_long</id>
+  </entry>
+</feed>
+"""
+    responses.add(
+        responses.GET,
+        _reddit_url_for("AAPL"),
+        body=long_xml,
+        status=200,
+        content_type="application/atom+xml",
+    )
+    posts = _fetch_reddit_search("AAPL")
+    assert len(posts) == 1
+    assert len(posts[0].title) == 500
+    assert posts[0].subreddit == "wallstreetbets"
+
+
+def test_parse_iso8601_handles_bad_input():
+    """Internal helper: None / empty / non-string / unparseable returns None."""
+    from ingestion.social import _parse_iso8601
+
+    assert _parse_iso8601(None) is None
+    assert _parse_iso8601("") is None
+    assert _parse_iso8601(12345) is None  # non-string
+    assert _parse_iso8601("totally not a date") is None
+    # Valid Z-form parses
+    dt = _parse_iso8601("2026-04-30T13:15:00Z")
+    assert dt is not None
+    assert dt.year == 2026
+    assert dt.month == 4
+    assert dt.tzinfo is not None
