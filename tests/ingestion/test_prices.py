@@ -20,7 +20,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
-import pytest
 import requests
 
 from analysts.data.prices import PriceSnapshot
@@ -154,4 +153,110 @@ def test_prices_yfinance_constructor_raises(fixtures_dir: Path) -> None:
         result = fetch_prices("AAPL")
 
     assert isinstance(result, PriceSnapshot)
+    assert result.data_unavailable is True
+
+
+def test_prices_uses_history_close_when_fast_info_and_info_both_missing(fixtures_dir: Path) -> None:
+    """Sanity-fallback path: yfinance returns history but neither fast_info
+    nor info supply a positive current price. fetch_prices uses the most
+    recent close as current_price (better than failing the whole snapshot).
+    """
+    df = _load_history_df(fixtures_dir, "yfinance_aapl_history.json")
+
+    mock_ticker = MagicMock()
+    mock_ticker.history.return_value = df
+    # fast_info subscript raises KeyError (not AttributeError on the property)
+    fast_info_mock = MagicMock()
+    fast_info_mock.__getitem__.side_effect = KeyError("last_price")
+    mock_ticker.fast_info = fast_info_mock
+    # info also missing regularMarketPrice
+    mock_ticker.info = {"longName": "Apple Inc."}
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_ticker):
+        result = fetch_prices("AAPL")
+
+    # Falls back to last bar close — known from fixture: 224.0
+    assert result.source == "yfinance"
+    assert result.data_unavailable is False
+    assert result.current_price == 224.0
+    assert len(result.history) == 60
+
+
+def test_prices_yfinance_info_raises_falls_to_last_close(fixtures_dir: Path) -> None:
+    """yfinance returns history but BOTH fast_info AND info raise exceptions
+    (e.g., yfinance internal lazy-loader hit a 503). fetch_prices falls back
+    to last bar close — exercises the info except-pass branch."""
+    df = _load_history_df(fixtures_dir, "yfinance_aapl_history.json")
+
+    mock_yf = MagicMock()
+    mock_yf.history.return_value = df
+    type(mock_yf).fast_info = property(
+        lambda self: (_ for _ in ()).throw(AttributeError())
+    )
+    type(mock_yf).info = property(
+        lambda self: (_ for _ in ()).throw(KeyError("info"))
+    )
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_yf):
+        result = fetch_prices("AAPL")
+
+    # Should still succeed — falls back to last bar close (224.0 from fixture)
+    assert result.source == "yfinance"
+    assert result.data_unavailable is False
+    assert result.current_price == 224.0
+
+
+def test_prices_yfinance_zero_price_falls_through(fixtures_dir: Path) -> None:
+    """yfinance returns history + fast_info reports last_price=0 (Pitfall #1
+    sanity-check fails). With history non-empty and last close > 0, we fall
+    back to last-bar close rather than declaring unavailable."""
+    df = _load_history_df(fixtures_dir, "yfinance_aapl_history.json")
+
+    mock_ticker = MagicMock()
+    mock_ticker.history.return_value = df
+    mock_ticker.fast_info = {"last_price": 0}  # broken price
+    mock_ticker.info = {"regularMarketPrice": 0}  # also broken
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_ticker):
+        result = fetch_prices("AAPL")
+
+    # Falls back to last close (224.0) since neither fast_info nor info had a positive price.
+    assert result.current_price == 224.0
+    assert result.source == "yfinance"
+
+
+def test_yahooquery_price_returns_non_dict(fixtures_dir: Path) -> None:
+    """yahooquery's .price returns a non-dict (e.g., None or a list — has
+    happened in older versions). fetch_prices treats this as a failed
+    fallback and marks data_unavailable."""
+    mock_yq_ticker = MagicMock()
+    mock_yq_ticker.price = None  # not a dict
+
+    mock_yf = MagicMock()
+    mock_yf.history.return_value = pd.DataFrame()
+    type(mock_yf).fast_info = property(lambda self: (_ for _ in ()).throw(AttributeError()))
+    mock_yf.info = {}
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_yf), \
+         patch("ingestion.prices.yahooquery.Ticker", return_value=mock_yq_ticker):
+        result = fetch_prices("AAPL")
+
+    assert result.data_unavailable is True
+
+
+def test_yahooquery_price_dict_missing_regular_market_price(fixtures_dir: Path) -> None:
+    """yahooquery returns the right shape but missing regularMarketPrice key
+    (or it's not a number)."""
+    mock_yq_ticker = MagicMock()
+    mock_yq_ticker.price = {"AAPL": {"currency": "USD"}}  # dict but no price
+
+    mock_yf = MagicMock()
+    mock_yf.history.return_value = pd.DataFrame()
+    type(mock_yf).fast_info = property(lambda self: (_ for _ in ()).throw(AttributeError()))
+    mock_yf.info = {}
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_yf), \
+         patch("ingestion.prices.yahooquery.Ticker", return_value=mock_yq_ticker):
+        result = fetch_prices("AAPL")
+
     assert result.data_unavailable is True
