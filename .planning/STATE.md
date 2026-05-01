@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 3
+current_plan: 4
 status: executing
-last_updated: "2026-05-01T04:03:25.641Z"
+last_updated: "2026-05-01T04:09:21.678Z"
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # State: Markets
@@ -20,15 +20,15 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 1 in progress — Plans 01 (scaffold) and 02 (schemas) complete; Plan 03 (loader) is next.
+**Current focus:** Phase 1 in progress — Plans 01 (scaffold), 02 (schemas), and 03 (loader) complete; Plan 04 (CLI core) is next.
 
 ## Current Phase
 
 **Phase:** 01-foundation-watchlist-per-ticker-config
-**Status:** In Progress (2 of 5 plans complete)
-**Current Plan:** 03 — loader
+**Status:** In Progress (3 of 5 plans complete)
+**Current Plan:** 04 — CLI core (add/remove)
 **Total Plans in Phase:** 5
-**Next:** `/gmd:execute-plan` with `01-03-loader-PLAN.md`
+**Next:** `/gmd:execute-plan` with `01-04-cli-core-PLAN.md`
 
 ## Phase Status
 
@@ -53,6 +53,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **2026-05-01 (Phase 1 / Plan 01 — scaffold)**: uv-managed Python project bootstrapped. Pydantic 2.13.3, pytest 9.0.3, pytest-cov 7.1.0, ruff 0.15.12 installed. Three importable packages (analysts/, watchlist/, cli/) created. `markets` console script wired end-to-end (verified). `tests/conftest.py` exposes empty/seeded/large watchlist fixtures with lazy schema imports. Pytest framework wired (collect-only exits 5, no ImportError). Plan-level commits: `fb3fad7`, `d3794ce`, `758a2fb`. Five WATCH-0* requirements marked complete in REQUIREMENTS.md.
 - **2026-05-01 (deviations during Plan 01)**: (1) `uv` not installed on host — installed via `python -m pip install --user uv` to `C:/Users/Mohan/AppData/Roaming/Python/Python314/Scripts/`. (2) `uv run markets` failed after Task 2 with `ModuleNotFoundError: No module named 'cli'` — initial wheel was built before package directories existed; fixed with `uv sync --reinstall-package markets`. Both Rule 3 (blocking environmental) auto-fixes — no design changes.
 - **2026-05-01 (Phase 1 / Plan 02 — schemas)**: Pydantic v2 schemas locked. `analysts/schemas.py` (171 lines) ships `TechnicalLevels`, `FundamentalTargets`, `TickerConfig`, `Watchlist` + module-level `normalize_ticker(s)` helper. 8/8 schema tests green; coverage 99% line / 98.89% branch (gate ≥95%). Hyphen-form normalization verified (BRK.B/BRK_B/BRK/B/brk-b → BRK-B). All cross-field rules use `@model_validator(mode='after')`. **Decision:** `normalize_ticker` extracted to module level (single source of truth) — Plans 04/05 will `from analysts.schemas import normalize_ticker` and reuse directly, no duplication. **Decision:** Strict watchlist key mode — dict-key/value.ticker mismatch raises `ValidationError` naming the offender, never silently rewrites. WATCH-04 + WATCH-05 covered (already marked `[x]` in REQUIREMENTS.md from Plan 01 over-attribution; behavior now actually delivered). Plan-level commits: `66795a2` (RED test), `87aaa4e` (GREEN impl). Zero deviations from plan.
+- **2026-05-01 (Phase 1 / Plan 03 — loader)**: Stdlib atomic-write loader landed. `watchlist/loader.py` (69 lines) ships `load_watchlist(path)` + `save_watchlist(wl, path)` + `DEFAULT_PATH`. **Decision:** stdlib `json.dumps(model_dump(mode="json"), indent=2, sort_keys=True) + "\n"` for serialization (NOT `model_dump_json`) per CONTEXT.md correction #3 / Pydantic v2 issue #7424 — guarantees byte-identical round-trip and stable git diffs. **Decision:** `tempfile.NamedTemporaryFile(delete=False, dir=parent) ... with-block-exit ... os.replace(tmp_path, path)` per Pitfall #2 (Windows file-lock release); on OSError, `tmp_path.unlink(missing_ok=True)` then re-raise. **Decision:** `load_watchlist` on missing path returns empty `Watchlist()` (not an error) — drives first-run CLI UX. **Decision:** save_watchlist re-validates the model before persistence (defense-in-depth). 7/7 loader tests green (15/15 combined with schemas); coverage 100% line+branch (gate ≥90%); 50-ticker load measured 6.18ms (<<100ms gate); round-trip byte-identical confirmed; no orphan tmp files in any test path. **Deviation (Rule 2):** Added 7th test `test_save_cleanup_on_replace_failure` (monkeypatched `os.replace` raises OSError → asserts cleanup + re-raise) to lock the failure-cleanup contract and close the coverage gap on lines 67-69 (originally-specified 6 tests came in at 88.89% coverage). No implementation deviation from `01-RESEARCH.md` "Loader / atomic save" example. Plan-level commits: `7c1bf15` (RED), `e40f0eb` (GREEN). WATCH-01, WATCH-02, WATCH-05 confirmed covered.
 
 ## Context Notes
 
@@ -79,4 +80,4 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 ## Last Touched
 
-2026-05-01 after Plan 02 (schemas) execution complete; commits `66795a2` (RED), `87aaa4e` (GREEN). Next: Plan 03 (loader).
+2026-05-01 after Plan 03 (loader) execution complete; commits `7c1bf15` (RED), `e40f0eb` (GREEN). Next: Plan 04 (CLI core — add/remove).
