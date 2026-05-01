@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Yahoo Finance: AAPL News</title>
+    <link>https://finance.yahoo.com/quote/AAPL/news</link>
+    <description>Latest Financial News for AAPL</description>
+    <language>en-US</language>
+    <lastBuildDate>Thu, 30 Apr 2026 14:30:00 -0400</lastBuildDate>
+    <item>
+      <title>Apple beats Q1 estimates</title>
+      <link>https://finance.yahoo.com/news/apple-beats-q1-estimates-091500001.html</link>
+      <guid isPermaLink="false">yahoo-aapl-2026-04-30-09-15-001</guid>
+      <pubDate>Thu, 30 Apr 2026 09:15:00 -0400</pubDate>
+      <description>Apple Inc. reported quarterly results that exceeded analyst expectations on both revenue and earnings per share.</description>
+    </item>
+    <item>
+      <title>Apple announces new iPhone subscription bundle</title>
+      <link>https://finance.yahoo.com/news/apple-iphone-subscription-bundle-103000002.html</link>
+      <guid isPermaLink="false">yahoo-aapl-2026-04-30-10-30-002</guid>
+      <pubDate>Thu, 30 Apr 2026 10:30:00 -0400</pubDate>
+      <description>Apple unveiled a new subscription bundle that combines iPhone hardware with services.</description>
+    </item>
+    <item>
+      <title>Cupertino tech giant raises dividend by 5%</title>
+      <link>https://finance.yahoo.com/news/cupertino-tech-dividend-raise-120000003.html</link>
+      <guid isPermaLink="false">yahoo-aapl-2026-04-30-12-00-003</guid>
+      <pubDate>Thu, 30 Apr 2026 12:00:00 -0400</pubDate>
+      <description>Apple's board approved a 5% dividend hike alongside a fresh share-buyback authorization.</description>
+    </item>
+    <item>
+      <title>Analyst upgrades AAPL to buy on services momentum</title>
+      <link>https://finance.yahoo.com/news/analyst-upgrades-aapl-buy-140000004.html</link>
+      <guid isPermaLink="false">yahoo-aapl-2026-04-30-14-00-004</guid>
+      <pubDate>Thu, 30 Apr 2026 14:00:00 -0400</pubDate>
+      <description>A major Wall Street firm raised its rating on Apple shares citing accelerating services growth.</description>
+    </item>
+    <item>
+      <title>Apple supply chain shifts toward India</title>
+      <link>https://finance.yahoo.com/news/apple-supply-chain-india-160000005.html</link>
+      <guid isPermaLink="false">yahoo-aapl-2026-04-29-16-00-005</guid>
+      <pubDate>Wed, 29 Apr 2026 16:00:00 -0400</pubDate>
+      <description>Apple is reportedly accelerating manufacturing diversification away from China.</description>
+    </item>
+    <item>
+      <title>Apple Vision Pro 2 rumored for late 2026</title>
+      <link>https://finance.yahoo.com/news/vision-pro-2-rumor-180000006.html</link>
+      <guid isPermaLink="false">yahoo-aapl-2026-04-29-18-00-006</guid>
+      <pubDate>Wed, 29 Apr 2026 18:00:00 -0400</pubDate>
+      <description>Supply chain leaks point to a refreshed Vision Pro arriving by Q4 2026.</description>
+    </item>
+  </channel>
+</rss>
