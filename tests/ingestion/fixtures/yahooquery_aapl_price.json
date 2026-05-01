@@ -1,0 +1,14 @@
+{
+  "AAPL": {
+    "regularMarketPrice": 178.0,
+    "regularMarketTime": 1714579200,
+    "regularMarketDayHigh": 179.5,
+    "regularMarketDayLow": 177.0,
+    "regularMarketOpen": 177.5,
+    "regularMarketPreviousClose": 177.8,
+    "regularMarketVolume": 52000000,
+    "currency": "USD",
+    "marketCap": 2900000000000,
+    "shortName": "Apple Inc."
+  }
+}
