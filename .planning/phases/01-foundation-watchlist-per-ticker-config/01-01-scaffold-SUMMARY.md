@@ -89,7 +89,7 @@ Each task was committed atomically:
 2. **Task 2: Create three empty packages + placeholder cli/main.py** — `d3794ce` (feat)
 3. **Task 3: Create tests/__init__.py + tests/conftest.py with all three fixtures** — `758a2fb` (test)
 
-**Plan metadata:** _pending — final commit captures SUMMARY + STATE + ROADMAP_
+**Plan metadata:** `55bbf02` (docs: complete scaffold plan — SUMMARY + STATE + ROADMAP + REQUIREMENTS)
 
 ## Files Created/Modified
 
