@@ -8,30 +8,35 @@ files_modified:
   - cli/list_watchlist.py
   - cli/show_ticker.py
   - cli/main.py
+  - cli/_errors.py
   - tests/test_cli_readonly.py
   - watchlist.example.json
   - README.md
 autonomous: true
-requirements: [WATCH-01]
+requirements: [WATCH-01, WATCH-03]
 must_haves:
   truths:
     - "`markets list` prints all watchlist tickers in deterministic (alphabetical) order with key fields (ticker, lens, thesis, notes preview)"
     - "`markets show AAPL` prints the full TickerConfig as a human-readable structured dump"
-    - "`markets show ZZZZZ` (not in watchlist) errors cleanly with non-zero exit and 'did you mean' suggestion (mirrors remove behavior)"
+    - "`markets show ZZZZZ` (not in watchlist) errors cleanly with non-zero exit and 'did you mean' suggestion (mirrors remove behavior; WATCH-03 ergonomics)"
     - "`watchlist.example.json` exists at repo root with 5 representative tickers (AAPL, NVDA, BRK-B, GME, V) spanning all four long_term_lens values; loads cleanly via load_watchlist"
     - "README.md documents the copy-and-edit pattern: `cp watchlist.example.json watchlist.json && markets add NEW_TICKER ...`"
+    - "cli/_errors.py exposes a shared suggest_ticker(unknown, known) helper used by both remove_command and show_command — single source of truth for did-you-mean logic"
   artifacts:
     - path: "cli/list_watchlist.py"
       provides: "build_list_parser(p); list_command(args) → exit_code"
       exports: ["build_list_parser", "list_command"]
     - path: "cli/show_ticker.py"
-      provides: "build_show_parser(p); show_command(args) → exit_code"
+      provides: "build_show_parser(p); show_command(args) → exit_code; uses shared normalize_ticker (Plan 02) and suggest_ticker (cli/_errors.py)"
       exports: ["build_show_parser", "show_command"]
     - path: "cli/main.py"
       provides: "EXTENDED — adds 'list' and 'show' to SUBCOMMANDS dict from Plan 04"
       contains: "list_command, show_command imports and dict entries"
+    - path: "cli/_errors.py"
+      provides: "EXTENDED — adds suggest_ticker(unknown, known) helper (used by both show_command and remove_command)"
+      contains: "def suggest_ticker"
     - path: "tests/test_cli_readonly.py"
-      provides: "Tests for list and show subcommands; verifies WATCH-01 30+ ticker readback via list"
+      provides: "Tests for list and show subcommands; verifies WATCH-01 30+ ticker readback via list and WATCH-03 did-you-mean ergonomics via show"
       contains: "test_list_empty, test_list_with_tickers, test_list_30_plus_tickers, test_show_existing_ticker, test_show_unknown_ticker"
     - path: "watchlist.example.json"
       provides: "5-ticker seed file demonstrating the schema; spans all four long_term_lens values"
@@ -41,8 +46,16 @@ must_haves:
   key_links:
     - from: "cli/main.py:SUBCOMMANDS"
       to: "cli/list_watchlist.py:build_list_parser, list_command AND cli/show_ticker.py:build_show_parser, show_command"
-      via: "dict registration extending Plan 04's pattern"
+      via: "dict registration extending Plan 04's documented extension point"
       pattern: "\"list\": (build_list_parser, list_command)"
+    - from: "cli/show_ticker.py:show_command"
+      to: "analysts.schemas.normalize_ticker (module-level helper from Plan 02)"
+      via: "import-and-call: shared with cli/remove_ticker.py — single source of truth"
+      pattern: "from analysts.schemas import normalize_ticker"
+    - from: "cli/show_ticker.py:show_command, cli/remove_ticker.py:remove_command"
+      to: "cli/_errors.py:suggest_ticker"
+      via: "shared difflib.get_close_matches wrapper; this plan extracts the helper and updates remove_command to use it"
+      pattern: "from cli._errors import suggest_ticker"
     - from: "watchlist.example.json"
       to: "watchlist/loader.py:load_watchlist"
       via: "load test verifies the example file is valid (would catch a schema regression in the example)"
@@ -54,13 +67,13 @@ must_haves:
 ---
 
 <objective>
-Ship the read-only CLI surface (`markets list`, `markets show`), the `watchlist.example.json` seed file, and a minimal README documenting the copy-and-edit onboarding pattern. After this plan, a new user (or future-self) can clone the repo, run `cp watchlist.example.json watchlist.json && uv run markets list`, and immediately see how the system works without reading source code.
+Ship the read-only CLI surface (`markets list`, `markets show`), the `watchlist.example.json` seed file, and a minimal README documenting the copy-and-edit onboarding pattern. Also extract `suggest_ticker` to `cli/_errors.py` (shared by `show_command` and `remove_command`) — closing the deferred decision from Plan 04. After this plan, a new user (or future-self) can clone the repo, run `cp watchlist.example.json watchlist.json && uv run markets list`, and immediately see how the system works without reading source code.
 
-Purpose: Closes the "Claude's Discretion" deliverables flagged in CONTEXT.md ("Whether to include a `cli/list_watchlist.py` or `cli/show_ticker.py` for read-only inspection — recommended: yes, low cost, high QoL") and ("Whether to ship a `watchlist.example.json` with 3-5 example tickers — recommended: yes"). Also provides the WATCH-01 confirmation surface — `markets list` on a 30+ ticker file is the user-facing demo of the requirement.
+Purpose: Closes the "Claude's Discretion" deliverables flagged in CONTEXT.md ("Whether to include a `cli/list_watchlist.py` or `cli/show_ticker.py` for read-only inspection — recommended: yes, low cost, high QoL") and ("Whether to ship a `watchlist.example.json` with 3-5 example tickers — recommended: yes"). Also provides the WATCH-01 confirmation surface — `markets list` on a 30+ ticker file is the user-facing demo of the requirement. AND covers a slice of WATCH-03 — `markets show UNKNOWN` does the did-you-mean suggestion (mirroring remove ergonomics).
 
 This plan runs **in parallel with Plan 04** (same wave 4) — both touch `cli/main.py` but at the SUBCOMMANDS dict level only. Plan 04 ships a 2-entry dict; Plan 05 appends 2 more entries. Conflict surface is one block of dict literal — easy merge. To minimize friction, Plan 05 should be executed AFTER Plan 04 commits (which the wave-4 dependency ordering naturally produces).
 
-Output: 2 production files, 1 extension to `cli/main.py`, 1 test file with 5 tests, 1 example data file, 1 README. Coverage on `cli/list_watchlist.py` + `cli/show_ticker.py` ≥ 85%. WATCH-01's user-facing demo working: `markets list` on a 35-ticker file prints 35 lines.
+Output: 2 new production files (`list_watchlist.py`, `show_ticker.py`), 1 extension to `cli/main.py`, 1 extension to `cli/_errors.py`, 1 test file with 5 tests, 1 example data file, 1 README. Coverage on `cli/list_watchlist.py` + `cli/show_ticker.py` ≥ 85%. WATCH-01's user-facing demo working: `markets list` on a 35-ticker file prints 35 lines. WATCH-03 ergonomics extended: `markets show AAPK` suggests "AAPL".
 </objective>
 
 <execution_context>
@@ -104,6 +117,10 @@ def build_show_parser(p: argparse.ArgumentParser) -> None:
 def show_command(args: argparse.Namespace) -> int:
     """Print full TickerConfig as a structured dump.
     Returns 1 if ticker not in watchlist (with did-you-mean suggestion mirror of remove behavior)."""
+
+# cli/_errors.py — extended in this plan
+def suggest_ticker(unknown: str, known: list[str]) -> str | None:
+    """Wrapper around difflib.get_close_matches(n=1, cutoff=0.6). Returns first match or None."""
 ```
 
 Plan 04's `SUBCOMMANDS` dict in `cli/main.py` gets two new entries:
@@ -121,6 +138,8 @@ Plus the imports at the top of `cli/main.py`:
 from cli.list_watchlist import build_list_parser, list_command  # ADDED
 from cli.show_ticker import build_show_parser, show_command     # ADDED
 ```
+
+`cli/remove_ticker.py` (from Plan 04) gets a 1-line import update to use the shared `suggest_ticker` helper instead of inline `difflib.get_close_matches`. This is an additive refactor — Plan 04's tests stay green.
 </interfaces>
 
 <corrections_callout>
@@ -128,13 +147,15 @@ This plan inherits all three CONTEXT.md corrections from Plans 02-04 (hyphen nor
 
 One specific implication: the `watchlist.example.json` MUST use hyphenated form for BRK-B (the ticker is in the seed). If we accidentally write `BRK.B` in the example file, the file would still load (the schema normalizes) but the test `test_example_file_loads_cleanly` would catch the regression by re-saving (round-trip mismatch — the file on disk would be `BRK.B` but the loaded model has `BRK-B`, then save_watchlist writes `BRK-B`, breaking byte-identity). The test enforces correctness.
 
-The `markets show` command for an unknown ticker mirrors `markets remove` behavior — same `difflib.get_close_matches(cutoff=0.6)` suggestion logic. Code reuse: extract a `_suggest_ticker(unknown, known)` helper into `cli/_errors.py` (which is the natural shared-utilities home from Plan 04) and call from both `remove_command` and `show_command`. **This is a Plan-04-revision touch** — note in SUMMARY. Acceptable because: (a) the change is additive (new helper, doesn't break existing tests), (b) `_errors.py` is already a shared module, (c) <10 lines.
+**Shared `normalize_ticker` from Plan 02:** `cli/show_ticker.py` imports `from analysts.schemas import normalize_ticker` (module-level helper resolved during prior revision). Same module is used by `cli/remove_ticker.py` (Plan 04). No duplication; no inline regex.
+
+**Shared `suggest_ticker` from this plan:** Both `markets show UNKNOWN` and `markets remove UNKNOWN` use the same did-you-mean logic. This plan extracts a `suggest_ticker(unknown, known) -> str | None` helper into `cli/_errors.py` (the natural shared-utilities home from Plan 04) and updates BOTH `remove_command` (touching Plan 04 output) and `show_command` to use it. Single source of truth — locked, no further deferral.
 </corrections_callout>
 </context>
 
 <feature>
-  <name>cli/list_watchlist.py + cli/show_ticker.py + cli/main.py extension + watchlist.example.json + README</name>
-  <files>cli/list_watchlist.py, cli/show_ticker.py, cli/main.py, tests/test_cli_readonly.py, watchlist.example.json, README.md</files>
+  <name>cli/list_watchlist.py + cli/show_ticker.py + cli/main.py extension + cli/_errors.py extension + watchlist.example.json + README</name>
+  <files>cli/list_watchlist.py, cli/show_ticker.py, cli/main.py, cli/_errors.py, tests/test_cli_readonly.py, watchlist.example.json, README.md</files>
   <behavior>
 **`cli/list_watchlist.py:list_command(args)` behavior:**
 - Loads via `load_watchlist(args.watchlist)`
@@ -152,7 +173,7 @@ The `markets show` command for an unknown ticker mirrors `markets remove` behavi
 
 **`cli/show_ticker.py:show_command(args)` behavior:**
 - Loads via `load_watchlist(args.watchlist)`
-- Normalizes input (same logic as remove): `args.ticker` → canonical hyphen form
+- Normalizes input via shared helper from Plan 02: `normalized = normalize_ticker(args.ticker)`. If `None` → print `f"error: invalid ticker format {args.ticker!r}"` to stderr, return 2.
 - If normalized ticker present: prints structured dump:
   ```
   TICKER: AAPL
@@ -168,7 +189,13 @@ The `markets show` command for an unknown ticker mirrors `markets remove` behavi
   updated_at: 2026-04-30T12:34:56+00:00
   ```
   Returns 0.
-- If not present: same suggestion behavior as remove (uses `_suggest_ticker` helper from `cli/_errors.py`); prints `"error: ticker {X!r} not in watchlist."` plus optional `" did you mean {Y!r}?"`; returns 1.
+- If not present: same suggestion behavior as remove via shared `suggest_ticker(normalized, list(wl.tickers.keys()))` from `cli/_errors.py`; prints `"error: ticker {X!r} not in watchlist."` plus optional `" did you mean {Y!r}?"`; returns 1.
+
+**`cli/_errors.py` extension:**
+- Add `suggest_ticker(unknown, known)` wrapper around `difflib.get_close_matches(n=1, cutoff=0.6)`. Returns first match or None. ~5 lines. Tested transitively via test_remove_suggests_close_match (Plan 04) and test_show_unknown_ticker (this plan).
+
+**`cli/remove_ticker.py` update (touches Plan 04 output):**
+- Replace inline `difflib.get_close_matches(...)` call with `suggest_ticker(...)` from `cli/_errors.py`. Single-line change inside `remove_command`. Plan 04's tests (test_remove_suggests_close_match, test_remove_no_match_no_suggestion) MUST still pass without modification.
 
 **`cli/main.py` extension:**
 - Append two imports: `from cli.list_watchlist import ...` and `from cli.show_ticker import ...`
@@ -179,7 +206,7 @@ The `markets show` command for an unknown ticker mirrors `markets remove` behavi
 - 5 tickers: AAPL (value, thesis 200), NVDA (growth, notes "AI infra"), BRK-B (value), GME (contrarian, notes "volatility test"), V (mixed, pe_target 30)
 - Spans all four `long_term_lens` values
 - BRK-B uses hyphen form (NOT BRK.B) per CONTEXT.md correction #1
-- Generated by:
+- Generated by dogfooding `markets add` (proves end-to-end correctness while producing the example):
   ```
   uv run markets add AAPL --lens value --thesis 200 --watchlist watchlist.example.json
   uv run markets add NVDA --lens growth --notes "AI infra" --watchlist watchlist.example.json
@@ -187,7 +214,6 @@ The `markets show` command for an unknown ticker mirrors `markets remove` behavi
   uv run markets add GME --lens contrarian --notes "volatility test" --watchlist watchlist.example.json
   uv run markets add V --lens mixed --pe-target 30 --watchlist watchlist.example.json
   ```
-  (This dogfoods the CLI — proves end-to-end correctness while producing the example.)
 
 **`README.md` content (~50-80 lines):**
 - Project tagline (one sentence: "Personal stock research dashboard — Phase 1: Watchlist + Per-Ticker Config")
@@ -224,7 +250,7 @@ The `markets show` command for an unknown ticker mirrors `markets remove` behavi
 - `test_list_with_tickers` — call `main(["list", "--watchlist", str(seeded_watchlist_path)])`; assert exit 0, stdout contains "AAPL", "BRK-B", "NVDA"; assert order is alphabetical (AAPL before BRK-B before NVDA)
 - `test_list_30_plus_tickers` — call `main(["list", "--watchlist", str(large_watchlist_path)])`; assert exit 0, stdout contains all 35 ticker symbols (count lines minus header — should be 35) — **this is WATCH-01's user-facing demo probe**
 - `test_show_existing_ticker` — call `main(["show", "AAPL", "--watchlist", str(seeded_watchlist_path)])`; assert exit 0, stdout contains "TICKER: AAPL", "long_term_lens: value", "thesis_price: 200"
-- `test_show_unknown_ticker` — call `main(["show", "AAPK", "--watchlist", str(seeded_watchlist_path)])` (typo); assert exit 1, stdout/stderr contains "did you mean" and "AAPL"
+- `test_show_unknown_ticker` — call `main(["show", "AAPK", "--watchlist", str(seeded_watchlist_path)])` (typo); assert exit 1, stdout/stderr contains "did you mean" and "AAPL" — **this is the WATCH-03 ergonomics extension probe (show mirrors remove)**
 
 Plus an example-file integrity test (file existence may be skipped in tmp_path tests but should still verify):
 - `test_example_file_loads_cleanly` — assert `Path("watchlist.example.json").exists()` (relative to repo root); `wl = load_watchlist(Path("watchlist.example.json"))`; assert `len(wl.tickers) == 5`; assert all four lenses represented; assert `"BRK-B" in wl.tickers and "BRK.B" not in wl.tickers` (CONTEXT.md correction #1 sentinel)
@@ -238,19 +264,34 @@ For this last test, use a marker `@pytest.mark.skipif(not Path("watchlist.exampl
 1. Write `tests/test_cli_readonly.py` with 6 tests above. Imports include `from cli.main import main` and `from watchlist.loader import load_watchlist`.
 2. Run `uv run pytest tests/test_cli_readonly.py -x` — confirm all FAIL with ImportError on `cli.list_watchlist` / `cli.show_ticker` OR argparse "invalid choice: 'list'" (since they're not yet registered in the dispatcher).
 
-**GREEN — commit `feat(01-05): implement list/show + example file + README`:**
+**GREEN — commit `feat(01-05): implement list/show + example file + README + shared suggest_ticker`:**
 
-3. Refactor `cli/_errors.py` to add `_suggest_ticker(unknown, known)` helper:
+3. Extend `cli/_errors.py` with `suggest_ticker` helper:
    ```python
    import difflib
    
    def suggest_ticker(unknown: str, known: list[str]) -> str | None:
+       """Did-you-mean helper. Wraps difflib.get_close_matches with project defaults (n=1, cutoff=0.6).
+       Used by cli/show_ticker.py and cli/remove_ticker.py. Returns first match or None."""
        matches = difflib.get_close_matches(unknown, known, n=1, cutoff=0.6)
        return matches[0] if matches else None
    ```
-   Update `cli/remove_ticker.py` to use this helper instead of inline `difflib.get_close_matches` (small refactor; keeps test_cli_remove green; reduces dup).
 
-4. Write `cli/list_watchlist.py`:
+4. Update `cli/remove_ticker.py` (touches Plan 04 output) to import and use `suggest_ticker`:
+   ```python
+   from cli._errors import suggest_ticker  # was: import difflib
+   ...
+   # Replace inside remove_command:
+   #   matches = difflib.get_close_matches(normalized, list(wl.tickers.keys()), n=1, cutoff=0.6)
+   #   if matches: msg += f" did you mean {matches[0]!r}?"
+   # With:
+   hint = suggest_ticker(normalized, list(wl.tickers.keys()))
+   if hint:
+       msg += f" did you mean {hint!r}?"
+   ```
+   Re-run Plan 04's remove tests to confirm they still pass: `uv run pytest tests/test_cli_remove.py -x`.
+
+5. Write `cli/list_watchlist.py`:
    ```python
    """`markets list` — read-only watchlist dump."""
    from __future__ import annotations
@@ -279,34 +320,27 @@ For this last test, use a marker `@pytest.mark.skipif(not Path("watchlist.exampl
        return 0
    ```
 
-5. Write `cli/show_ticker.py`:
+6. Write `cli/show_ticker.py` using shared helpers (no inline regex, no inline difflib):
    ```python
    """`markets show TICKER` — full per-ticker config dump."""
    from __future__ import annotations
    import argparse
-   import re
    import sys
    from pathlib import Path
-   from watchlist.loader import load_watchlist
+
+   from analysts.schemas import normalize_ticker
    from cli._errors import suggest_ticker
-   
-   _TICKER_PATTERN = re.compile(r"^[A-Z][A-Z0-9.\-]{0,8}$")
-   
-   
-   def _normalize(s: str) -> str | None:
-       norm = s.strip().upper().replace(".", "-").replace("/", "-").replace("_", "-")
-       norm = re.sub(r"-+", "-", norm)
-       return norm if _TICKER_PATTERN.match(norm) else None
-   
-   
+   from watchlist.loader import load_watchlist
+
+
    def build_show_parser(p: argparse.ArgumentParser) -> None:
        p.add_argument("ticker")
        p.add_argument("--watchlist", type=Path, default=Path("watchlist.json"))
-   
-   
+
+
    def show_command(args: argparse.Namespace) -> int:
-       normalized = _normalize(args.ticker)
-       if not normalized:
+       normalized = normalize_ticker(args.ticker)
+       if normalized is None:
            print(f"error: invalid ticker format {args.ticker!r}", file=sys.stderr)
            return 2
        wl = load_watchlist(args.watchlist)
@@ -341,7 +375,7 @@ For this last test, use a marker `@pytest.mark.skipif(not Path("watchlist.exampl
        return 0
    ```
 
-6. Edit `cli/main.py` (Plan 04's output) — append imports and SUBCOMMANDS entries:
+7. Edit `cli/main.py` (Plan 04's output) — append imports and SUBCOMMANDS entries:
    ```python
    from cli.list_watchlist import build_list_parser, list_command  # ADD
    from cli.show_ticker import build_show_parser, show_command     # ADD
@@ -355,15 +389,15 @@ For this last test, use a marker `@pytest.mark.skipif(not Path("watchlist.exampl
    ```
    Verify `uv run markets --help` lists all four subcommands.
 
-7. Generate `watchlist.example.json` by running the 5 commands from the behavior section. Verify the result loads cleanly and round-trips byte-identically (run save_watchlist on the loaded model, compare bytes).
+8. Generate `watchlist.example.json` by running the 5 commands from the behavior section. Verify the result loads cleanly and round-trips byte-identically (run save_watchlist on the loaded model, compare bytes).
 
-8. Write `README.md` per content spec.
+9. Write `README.md` per content spec.
 
-9. Run `uv run pytest tests/test_cli_readonly.py -x` — all 6 tests pass.
+10. Run `uv run pytest tests/test_cli_readonly.py -x` — all 6 tests pass.
 
-10. Run full Phase 1 suite: `uv run pytest --cov=analysts --cov=watchlist --cov=cli --cov-fail-under=90` — global coverage gate. If under 90%, identify uncovered branches and either add tests or accept (with note in SUMMARY) that the gate is at 88-90% due to e.g. argparse help-text branches.
+11. Run full Phase 1 suite: `uv run pytest --cov=analysts --cov=watchlist --cov=cli --cov-fail-under=90` — global coverage gate. If under 90%, identify uncovered branches and either add tests or accept (with note in SUMMARY) that the gate is at 88-90% due to e.g. argparse help-text branches.
 
-11. Manual smoke test (use real `watchlist.example.json`):
+12. Manual smoke test (use real `watchlist.example.json`):
     ```
     cp watchlist.example.json /tmp/wl.json
     uv run markets list --watchlist /tmp/wl.json
@@ -373,8 +407,6 @@ For this last test, use a marker `@pytest.mark.skipif(not Path("watchlist.exampl
     ```
 
 **REFACTOR (skip):** Code is already minimal.
-
-**Note on `_normalize` duplication:** `cli/show_ticker.py:_normalize` and `cli/remove_ticker.py:remove_command`'s normalization both re-implement what `analysts.schemas.TickerConfig.normalize_ticker` does. This is acknowledged in Plan 04's CORRECTIONS callout. The cleanest fix is to extract a module-level `normalize_ticker(s: str) -> str | None` helper in `analysts/schemas.py` and have all three call sites use it. **If Plan 04's SUMMARY noted that the classmethod-call route worked**, prefer that; otherwise extract the helper here as a Plan-02-revision touch. Either way, document in this plan's SUMMARY.
   </implementation>
 </feature>
 
@@ -386,8 +418,10 @@ After GREEN:
 4. `uv run markets --help` lists all four subcommands: add, remove, list, show
 5. `cp watchlist.example.json /tmp/wl.json && uv run markets list --watchlist /tmp/wl.json` shows 5 tickers in alphabetical order spanning all four lenses
 6. `uv run markets show AAPL --watchlist /tmp/wl.json` shows complete structured dump
-7. README.md exists and contains the quick-start section with the copy-and-edit pattern
-8. `watchlist.example.json` exists at repo root and contains BRK-B (NOT BRK.B)
+7. `uv run markets show AAPK --watchlist /tmp/wl.json` exit 1, output contains "did you mean" and "AAPL" — confirms WATCH-03 ergonomics extension to show
+8. README.md exists and contains the quick-start section with the copy-and-edit pattern
+9. `watchlist.example.json` exists at repo root and contains BRK-B (NOT BRK.B)
+10. **Plan 04 tests still green after `cli/_errors.py` extension and `cli/remove_ticker.py` update:** `uv run pytest tests/test_cli_remove.py -x` — all green (no test changes; the refactor is internal)
 </verification>
 
 <success_criteria>
@@ -396,12 +430,15 @@ After GREEN:
 - [ ] Phase coverage gate ≥ 90% across `analysts`, `watchlist`, `cli` (`--cov-fail-under=90`)
 - [ ] `markets list` on `large_watchlist_path` (35 tickers) prints 35 ticker lines — WATCH-01 user-facing demo
 - [ ] `markets show AAPL` on seeded watchlist prints full structured dump (all 9 fields visible or "-")
-- [ ] `markets show AAPK` (typo) suggests AAPL via difflib — mirror of remove behavior
+- [ ] `markets show AAPK` (typo) suggests AAPL via shared `suggest_ticker` helper — WATCH-03 ergonomics extended to show
+- [ ] `cli/show_ticker.py` imports `normalize_ticker` from `analysts.schemas` (no inline regex) AND `suggest_ticker` from `cli/_errors.py` (no inline difflib)
+- [ ] `cli/remove_ticker.py` updated to use shared `suggest_ticker` — Plan 04 remove tests still green
 - [ ] `cli/main.py` SUBCOMMANDS dict has all four entries; `markets --help` lists add, remove, list, show
 - [ ] `watchlist.example.json` exists at repo root, contains exactly 5 tickers (AAPL, NVDA, BRK-B, GME, V), spans all four `long_term_lens` values
 - [ ] BRK-B in example file uses HYPHEN (CONTEXT.md correction #1 sentinel; `grep "BRK.B" watchlist.example.json` returns no matches)
 - [ ] README.md exists with quick-start (uv sync → cp example → markets list/show), schema reference, run-tests instruction
 - [ ] WATCH-01 covered: 1 user-facing probe (test_list_30_plus_tickers) + 1 example-file integrity probe
+- [ ] WATCH-03 covered: 1 ergonomics probe (test_show_unknown_ticker — show mirrors remove did-you-mean behavior)
 </success_criteria>
 
 <output>
@@ -409,10 +446,12 @@ After completion, create `.planning/phases/01-foundation-watchlist-per-ticker-co
 - Final line counts for `cli/list_watchlist.py`, `cli/show_ticker.py`, `README.md`
 - Coverage % on `cli/list_watchlist.py` and `cli/show_ticker.py`
 - Confirmation that `markets --help` lists all four subcommands
-- Whether `_suggest_ticker` was extracted to `cli/_errors.py` (touches Plan 04 output) — and whether `cli/remove_ticker.py` was updated to use it
-- Whether `_normalize` ticker logic was extracted to `analysts/schemas.py` (touches Plan 02 output) OR remains duplicated in show/remove — and rationale
+- Confirmation that `cli/_errors.py:suggest_ticker` is extracted and used by BOTH `show_command` and `remove_command` (resolves prior deferred decision; locked)
+- Confirmation that `cli/show_ticker.py` uses the Plan 02 `normalize_ticker` module-level helper (no inline regex)
+- Confirmation that Plan 04's remove tests still pass after the `cli/remove_ticker.py` update
 - Output of `markets list --watchlist /tmp/wl.json` after copying example file (paste actual output)
 - Output of `markets show AAPL` (paste actual output)
+- Output of `markets show AAPK` (paste — confirms did-you-mean works for show too; WATCH-03 ergonomics)
 - Final phase coverage % from `uv run pytest --cov=analysts --cov=watchlist --cov=cli --cov-report=term`
 - Confirmation that `watchlist.example.json` contains BRK-B (hyphen) — `grep "BRK[\\.\\-]B" watchlist.example.json` shows hyphenated form only
 - Phase 1 closeout: confirm all 4 ROADMAP success criteria are met:

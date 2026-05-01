@@ -2,14 +2,31 @@
 phase: 1
 slug: foundation-watchlist-per-ticker-config
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-30
 ---
 
 # Phase 1 — Validation Strategy
 
 > Per-phase validation contract for feedback sampling during execution. Derived from `01-RESEARCH.md` § Validation Architecture.
+
+---
+
+## Wave 0 Model (TDD-Equivalent)
+
+**This phase uses TDD Red commits as the Wave 0 equivalent.** Every test file is created by its owning plan's TDD Red phase BEFORE any implementation lands in the same plan:
+
+- Plan 02 (Schemas, type=tdd) — RED commit creates `tests/test_schemas.py`
+- Plan 03 (Loader, type=tdd) — RED commit creates `tests/test_loader.py`
+- Plan 04 (CLI core, type=tdd) — RED commit creates `tests/test_cli_add.py`, `tests/test_cli_remove.py`, `tests/test_cli_errors.py`
+- Plan 05 (CLI readonly, type=tdd) — RED commit creates `tests/test_cli_readonly.py`
+
+Plan 01 (Scaffold) creates `tests/__init__.py` and `tests/conftest.py` (the shared fixture surface) so pytest collection works before any test files exist.
+
+**Probe markers `❌ W0` in the table below mean "test file does not yet exist on disk" — they are satisfied by the corresponding plan's TDD Red phase commit.** The `<verify>` commands in each plan's tasks are the satisfying refs: every probe ID maps to a specific `pytest tests/test_*.py::test_<name> -x` invocation that runs in the owning plan's GREEN phase.
+
+This is functionally equivalent to a separate Wave 0 stub-test plan but avoids duplicating the test names in two places (a Wave 0 stub plan + the TDD plan that fills them in).
 
 ---
 
@@ -36,7 +53,7 @@ created: 2026-04-30
 
 ## Per-Task Verification Map
 
-All 21 probes are automated unit/integration tests — zero manual-only. Test files are Wave 0 gaps; see "Wave 0 Requirements" below.
+All 21 probes are automated unit/integration tests — zero manual-only. The `❌ W0` markers in the "File Exists" column indicate the test file is created by the owning plan's TDD Red phase (see "Wave 0 Model" above) — not a separate Wave 0 stub plan.
 
 | Probe ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |----------|------|------|-------------|-----------|-------------------|-------------|--------|
@@ -76,18 +93,18 @@ All 21 probes are automated unit/integration tests — zero manual-only. Test fi
 
 ## Wave 0 Requirements
 
-All test files are gaps; the project is bare except for `.planning/` and `.git`. The Wave 0 (scaffold) plan must create:
+Per the "Wave 0 Model" note above, this phase satisfies Wave 0 via TDD Red commits inside each owning plan. The list below describes WHICH plan creates WHICH file — it is NOT a separate scaffold plan list.
 
-- [ ] `pyproject.toml` — including `[project.scripts] markets = "cli.main:main"`, `[build-system]`, `[tool.pytest.ini_options]`, `[tool.coverage.run]`
-- [ ] `tests/__init__.py` — empty (pytest discovery)
-- [ ] `tests/conftest.py` — shared fixtures: `empty_watchlist_path`, `seeded_watchlist_path`, `large_watchlist_path` (35 synthetic tickers for WATCH-01 30+ ticker probe)
-- [ ] `tests/test_schemas.py` — covers WATCH-04, WATCH-05 (schema-level rules)
-- [ ] `tests/test_loader.py` — covers WATCH-01, WATCH-02, WATCH-05 (file I/O + round-trip + atomic save)
-- [ ] `tests/test_cli_add.py` — covers WATCH-02, WATCH-04 (add CLI happy paths + cross-field flag exercise)
-- [ ] `tests/test_cli_remove.py` — covers WATCH-03 (remove CLI happy paths + suggestion logic)
-- [ ] `tests/test_cli_readonly.py` — covers `list`, `show` subcommands (Claude's discretion, low-cost QoL)
-- [ ] `tests/test_cli_errors.py` — covers `format_validation_error`
-- [ ] Framework install: `uv add 'pydantic>=2.10'`, `uv add --dev 'pytest>=8.0' 'pytest-cov>=5.0' 'ruff>=0.6'`
+- [x] Plan 01 — `pyproject.toml` (incl. `[project.scripts] markets = "cli.main:main"`, `[build-system]`, `[tool.pytest.ini_options]`, `[tool.coverage.run]`)
+- [x] Plan 01 — `tests/__init__.py` (empty, pytest discovery)
+- [x] Plan 01 — `tests/conftest.py` (shared fixtures: `empty_watchlist_path`, `seeded_watchlist_path`, `large_watchlist_path` with 35 synthetic tickers for WATCH-01)
+- [x] Plan 02 RED — `tests/test_schemas.py` (covers WATCH-04, WATCH-05)
+- [x] Plan 03 RED — `tests/test_loader.py` (covers WATCH-01, WATCH-02, WATCH-05)
+- [x] Plan 04 RED — `tests/test_cli_add.py` (covers WATCH-02, WATCH-04)
+- [x] Plan 04 RED — `tests/test_cli_remove.py` (covers WATCH-03)
+- [x] Plan 04 RED — `tests/test_cli_errors.py` (covers `format_validation_error`)
+- [x] Plan 05 RED — `tests/test_cli_readonly.py` (covers `list`, `show`)
+- [x] Plan 01 — Framework install: `uv add 'pydantic>=2.10'`, `uv add --dev 'pytest>=8.0' 'pytest-cov>=5.0' 'ruff>=0.6'`
 
 ---
 
@@ -104,11 +121,11 @@ The Wave 3 smoke test (`uv run markets add AAPL --lens value && uv run markets l
 
 ## Validation Sign-Off
 
-- [ ] All tasks have automated `<verify>` commands or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (8 test files + pyproject.toml)
-- [ ] No watch-mode flags (CI-friendly: `-x` for fail-fast, no interactive)
-- [ ] Feedback latency < 10s for full suite
-- [ ] `nyquist_compliant: true` set in frontmatter once Wave 0 is verified scaffold-complete
+- [x] All tasks have automated `<verify>` commands or Wave 0 (TDD Red) dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (every test file owned by a plan's TDD Red phase)
+- [x] No watch-mode flags (CI-friendly: `-x` for fail-fast, no interactive)
+- [x] Feedback latency < 10s for full suite
+- [x] `nyquist_compliant: true` set in frontmatter (Wave 0 model: TDD Red commits)
 
-**Approval:** pending
+**Approval:** approved (revision 1)

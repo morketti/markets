@@ -6,7 +6,7 @@
 
 > **CORRECTIONS FROM RESEARCH (2026-04-30 — see `01-RESEARCH.md`):**
 > Phase research surfaced three factual corrections to locked decisions below. The planner MUST follow research where it conflicts with this document:
-> 1. **Ticker normalization → HYPHEN, not dot.** yfinance uses `BRK-B`; the dotted form returns empty data and silently triggers `data_unavailable` in Phase 2. Accept `.`, `/`, `_`, `-` as input separators; normalize to hyphen. Regex: `^[A-Z][A-Z0-9-]{0,8}$`.
+> 1. **Ticker normalization → HYPHEN, not dot.** yfinance uses `BRK-B`; the dotted form returns empty data and silently triggers `data_unavailable` in Phase 2. Accept `.`, `/`, `_`, `-` as input separators; normalize to hyphen. Regex: `^[A-Z][A-Z0-9.\-]{0,8}$` (the matcher allows BOTH dot and hyphen so inputs containing a leftover dot get accepted and normalized rather than producing a misleading regex error before normalization runs; the normalizer always emits hyphen form).
 > 2. **Cross-field validators → use `@model_validator(mode="after")`, not `@field_validator`.** `field_validator` runs in declaration order with partial state (`ValidationInfo.data`); cross-field rules need a fully-validated model. Single-field rules (e.g., `thesis_price > 0`) can stay as `@field_validator`.
 > 3. **JSON serialization → `json.dumps(model.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"`, NOT `model_dump_json(indent=2)`.** Pydantic v2 doesn't sort dict keys (issue #7424); without `sort_keys` the watchlist file's git diffs are noisy after every mutation.
 

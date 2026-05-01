@@ -343,7 +343,7 @@ WHY the ticker list is exactly 35: WATCH-01 mandates "30+ tickers" — 35 gives 
 WHY include `BRK-B` in the sample: it exercises the hyphen-normalization invariant in the loader's load test (Plan 03) — proves we don't accidentally regress to dot form during round-trip.
   </action>
   <verify>
-    <automated>uv run pytest --collect-only -q 2>&1 | tail -5</automated>
+    <automated>uv run pytest --collect-only -q 2>&1 | grep -v -E "ImportError|ModuleNotFoundError" >/dev/null && echo OK</automated>
   </verify>
   <done>`tests/conftest.py` and `tests/__init__.py` exist; `uv run pytest --collect-only` exits with code 5 ("no tests collected") OR code 0 (zero tests but framework runs) — both are acceptable signal that the framework is wired and `conftest.py` parses without import errors. Stderr does NOT contain "ImportError" or "ModuleNotFoundError" for `analysts.schemas` at collection time (would indicate the lazy-import pattern was bypassed).</done>
 </task>

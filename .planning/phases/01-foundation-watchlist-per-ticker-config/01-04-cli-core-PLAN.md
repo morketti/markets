@@ -27,8 +27,8 @@ must_haves:
     - "Pydantic ValidationError is rendered as multi-line CLI output via format_validation_error — never raw stack trace"
   artifacts:
     - path: "cli/main.py"
-      provides: "argparse dispatcher; build_parser(); main(argv)"
-      exports: ["main", "build_parser"]
+      provides: "argparse dispatcher; build_parser(); main(argv); SUBCOMMANDS dict (extension point for Plan 05)"
+      exports: ["main", "build_parser", "SUBCOMMANDS"]
       replaces: "Plan 01 placeholder"
     - path: "cli/_errors.py"
       provides: "format_validation_error(exc) → multi-line CLI string"
@@ -51,12 +51,20 @@ must_haves:
   key_links:
     - from: "cli/main.py:main"
       to: "cli/add_ticker.py:add_command, cli/remove_ticker.py:remove_command"
-      via: "dict dispatch on args.cmd"
+      via: "dict dispatch on args.cmd via SUBCOMMANDS"
       pattern: "args.cmd"
+    - from: "cli/main.py:SUBCOMMANDS"
+      to: "cli/list_watchlist.py, cli/show_ticker.py (Plan 05)"
+      via: "dict extension point — Plan 05 appends 'list' and 'show' entries to this dict; designed as the only conflict surface between Plans 04 and 05"
+      pattern: "# Plan 05 will append"
     - from: "cli/main.py:main"
       to: "cli/_errors.py:format_validation_error"
       via: "except ValidationError block — print formatted, return exit code 2"
       pattern: "except ValidationError"
+    - from: "cli/remove_ticker.py:remove_command"
+      to: "analysts.schemas.normalize_ticker (module-level helper from Plan 02)"
+      via: "import-and-call: normalized = normalize_ticker(args.ticker); shared logic, no duplication"
+      pattern: "from analysts.schemas import normalize_ticker"
     - from: "cli/remove_ticker.py:remove_command"
       to: "difflib.get_close_matches"
       via: "import difflib; get_close_matches(unknown, known, n=1, cutoff=0.6)"
@@ -137,18 +145,22 @@ SUBCOMMANDS: dict[str, tuple[Callable, Callable]] = {
 }
 ```
 
-Plan 05 will edit this dict to add two entries — a 2-line change on a single file. Acceptable conflict surface.
+Plan 05 will edit this dict to add two entries — a 2-line change on a single file. Acceptable conflict surface. This dict is the documented extension point — see frontmatter `key_links`.
+
+**Shared normalization helper from Plan 02:** `cli/remove_ticker.py` imports `from analysts.schemas import normalize_ticker` (module-level helper resolved during prior revision). Single source of truth — no inline regex duplication. Same module is used by Plan 05's `cli/show_ticker.py`.
 </interfaces>
 
 <corrections_callout>
 This plan touches CONTEXT.md correction #1 (hyphen normalization) directly:
 
-- **`markets add BRK.B` MUST produce a watchlist.json with the key `BRK-B` (hyphen).** The test `test_add_brk_normalizes_to_hyphen` enforces this end-to-end. Normalization happens automatically inside the schema (Plan 02) — `add_command` builds a `TickerConfig(ticker=args.ticker)`, the `@field_validator(mode="before")` kicks in and produces hyphenated form. The CLI does NOT re-implement normalization.
-- **`markets remove BRK.B` MUST normalize the input to `BRK-B` BEFORE looking up in `wl.tickers` and BEFORE running `difflib.get_close_matches`.** The remove command calls `TickerConfig.normalize_ticker(args.ticker)` directly (it's a classmethod on the schema; usable from outside model construction) — this guarantees the lookup uses canonical form. Test `test_remove_happy_path` includes a case with mixed-case input.
+- **`markets add BRK.B` MUST produce a watchlist.json with the key `BRK-B` (hyphen).** The test `test_add_brk_normalizes_to_hyphen` enforces this end-to-end. Normalization happens automatically inside the schema (Plan 02) — `add_command` builds a `TickerConfig(ticker=args.ticker)`, the `@field_validator(mode="before")` kicks in (which delegates to module-level `normalize_ticker`) and produces hyphenated form. The CLI does NOT re-implement normalization in `add_command`.
+- **`markets remove BRK.B` MUST normalize the input to `BRK-B` BEFORE looking up in `wl.tickers` and BEFORE running `difflib.get_close_matches`.** The remove command imports `normalize_ticker` from `analysts.schemas` (module-level helper from Plan 02) and calls it directly. Returns `None` on invalid input → CLI prints clean error and returns exit 2. Test `test_remove_happy_path` includes a case with mixed-case input.
 
 Corrections #2 (`@model_validator(mode="after")`) and #3 (`json.dumps(... sort_keys=True)`) are inherited from Plans 02 and 03 — the CLI builds models and calls save_watchlist; the schemas and loader handle correctness. No additional CLI work needed for those.
 
 **Edge case from Pitfall #5 (`validate_assignment`):** if a future change has the CLI directly mutate fields on a loaded `TickerConfig` (e.g., `cfg.thesis_price = -1`), `validate_assignment=True` from the schema (Plan 02) will catch it. We don't rely on this — the CLI rebuilds models via `model_copy(update=...)` per 01-RESEARCH.md examples.
+
+**Resolved deferred decision (prior revision):** `normalize_ticker` is now a module-level helper in `analysts/schemas.py` (Plan 02 owns the extraction). Plan 04's `remove_command` imports and uses it directly. Plan 05's `show_command` does the same. No duplication; no inline regex anywhere in the CLI layer.
 </corrections_callout>
 </context>
 
@@ -189,7 +201,7 @@ Corrections #2 (`@model_validator(mode="after")`) and #3 (`json.dumps(... sort_k
 - `build_remove_parser` registers `ticker` (positional), `--watchlist`, `--yes`/`-y`
 - `remove_command(args)` flow:
   1. `wl = load_watchlist(args.watchlist)`
-  2. Normalize input: `normalized = TickerConfig.normalize_ticker(args.ticker)` — wrapped in try/except ValueError → print error, return 2
+  2. Normalize input via shared helper: `normalized = normalize_ticker(args.ticker)` (imported from `analysts.schemas`). If `normalized is None`: print `f"error: invalid ticker format {args.ticker!r}"` to stderr, return 2.
   3. If `normalized not in wl.tickers`:
      - `suggestion = difflib.get_close_matches(normalized, list(wl.tickers.keys()), n=1, cutoff=0.6)`
      - print `"error: ticker {normalized!r} not in watchlist."` plus `" did you mean {suggestion[0]!r}?"` if suggestion
@@ -267,17 +279,50 @@ For the `--yes` flag: ALL test invocations of `remove` use `--yes` to bypass the
 
 6. Write `cli/add_ticker.py` from 01-RESEARCH.md § Code Examples ("CLI add command"). Add module docstring; ensure `_now_iso()` helper is module-private.
 
-7. Write `cli/remove_ticker.py` from 01-RESEARCH.md § Code Examples ("CLI remove with did you mean"). Use `TickerConfig.normalize_ticker(args.ticker)` to normalize input before lookup. The classmethod is callable as `TickerConfig.normalize_ticker(input_str)` but Pydantic v2's `@field_validator` decoration may complicate direct call — TEST THIS in dev. If it doesn't work, factor out the normalization logic into a module-level `_normalize_ticker_str(s)` function in `analysts/schemas.py` and import it from there. (Plan 02's deliverable supports this — the `_TICKER_PATTERN` is module-level and the normalization is small enough to extract.) **If extraction is needed, that's a Plan-02-revision touch — note in the SUMMARY.**
-
-   Defensive fallback if classmethod is awkward to invoke: do the normalization inline:
+7. Write `cli/remove_ticker.py` using the **shared `normalize_ticker` helper from Plan 02**. No inline regex; no duplication. Skeleton:
    ```python
-   normalized_raw = args.ticker.strip().upper().replace(".", "-").replace("/", "-").replace("_", "-")
-   normalized = re.sub(r"-+", "-", normalized_raw)
-   if not _TICKER_PATTERN.match(normalized):
-       print(f"error: invalid ticker format {args.ticker!r}", file=sys.stderr)
-       return 2
+   """`markets remove TICKER` — remove a ticker from the watchlist with did-you-mean suggestion."""
+   from __future__ import annotations
+   import argparse
+   import difflib
+   import sys
+   from pathlib import Path
+
+   from analysts.schemas import normalize_ticker
+   from watchlist.loader import load_watchlist, save_watchlist
+
+
+   def build_remove_parser(p: argparse.ArgumentParser) -> None:
+       p.add_argument("ticker")
+       p.add_argument("--watchlist", type=Path, default=Path("watchlist.json"))
+       p.add_argument("--yes", "-y", action="store_true")
+
+
+   def remove_command(args: argparse.Namespace) -> int:
+       normalized = normalize_ticker(args.ticker)
+       if normalized is None:
+           print(f"error: invalid ticker format {args.ticker!r}", file=sys.stderr)
+           return 2
+       wl = load_watchlist(args.watchlist)
+       if normalized not in wl.tickers:
+           matches = difflib.get_close_matches(normalized, list(wl.tickers.keys()), n=1, cutoff=0.6)
+           msg = f"error: ticker {normalized!r} not in watchlist."
+           if matches:
+               msg += f" did you mean {matches[0]!r}?"
+           print(msg, file=sys.stderr)
+           return 1
+       if not args.yes:
+           ans = input(f"remove {normalized}? [y/N] ")
+           if ans.strip().lower() not in ("y", "yes"):
+               print("aborted")
+               return 0
+       new_tickers = {k: v for k, v in wl.tickers.items() if k != normalized}
+       new_wl = wl.model_copy(update={"tickers": new_tickers})
+       save_watchlist(new_wl, args.watchlist)
+       print(f"removed {normalized}")
+       return 0
    ```
-   (Then `_TICKER_PATTERN` and `re` are imports. This is mild duplication of the schema's logic — acceptable trade-off if the classmethod-call route turns out to be brittle.)
+   No fallback inline regex needed — Plan 02 owns and exports the helper.
 
 8. Write `cli/main.py` from 01-RESEARCH.md § Pattern 5, modified with the SUBCOMMANDS dict pattern for Plan 05 extensibility:
    ```python
@@ -359,6 +404,8 @@ After GREEN:
    ```
    exits 0; `/tmp/wl.json` exists with valid content
 5. `uv run markets add BRK.B --lens value --watchlist /tmp/wl2.json` exits 0; `/tmp/wl2.json` contains `"BRK-B"`, NOT `"BRK.B"`
+6. **End-to-end ValidationError surfacing (NOT raw traceback):** `uv run markets add AAPL --thesis -1 --watchlist /tmp/val_test.json 2>&1 | grep "validation failed"` — exits 0 (grep finds the marker line); proves `format_validation_error` is wired into `main()`'s except-block path, NOT a raw Python traceback bubbling up. Cleanup: `rm -f /tmp/val_test.json` (file should not have been created since the add failed).
+7. **Shared helper integration:** `uv run python -c "from cli.remove_ticker import remove_command; from analysts.schemas import normalize_ticker; print('shared helper OK')"` — confirms `cli/remove_ticker.py` imports from `analysts.schemas` (no duplication).
 </verification>
 
 <success_criteria>
@@ -371,7 +418,8 @@ After GREEN:
 - [ ] Duplicate add rejected with non-zero exit (no silent overwrite)
 - [ ] Remove suggests close match via `difflib.get_close_matches(cutoff=0.6)` (test_remove_suggests_close_match green)
 - [ ] Remove with no match prints clean error (no spurious "did you mean")
-- [ ] ValidationError surfaces as multi-line `format_validation_error` output (NOT raw stack trace)
+- [ ] `cli/remove_ticker.py` imports `normalize_ticker` from `analysts.schemas` — no inline regex duplication (resolved deferred decision)
+- [ ] ValidationError surfaces as multi-line `format_validation_error` output (NOT raw stack trace) — verified end-to-end via Check 6 in `<verification>`
 - [ ] SUBCOMMANDS dict pattern in `cli/main.py` is extensible — Plan 05 can register `list` and `show` with a 2-line patch
 - [ ] WATCH-02 covered: 5 probes (1-W3-01..05)
 - [ ] WATCH-03 covered: 3 probes (1-W3-06..08)
@@ -383,9 +431,9 @@ After GREEN:
 After completion, create `.planning/phases/01-foundation-watchlist-per-ticker-config/01-04-cli-core-SUMMARY.md` documenting:
 - Final line counts for `cli/main.py`, `cli/_errors.py`, `cli/add_ticker.py`, `cli/remove_ticker.py`
 - Coverage % on each cli/* file
-- Whether `TickerConfig.normalize_ticker(input_str)` direct classmethod call worked, OR whether the inline-normalization fallback was used (and if so, note that for Plan 02 follow-up — extract `_normalize_ticker_str` helper in next refactor)
+- Confirmation that `cli/remove_ticker.py` imports `normalize_ticker` from `analysts.schemas` (no duplication; resolved deferred decision from prior revision)
 - Confirmation that `BRK.B` end-to-end produces `BRK-B` (CONTEXT.md correction #1)
-- Confirmation that ValidationError in any subcommand surfaces via `format_validation_error` (no raw stack traces in CLI output)
+- Confirmation that ValidationError in any subcommand surfaces via `format_validation_error` (no raw stack traces in CLI output) — paste output from `markets add AAPL --thesis -1` smoke test (`<verification>` Check 6)
 - Smoke-test output of `uv run markets add AAPL --lens value --thesis 200 --watchlist /tmp/wl.json` (paste actual output)
 - Plan 05 prep: confirm `SUBCOMMANDS` dict in `cli/main.py` is in place and Plan 05 just needs to append `"list"` and `"show"` entries
 - Any deviation from 01-RESEARCH.md examples and why
