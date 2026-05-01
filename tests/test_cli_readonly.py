@@ -105,6 +105,76 @@ def test_show_unknown_ticker(
     assert "AAPL" in output
 
 
+def test_show_invalid_ticker_format(
+    seeded_watchlist_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """`markets show '!@#'` returns exit 2 with 'invalid ticker format' on stderr."""
+    rc = main(["show", "!@#", "--watchlist", str(seeded_watchlist_path)])
+    assert rc == 2
+    err = capsys.readouterr().err
+    assert "invalid ticker format" in err, (
+        f"expected 'invalid ticker format' in stderr; got {err!r}"
+    )
+
+
+def test_show_with_technical_and_targets(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Show prints technical_levels + target_multiples blocks when set; covers both branches."""
+    from analysts.schemas import (
+        FundamentalTargets,
+        TechnicalLevels,
+        TickerConfig,
+        Watchlist,
+    )
+    from watchlist.loader import save_watchlist
+
+    wl_path = tmp_path / "watchlist.json"
+    wl = Watchlist(
+        tickers={
+            "AAPL": TickerConfig(
+                ticker="AAPL",
+                long_term_lens="value",
+                thesis_price=200.0,
+                technical_levels=TechnicalLevels(support=175.0, resistance=220.0),
+                target_multiples=FundamentalTargets(pe_target=25.0, ps_target=7.0),
+                notes="reload zone test",
+            ),
+        }
+    )
+    save_watchlist(wl, wl_path)
+    rc = main(["show", "AAPL", "--watchlist", str(wl_path)])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "technical_levels:" in out
+    assert "support: 175" in out
+    assert "resistance: 220" in out
+    assert "target_multiples:" in out
+    assert "pe_target: 25" in out
+    assert "ps_target: 7" in out
+    assert "pb_target: -" in out
+    assert "notes: reload zone test" in out
+
+
+def test_list_truncates_long_notes(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """`markets list` truncates notes longer than 40 chars with `...` suffix."""
+    from analysts.schemas import TickerConfig, Watchlist
+    from watchlist.loader import save_watchlist
+
+    wl_path = tmp_path / "watchlist.json"
+    long_note = "x" * 100  # well over 40 chars
+    wl = Watchlist(tickers={"AAPL": TickerConfig(ticker="AAPL", notes=long_note)})
+    save_watchlist(wl, wl_path)
+    rc = main(["list", "--watchlist", str(wl_path)])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "..." in out, f"expected truncation marker '...' in output:\n{out}"
+    # The full 100-char note should NOT be present.
+    assert long_note not in out
+
+
 def test_example_file_loads_cleanly() -> None:
     """`watchlist.example.json` exists at repo root, has 5 tickers, spans 4 lenses, BRK-B (no BRK.B)."""
     example_path = Path("watchlist.example.json")
