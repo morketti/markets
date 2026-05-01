@@ -230,6 +230,65 @@ def test_write_manifest_atomic(tmp_path: Path):
     assert leftover_tmps == []
 
 
+# ---------------- Task 1 coverage-completing probes ----------------
+
+
+def test_snapshot_rejects_invalid_ticker():
+    """Snapshot.ticker validator delegates to normalize_ticker; invalid input raises."""
+    with pytest.raises(Exception):  # pydantic.ValidationError wraps the ValueError
+        Snapshot(
+            ticker="not a ticker",
+            fetched_at=datetime(2026, 5, 1, 12, 0, tzinfo=timezone.utc),
+        )
+
+
+def test_write_manifest_oserror_cleans_up_tmp(tmp_path: Path, monkeypatch):
+    """When os.replace raises OSError, write_manifest deletes the tmp file and re-raises."""
+    snap_dir = tmp_path / "snapshots" / "2026-05-01"
+    m = Manifest(
+        schema_version=1,
+        run_started_at=datetime(2026, 5, 1, 12, 0, tzinfo=timezone.utc),
+        run_completed_at=datetime(2026, 5, 1, 12, 0, 5, tzinfo=timezone.utc),
+        snapshot_date=date(2026, 5, 1),
+        tickers=[],
+        errors=[],
+    )
+
+    import ingestion.manifest as mm
+
+    def _boom(src, dst):
+        raise OSError("simulated rename failure")
+
+    monkeypatch.setattr(mm.os, "replace", _boom)
+
+    with pytest.raises(OSError, match="simulated rename failure"):
+        write_manifest(m, snap_dir)
+
+    # No tmp files should remain
+    leftovers = [p for p in snap_dir.iterdir() if p.suffix == ".tmp" or ".tmp" in p.name]
+    assert leftovers == []
+    # No final manifest.json either
+    assert not (snap_dir / "manifest.json").exists()
+
+
+def test_read_manifest_round_trip(tmp_path: Path):
+    """read_manifest convenience returns the Manifest written by write_manifest."""
+    from ingestion.manifest import read_manifest
+
+    snap_dir = tmp_path / "snapshots" / "2026-05-01"
+    m = Manifest(
+        schema_version=1,
+        run_started_at=datetime(2026, 5, 1, 12, 0, tzinfo=timezone.utc),
+        run_completed_at=datetime(2026, 5, 1, 12, 0, 5, tzinfo=timezone.utc),
+        snapshot_date=date(2026, 5, 1),
+        tickers=[TickerOutcome(ticker="AAPL", success=True, duration_ms=100)],
+        errors=[],
+    )
+    write_manifest(m, snap_dir)
+    loaded = read_manifest(snap_dir)
+    assert loaded == m
+
+
 # ---------------- Task 2: orchestrator probes (2-W3-01, 02, 04) ----------------
 
 
