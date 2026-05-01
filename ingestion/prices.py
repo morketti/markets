@@ -12,11 +12,17 @@ treated as "yfinance broke" if those checks fail. The fallback path
 broken the other often still works.
 
 Public surface:
-    fetch_prices(ticker: str, *, period: str = "3mo") -> PriceSnapshot
+    fetch_prices(ticker: str, *, period: str = "1y") -> PriceSnapshot
 
 Always returns a PriceSnapshot — sets data_unavailable=True when both sources
 fail. NEVER raises for upstream breakage; only Pydantic ValidationError can
 escape (which would be a programmer bug, not a runtime condition).
+
+Plan 02-07 amendment — default `period` bumped from "3mo" (~63 trading bars)
+to "1y" (~252 trading bars) so Phase 3's technicals analyst (ANLY-02) has
+enough warm-up history for MA200 / 6m momentum / stable ADX without
+per-call overrides. Existing callers that pin `period=` explicitly are
+unaffected. See 03-RESEARCH.md Pitfall #1 for the rationale.
 
 The function is pure-side-effect-free wrt our process: yfinance.Ticker /
 yahooquery.Ticker manage their own HTTP under the hood. We don't reuse the
@@ -204,7 +210,7 @@ def _unavailable(ticker: str, source: str = "yfinance") -> PriceSnapshot:
     )
 
 
-def fetch_prices(ticker: str, *, period: str = "3mo") -> PriceSnapshot:
+def fetch_prices(ticker: str, *, period: str = "1y") -> PriceSnapshot:
     """Fetch daily OHLC + current price for `ticker`.
 
     yfinance is primary (full OHLC history); yahooquery is the fallback for
@@ -219,7 +225,11 @@ def fetch_prices(ticker: str, *, period: str = "3mo") -> PriceSnapshot:
 
     Args:
         ticker: ticker symbol (any case / dot notation accepted; normalized).
-        period: yfinance history period — default "3mo" (~60 trading days).
+        period: yfinance history period — default ``"1y"`` (~252 trading days).
+            Plan 02-07 bumped this from ``"3mo"`` (~63 bars) so downstream
+            Phase 3 analytics (MA200 / 6m momentum / stable ADX) have enough
+            warm-up bars without per-call overrides. Callers that pin
+            ``period=`` explicitly are unaffected by the default change.
 
     Returns:
         PriceSnapshot with `source="yfinance"` (happy or both-failed),
