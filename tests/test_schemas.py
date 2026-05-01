@@ -131,6 +131,12 @@ def test_support_equals_resistance_rejected() -> None:
     with pytest.raises(ValidationError):
         TechnicalLevels(support=100.0, resistance=100.0)
 
+    # Per-bound positivity (also covers the TechnicalLevels.positive validator):
+    with pytest.raises(ValidationError):
+        TechnicalLevels(support=-5.0)
+    with pytest.raises(ValidationError):
+        TechnicalLevels(resistance=0.0)
+
 
 # ----------------------------------------------------------------------
 # 1-W1-07: Watchlist key must equal value.ticker (strict mode, no rewrite)
