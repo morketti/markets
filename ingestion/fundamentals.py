@@ -12,12 +12,23 @@ metrics. fetch_fundamentals tolerates ALL of these failure modes:
 
 - empty {} → data_unavailable=True, all metrics None
 - missing key → that metric is None, others populated
-- non-numeric string / NaN → coerced to None via _safe_float
+- non-numeric string / NaN → coerced to None via _safe_float / _safe_int
 - yfinance internal exception → caught, data_unavailable=True
 
 NEVER raises KeyError. NEVER raises NetworkError. The only escapable
 exception is a Pydantic ValidationError if our schema rejects the data
 we constructed — which would be a programmer bug, not runtime weather.
+
+Plan 02-07 amendment — additionally reads 4 analyst-consensus keys from
+the same .info dict (additive, no behavior change for existing callers):
+    targetMeanPrice          → analyst_target_mean (Optional[float])
+    targetMedianPrice        → analyst_target_median (Optional[float])
+    recommendationMean       → analyst_recommendation_mean (Optional[float])
+    numberOfAnalystOpinions  → analyst_opinion_count (Optional[int])
+These four fields are advisory metadata — they do NOT influence the
+data_unavailable predicate (canonical markers remain trailingPE +
+marketCap). Phase 3's valuation analyst (ANLY-04) consumes them as the
+tertiary blend tier.
 
 Public surface:
     fetch_fundamentals(ticker: str) -> FundamentalsSnapshot
@@ -57,6 +68,31 @@ def _safe_float(v: Any) -> Optional[float]:
         if v != v or v == float("inf") or v == float("-inf"):  # noqa: PLR0124
             return None
         return float(v)
+    return None
+
+
+def _safe_int(v: Any) -> Optional[int]:
+    """Coerce a yfinance .info value to int — None if it's not a finite number.
+
+    Same defensive posture as `_safe_float`: rejects bools (since Python treats
+    True/False as int subclasses — `isinstance(True, int) is True` — and we
+    don't want a flag accidentally serialized as 1), rejects NaN / inf, rejects
+    non-numeric strings (no string parsing — keep parity with _safe_float).
+
+    Floats are floored to int via `int(v)` — yfinance occasionally returns
+    floats for count fields (e.g., 42.0 instead of 42 around stale-cache
+    records). Truncation toward zero matches Python's int(float) semantics.
+
+    Plan 02-07 — added for analyst_opinion_count (numberOfAnalystOpinions key).
+    """
+    if v is None or isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float):
+        if v != v or v == float("inf") or v == float("-inf"):  # noqa: PLR0124
+            return None
+        return int(v)  # truncate toward zero (matches Python's int(float))
     return None
 
 
@@ -109,6 +145,15 @@ def fetch_fundamentals(ticker: str) -> FundamentalsSnapshot:
     free_cash_flow = _safe_float(info.get("freeCashflow"))
     market_cap = _safe_float(info.get("marketCap"))
 
+    # Plan 02-07: analyst-consensus advisory metadata. NOT part of the
+    # canonical-marker check below — these fields are absent for obscure
+    # tickers even on healthy days, so they wouldn't be a reliable
+    # data_unavailable signal.
+    analyst_target_mean = _safe_float(info.get("targetMeanPrice"))
+    analyst_target_median = _safe_float(info.get("targetMedianPrice"))
+    analyst_recommendation_mean = _safe_float(info.get("recommendationMean"))
+    analyst_opinion_count = _safe_int(info.get("numberOfAnalystOpinions"))
+
     # Canonical-marker check: if BOTH trailingPE AND marketCap are missing
     # after coercion, treat as silent breakage. A snapshot with one populated
     # metric is still useful — let the caller decide.
@@ -127,4 +172,8 @@ def fetch_fundamentals(ticker: str) -> FundamentalsSnapshot:
         profit_margin=profit_margin,
         free_cash_flow=free_cash_flow,
         market_cap=market_cap,
+        analyst_target_mean=analyst_target_mean,
+        analyst_target_median=analyst_target_median,
+        analyst_recommendation_mean=analyst_recommendation_mean,
+        analyst_opinion_count=analyst_opinion_count,
     )
