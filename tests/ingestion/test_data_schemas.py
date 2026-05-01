@@ -229,6 +229,28 @@ def test_reddit_post_rejects_empty_title() -> None:
         RedditPost(title="", url="https://reddit.com/x", subreddit="wsb")
 
 
+def test_schemas_reject_non_string_ticker() -> None:
+    """Cover the isinstance-False branch in every _normalize_ticker_field validator."""
+    bad: object = 123  # int instead of str — covers `isinstance(v, str)` False path
+    with pytest.raises(ValidationError):
+        PriceSnapshot(ticker=bad, fetched_at=NOW, source="yfinance")  # type: ignore[arg-type]
+    with pytest.raises(ValidationError):
+        FundamentalsSnapshot(ticker=bad, fetched_at=NOW, source="yfinance")  # type: ignore[arg-type]
+    with pytest.raises(ValidationError):
+        FilingMetadata(ticker=bad, fetched_at=NOW, form_type="10-K")  # type: ignore[arg-type]
+    with pytest.raises(ValidationError):
+        Headline(
+            ticker=bad,  # type: ignore[arg-type]
+            fetched_at=NOW,
+            source="yahoo-rss",
+            title="x",
+            url="https://x.test",
+            dedup_key="x::1",
+        )
+    with pytest.raises(ValidationError):
+        SocialSignal(ticker=bad, fetched_at=NOW)  # type: ignore[arg-type]
+
+
 def test_data_re_exports() -> None:
     """analysts.data top-level re-exports everything."""
     from analysts.data import (
