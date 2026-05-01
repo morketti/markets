@@ -67,6 +67,16 @@ Plans:
 
 **Pitfalls addressed:** #1 (yfinance silent breakage — sanity checks + fallback), #2 (EDGAR User-Agent compliance)
 
+**Plans:** 6 plans
+
+Plans:
+- [ ] 02-01-foundation-PLAN.md — ingestion/http.py + errors + analysts/data/ schemas + Wave-0 fixtures + responses dep
+- [ ] 02-02-prices-fundamentals-PLAN.md — ingestion/prices.py + fundamentals.py (yfinance + yahooquery fallback)
+- [ ] 02-03-edgar-filings-PLAN.md — ingestion/filings.py (EDGAR with compliant User-Agent + retry)
+- [ ] 02-04-news-rss-PLAN.md — ingestion/news.py (Yahoo RSS + Google News + FinViz scrape + dedup + sort)
+- [ ] 02-05-social-PLAN.md — ingestion/social.py (Reddit RSS + StockTwits trending + per-symbol)
+- [ ] 02-06-refresh-orchestrator-PLAN.md — ingestion/refresh.py + manifest + Snapshot + cli/refresh.py + SUBCOMMANDS extension
+
 ---
 
 ### Phase 3: Analytical Agents — Deterministic Scoring
