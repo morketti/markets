@@ -39,6 +39,15 @@
 
 **Pitfalls addressed:** #10 (premature abstraction — keep watchlist simple, no plugin system)
 
+**Plans:** 5 plans
+
+Plans:
+- [ ] 01-01-scaffold-PLAN.md — pyproject.toml, packages, conftest fixtures, placeholder CLI dispatcher
+- [ ] 01-02-schemas-PLAN.md — analysts/schemas.py: TickerConfig + Watchlist + nested models, all validators
+- [ ] 01-03-loader-PLAN.md — watchlist/loader.py: load_watchlist + atomic save_watchlist with sort_keys serialization
+- [ ] 01-04-cli-core-PLAN.md — cli/main.py dispatcher + add/remove subcommands + format_validation_error
+- [ ] 01-05-cli-readonly-and-example-PLAN.md — list/show subcommands + watchlist.example.json + README
+
 ---
 
 ### Phase 2: Ingestion — Keyless Data Plane
