@@ -13,6 +13,7 @@ clean (no `"technical_levels": null` clutter unless the user opts in).
 from __future__ import annotations
 
 import argparse
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -90,7 +91,8 @@ def add_command(args: argparse.Namespace) -> int:
     if cfg.ticker in wl.tickers:
         print(
             f"error: ticker {cfg.ticker!r} already exists. "
-            f"use 'remove' first if you want to replace."
+            f"use 'remove' first if you want to replace.",
+            file=sys.stderr,
         )
         return 1
 
