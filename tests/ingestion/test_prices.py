@@ -260,3 +260,42 @@ def test_yahooquery_price_dict_missing_regular_market_price(fixtures_dir: Path) 
         result = fetch_prices("AAPL")
 
     assert result.data_unavailable is True
+
+
+# ---------------------------------------------------------------------------
+# Plan 02-07 amendment: fetch_prices default period bumped 3mo → 1y
+# ---------------------------------------------------------------------------
+
+
+def test_fetch_prices_default_period_is_1y(fixtures_dir: Path) -> None:
+    """fetch_prices called with NO period kwarg invokes yfinance's
+    history(period=...) with period='1y' — enough trading bars (~252) for
+    Phase 3's MA200 / 6m momentum / stable ADX without per-call overrides.
+    Plan 02-07 amendment: bumped from '3mo' (~63 bars).
+    """
+    df = _load_history_df(fixtures_dir, "yfinance_aapl_history.json")
+
+    mock_ticker = MagicMock()
+    mock_ticker.history.return_value = df
+    mock_ticker.fast_info = {"last_price": 180.5}
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_ticker):
+        fetch_prices("AAPL")  # no period kwarg → must use the new "1y" default
+
+    mock_ticker.history.assert_called_once_with(period="1y")
+
+
+def test_fetch_prices_explicit_period_still_honored(fixtures_dir: Path) -> None:
+    """Caller passing period='6mo' explicitly still gets the override —
+    the default change is only visible when the kwarg is omitted, so existing
+    callers that pin the period are unaffected."""
+    df = _load_history_df(fixtures_dir, "yfinance_aapl_history.json")
+
+    mock_ticker = MagicMock()
+    mock_ticker.history.return_value = df
+    mock_ticker.fast_info = {"last_price": 180.5}
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_ticker):
+        fetch_prices("AAPL", period="6mo")
+
+    mock_ticker.history.assert_called_once_with(period="6mo")
