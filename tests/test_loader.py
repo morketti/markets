@@ -110,3 +110,38 @@ def test_load_nonexistent_returns_empty(empty_watchlist_path: Path) -> None:
     wl = load_watchlist(empty_watchlist_path)
     assert wl.tickers == {}
     assert wl.version == 1
+
+
+def test_save_cleanup_on_replace_failure(
+    empty_watchlist_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """save_watchlist re-raises and removes the tmp file when os.replace fails.
+
+    Locks the failure-cleanup contract: a half-written tmp file must NOT pollute
+    the user's directory after a failed save. Without this guarantee, a single
+    Ctrl-C during `markets add` could litter `git status` with orphan *.tmp
+    files. Monkeypatches watchlist.loader.os.replace to raise; asserts the
+    OSError surfaces AND no .tmp file remains.
+    """
+    import watchlist.loader as loader_mod
+
+    wl = Watchlist(tickers={"AAPL": TickerConfig(ticker="AAPL")})
+
+    def fake_replace(_src: object, _dst: object) -> None:
+        raise OSError("simulated replace failure")
+
+    monkeypatch.setattr(loader_mod.os, "replace", fake_replace)
+
+    with pytest.raises(OSError, match="simulated replace failure"):
+        save_watchlist(wl, empty_watchlist_path)
+
+    # Cleanup contract: no orphan tmp files.
+    parent = empty_watchlist_path.parent
+    tmps = [
+        p
+        for p in parent.iterdir()
+        if p.is_file() and (p.suffix == ".tmp" or ".tmp" in p.name)
+    ]
+    assert tmps == [], f"orphan tmp files after failed save: {tmps}"
+    # Target file was never created (replace was the only writer).
+    assert not empty_watchlist_path.exists()
