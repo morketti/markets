@@ -9,7 +9,7 @@
 
 | # | Phase | Goal | Requirements | Success Criteria | Dependencies |
 |---|-------|------|--------------|------------------|--------------|
-| 1 | Foundation — Watchlist + Per-Ticker Config | Users declare a watchlist with per-ticker analytical config | WATCH-01..05 | 4 | — |
+| 1 | 1/5 | In Progress|  | 4 | — |
 | 2 | Ingestion — Keyless Data Plane | All data fetched without API keys, validated, with fallbacks | DATA-01..08 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |
@@ -39,7 +39,7 @@
 
 **Pitfalls addressed:** #10 (premature abstraction — keep watchlist simple, no plugin system)
 
-**Plans:** 5 plans
+**Plans:** 1/5 plans executed
 
 Plans:
 - [ ] 01-01-scaffold-PLAN.md — pyproject.toml, packages, conftest fixtures, placeholder CLI dispatcher

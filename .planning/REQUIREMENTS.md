@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Watchlist (WATCH)
 
-- [ ] **WATCH-01**: User can maintain a watchlist of 30+ tickers in `watchlist.json`
-- [ ] **WATCH-02**: User can add a ticker via CLI utility (frontend CRUD deferred to v1.x)
-- [ ] **WATCH-03**: User can remove a ticker via CLI utility
-- [ ] **WATCH-04**: User can set per-ticker config: `short_term_focus` (bool), `long_term_lens` (value/growth/contrarian/mixed), `thesis_price`, `technical_levels` (support/resistance), `target_multiples` (P/E, P/S targets), `notes`
-- [ ] **WATCH-05**: Per-ticker config is validated via Pydantic schema; invalid entries rejected with clear error
+- [x] **WATCH-01**: User can maintain a watchlist of 30+ tickers in `watchlist.json`
+- [x] **WATCH-02**: User can add a ticker via CLI utility (frontend CRUD deferred to v1.x)
+- [x] **WATCH-03**: User can remove a ticker via CLI utility
+- [x] **WATCH-04**: User can set per-ticker config: `short_term_focus` (bool), `long_term_lens` (value/growth/contrarian/mixed), `thesis_price`, `technical_levels` (support/resistance), `target_multiples` (P/E, P/S targets), `notes`
+- [x] **WATCH-05**: Per-ticker config is validated via Pydantic schema; invalid entries rejected with clear error
 
 ### Data Ingestion (DATA)
 
@@ -153,11 +153,11 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WATCH-01 | Phase 1 | Pending |
-| WATCH-02 | Phase 1 | Pending |
-| WATCH-03 | Phase 1 | Pending |
-| WATCH-04 | Phase 1 | Pending |
-| WATCH-05 | Phase 1 | Pending |
+| WATCH-01 | Phase 1 | Complete |
+| WATCH-02 | Phase 1 | Complete |
+| WATCH-03 | Phase 1 | Complete |
+| WATCH-04 | Phase 1 | Complete |
+| WATCH-05 | Phase 1 | Complete |
 | DATA-01 | Phase 2 | Pending |
 | DATA-02 | Phase 2 | Pending |
 | DATA-03 | Phase 2 | Pending |
