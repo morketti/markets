@@ -9,7 +9,7 @@
 
 | # | Phase | Goal | Requirements | Success Criteria | Dependencies |
 |---|-------|------|--------------|------------------|--------------|
-| 1 | Foundation — Watchlist + Per-Ticker Config (3/5 plans, In Progress) | User can declare a watchlist with rich per-ticker configuration that drives all downstream analysis | WATCH-01..05 | 4 | — |
+| 1 | Foundation — Watchlist + Per-Ticker Config (4/5 plans, In Progress) | User can declare a watchlist with rich per-ticker configuration that drives all downstream analysis | WATCH-01..05 | 4 | — |
 | 2 | Ingestion — Keyless Data Plane | All data fetched without API keys, validated, with fallbacks | DATA-01..08 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |

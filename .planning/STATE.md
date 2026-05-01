@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 4
+current_plan: 5
 status: executing
-last_updated: "2026-05-01T04:09:21.678Z"
+last_updated: "2026-05-01T04:17:52.444Z"
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # State: Markets
@@ -20,15 +20,15 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 1 in progress — Plans 01 (scaffold), 02 (schemas), and 03 (loader) complete; Plan 04 (CLI core) is next.
+**Current focus:** Phase 1 in progress — Plans 01 (scaffold), 02 (schemas), 03 (loader), and 04 (CLI core) complete; Plan 05 (CLI readonly + example) is next.
 
 ## Current Phase
 
 **Phase:** 01-foundation-watchlist-per-ticker-config
-**Status:** In Progress (3 of 5 plans complete)
-**Current Plan:** 04 — CLI core (add/remove)
+**Status:** In Progress (4 of 5 plans complete)
+**Current Plan:** 05 — CLI readonly + example
 **Total Plans in Phase:** 5
-**Next:** `/gmd:execute-plan` with `01-04-cli-core-PLAN.md`
+**Next:** `/gmd:execute-plan` with `01-05-cli-readonly-and-example-PLAN.md`
 
 ## Phase Status
 
@@ -54,6 +54,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **2026-05-01 (deviations during Plan 01)**: (1) `uv` not installed on host — installed via `python -m pip install --user uv` to `C:/Users/Mohan/AppData/Roaming/Python/Python314/Scripts/`. (2) `uv run markets` failed after Task 2 with `ModuleNotFoundError: No module named 'cli'` — initial wheel was built before package directories existed; fixed with `uv sync --reinstall-package markets`. Both Rule 3 (blocking environmental) auto-fixes — no design changes.
 - **2026-05-01 (Phase 1 / Plan 02 — schemas)**: Pydantic v2 schemas locked. `analysts/schemas.py` (171 lines) ships `TechnicalLevels`, `FundamentalTargets`, `TickerConfig`, `Watchlist` + module-level `normalize_ticker(s)` helper. 8/8 schema tests green; coverage 99% line / 98.89% branch (gate ≥95%). Hyphen-form normalization verified (BRK.B/BRK_B/BRK/B/brk-b → BRK-B). All cross-field rules use `@model_validator(mode='after')`. **Decision:** `normalize_ticker` extracted to module level (single source of truth) — Plans 04/05 will `from analysts.schemas import normalize_ticker` and reuse directly, no duplication. **Decision:** Strict watchlist key mode — dict-key/value.ticker mismatch raises `ValidationError` naming the offender, never silently rewrites. WATCH-04 + WATCH-05 covered (already marked `[x]` in REQUIREMENTS.md from Plan 01 over-attribution; behavior now actually delivered). Plan-level commits: `66795a2` (RED test), `87aaa4e` (GREEN impl). Zero deviations from plan.
 - **2026-05-01 (Phase 1 / Plan 03 — loader)**: Stdlib atomic-write loader landed. `watchlist/loader.py` (69 lines) ships `load_watchlist(path)` + `save_watchlist(wl, path)` + `DEFAULT_PATH`. **Decision:** stdlib `json.dumps(model_dump(mode="json"), indent=2, sort_keys=True) + "\n"` for serialization (NOT `model_dump_json`) per CONTEXT.md correction #3 / Pydantic v2 issue #7424 — guarantees byte-identical round-trip and stable git diffs. **Decision:** `tempfile.NamedTemporaryFile(delete=False, dir=parent) ... with-block-exit ... os.replace(tmp_path, path)` per Pitfall #2 (Windows file-lock release); on OSError, `tmp_path.unlink(missing_ok=True)` then re-raise. **Decision:** `load_watchlist` on missing path returns empty `Watchlist()` (not an error) — drives first-run CLI UX. **Decision:** save_watchlist re-validates the model before persistence (defense-in-depth). 7/7 loader tests green (15/15 combined with schemas); coverage 100% line+branch (gate ≥90%); 50-ticker load measured 6.18ms (<<100ms gate); round-trip byte-identical confirmed; no orphan tmp files in any test path. **Deviation (Rule 2):** Added 7th test `test_save_cleanup_on_replace_failure` (monkeypatched `os.replace` raises OSError → asserts cleanup + re-raise) to lock the failure-cleanup contract and close the coverage gap on lines 67-69 (originally-specified 6 tests came in at 88.89% coverage). No implementation deviation from `01-RESEARCH.md` "Loader / atomic save" example. Plan-level commits: `7c1bf15` (RED), `e40f0eb` (GREEN). WATCH-01, WATCH-02, WATCH-05 confirmed covered.
+- **2026-05-01 (Phase 1 / Plan 04 — CLI core)**: argparse dispatcher + add/remove + format_validation_error shipped. `cli/main.py` (71 lines), `cli/_errors.py` (38), `cli/add_ticker.py` (102), `cli/remove_ticker.py` (73) — 284 production lines total. **Decision:** SUBCOMMANDS dict-of-tuples pattern in `cli/main.py` is Plan 05's documented extension surface (4-line patch: 2 imports + 2 dict entries; zero modifications to existing lines). **Decision:** `cli/remove_ticker.py` imports `normalize_ticker` from `analysts.schemas` (zero inline regex; closes Plan 02's deferred decision). **Decision:** ISO 8601 timestamps stick with `+00:00` form (NOT `Z`) per Pitfall #3 — round-trips natively through `datetime.fromisoformat`. **Decision:** Optional groups (TechnicalLevels, FundamentalTargets) constructed only when at least one of their flags is passed (no `null` clutter in watchlist.json). **Decision:** ValidationError caught in main() → format_validation_error → stderr → exit 2 (no raw tracebacks); FileNotFoundError → stderr → exit 1; other exceptions propagate (debug-friendly). 9/9 CLI tests green (probes 1-W3-01..09); combined Wave 1+2+3 24/24 green; coverage 85.62% on the four cli/* files (gate ≥85%). BRK.B → BRK-B verified end-to-end via `test_add_brk_normalizes_to_hyphen` AND smoke test. ValidationError surfaces cleanly via smoke test (`markets add AAPL --thesis -1` → `validation failed (1 error): - thesis_price: ... (got: -1.0)` exit 2, no file created). Plan-level commits: `4a3ae49` (RED), `0446715` (GREEN). WATCH-02, WATCH-03, WATCH-04, WATCH-05 confirmed covered. **Zero deviations** from plan.
 
 ## Context Notes
 
@@ -80,4 +81,4 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 ## Last Touched
 
-2026-05-01 after Plan 03 (loader) execution complete; commits `7c1bf15` (RED), `e40f0eb` (GREEN). Next: Plan 04 (CLI core — add/remove).
+2026-05-01 after Plan 04 (CLI core) execution complete; commits `4a3ae49` (RED), `0446715` (GREEN). Next: Plan 05 (CLI readonly + example).
