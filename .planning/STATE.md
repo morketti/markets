@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 02-02-prices-fundamentals
-status: in_progress
-last_updated: "2026-05-01T08:13:00Z"
+current_plan: 3
+status: executing
+last_updated: "2026-05-01T10:52:04.211Z"
 progress:
   total_phases: 9
   completed_phases: 1
   total_plans: 11
-  completed_plans: 6
+  completed_plans: 8
 ---
 
 # State: Markets
@@ -20,22 +20,22 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 2 Wave 1 complete. Plan 02-01 (foundation) shipped — shared HTTP session + ingestion exception hierarchy + 5 Pydantic data schemas. Ready to start Wave 2 (Plans 02-02..02-05 can run in parallel).
+**Current focus:** Phase 2 Wave 2 in flight. Plans 02-01 (foundation), 02-02 (prices/fundamentals), 02-03 (EDGAR filings) shipped. Plans 02-04 (news/RSS) and 02-05 (social) running in parallel. Plan 02-06 (refresh orchestrator) gates on all four Wave-2 plans completing.
 
 ## Current Phase
 
 **Phase:** 02-ingestion-keyless-data-plane
-**Status:** In progress (1/6 plans complete)
-**Current Plan:** 02-02-prices-fundamentals (next)
+**Status:** In progress (3/6 plans complete; 02-04 + 02-05 parallel; 02-06 gated)
+**Current Plan:** 3 (02-03 just completed; 02-04 + 02-05 in parallel execution)
 **Total Plans in Phase:** 6
-**Next:** Run Plan 02-02 (yfinance + yahooquery prices/fundamentals). Plans 02-02..02-05 are independent and can run in parallel; Plan 02-06 (refresh orchestrator) gates on all four.
+**Next:** Wait for 02-04 + 02-05 parallel execution to complete, then run 02-06 (refresh orchestrator) to integrate all four Wave-2 sources.
 
 ## Phase Status
 
 | # | Phase | Status |
 |---|-------|--------|
 | 1 | Foundation — Watchlist + Per-Ticker Config | Complete (5/5 plans) — pending verify |
-| 2 | Ingestion — Keyless Data Plane | In progress (1/6 plans — Wave 1 done) |
+| 2 | Ingestion — Keyless Data Plane | In progress (3/6 plans — Wave 1 + 02-02 + 02-03 done; 02-04 + 02-05 parallel) |
 | 3 | Analytical Agents — Deterministic Scoring | Pending |
 | 4 | Position-Adjustment Radar | Pending |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Pending |
@@ -57,6 +57,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **2026-05-01 (Phase 1 / Plan 04 — CLI core)**: argparse dispatcher + add/remove + format_validation_error shipped. `cli/main.py` (71 lines), `cli/_errors.py` (38), `cli/add_ticker.py` (102), `cli/remove_ticker.py` (73) — 284 production lines total. **Decision:** SUBCOMMANDS dict-of-tuples pattern in `cli/main.py` is Plan 05's documented extension surface (4-line patch: 2 imports + 2 dict entries; zero modifications to existing lines). **Decision:** `cli/remove_ticker.py` imports `normalize_ticker` from `analysts.schemas` (zero inline regex; closes Plan 02's deferred decision). **Decision:** ISO 8601 timestamps stick with `+00:00` form (NOT `Z`) per Pitfall #3 — round-trips natively through `datetime.fromisoformat`. **Decision:** Optional groups (TechnicalLevels, FundamentalTargets) constructed only when at least one of their flags is passed (no `null` clutter in watchlist.json). **Decision:** ValidationError caught in main() → format_validation_error → stderr → exit 2 (no raw tracebacks); FileNotFoundError → stderr → exit 1; other exceptions propagate (debug-friendly). 9/9 CLI tests green (probes 1-W3-01..09); combined Wave 1+2+3 24/24 green; coverage 85.62% on the four cli/* files (gate ≥85%). BRK.B → BRK-B verified end-to-end via `test_add_brk_normalizes_to_hyphen` AND smoke test. ValidationError surfaces cleanly via smoke test (`markets add AAPL --thesis -1` → `validation failed (1 error): - thesis_price: ... (got: -1.0)` exit 2, no file created). Plan-level commits: `4a3ae49` (RED), `0446715` (GREEN). WATCH-02, WATCH-03, WATCH-04, WATCH-05 confirmed covered. **Zero deviations** from plan.
 - **2026-05-01 (Phase 1 / Plan 05 — CLI readonly + example)**: Read-only CLI surface shipped. `cli/list_watchlist.py` (45 lines) + `cli/show_ticker.py` (83 lines) + `watchlist.example.json` (5 tickers, 4 lenses, BRK-B hyphenated) + `README.md` (88 lines, quick-start + schema table + provenance). **Decision (locked):** `cli/_errors.py:suggest_ticker(unknown, known)` is the single source of truth for did-you-mean across show + remove — closes Plan 04's deferred decision. Plan 04's remove tests stay green with no test changes (refactor is internal). **Decision (locked):** `cli/show_ticker.py` imports `normalize_ticker` from `analysts.schemas` — same pattern as Plan 04 remove. **Decision:** `markets list` empty watchlist exits 0 (mirrors loader contract); show error codes mirror remove (0/1/2). **Decision:** Notes column truncated at 40 chars in list output. **Decision:** `watchlist.example.json` generated via dogfooded `markets add` (not hand-crafted) — exercises full add → schema → loader → save pipeline. WATCH-01 user-facing demo proven (`test_list_30_plus_tickers` over 35-ticker fixture); WATCH-03 ergonomics extended to show (`markets show AAPK` → did-you-mean AAPL). 33/33 Phase 1 tests pass; coverage 94% global, 100% list_watchlist.py, 98% show_ticker.py — well above the ≥90% gate. Plan-level commits: `6f555d3` (RED), `ba679ce` (GREEN). **Zero deviations** from plan (3 extra coverage tests added to clear the gate are documented in SUMMARY).
 - **2026-05-01 (Phase 2 / Plan 01 — foundation)**: Wave 1 ingestion foundation shipped. `ingestion/http.py` (76 lines) provides `get_session()` returning a process-shared `requests.Session` with EDGAR-compliant `User-Agent` (env-overridable via `MARKETS_USER_AGENT`), `HTTPAdapter` mounted with `Retry(total=3, backoff_factor=0.3, status_forcelist=[429,500,502,503,504], allowed_methods={GET,HEAD}, raise_on_status=False)`, `DEFAULT_TIMEOUT=10.0` constant, and `polite_sleep(source, last_call, min_interval)` helper. `ingestion/errors.py` ships the 3-class hierarchy (`IngestionError` → `NetworkError`, `SchemaDriftError`). `analysts/data/` sub-package ships eight Pydantic schemas (`PriceSnapshot`, `OHLCBar`, `FundamentalsSnapshot`, `FilingMetadata`, `Headline`, `RedditPost`, `StockTwitsPost`, `SocialSignal`) — every one delegates ticker normalization to `analysts.schemas.normalize_ticker` (no regex duplication) and uses `ConfigDict(extra="forbid")`. `pyproject.toml` extended with 5 runtime deps (yfinance/yahooquery/requests/feedparser/beautifulsoup4) + 1 dev dep (responses); `ingestion` registered in hatch packages and coverage source. **Decision:** `raise_on_status=False` on Retry — callers see the final response (status + body) when retries exhaust on 5xx so the Plan 02-06 orchestrator can branch on response type rather than catching `MaxRetryError`. **Decision:** `polite_sleep` is caller-owned-state (no module singletons that would bleed between tests). **Decision:** Fundamentals carry NO positivity constraint at the schema layer — FCF/ROE can be negative legitimately; downstream sanity checks enforce ranges. **Decision:** `Headline.url` is plain `str` (not HttpUrl) — Yahoo redirect URLs sometimes fail strict checks. **Decision:** `FilingMetadata.form_type` Literal includes `"OTHER"` escape-hatch for unknown EDGAR forms. 34/34 Phase 2 W1 tests green (9 http + 2 errors + 23 schemas; full suite 69/69). Coverage: errors.py 100%/100%, http.py 97%/91%, analysts/data/* 100%/100%. Plan-level commits: `0ffcabf` (chore scaffold), `b370d9c` (RED tests), `b58f932` (GREEN http impl), `b206206` (RED schemas), `777ff28` (GREEN schemas). **Deviations:** 4 auto-fixed (1 Rule 1 bug — `raise_on_status=False`; 2 Rule 2 missing-critical — added `test_schemas_reject_non_string_ticker` for branch coverage + 4 extra schema tests beyond the planned ~16; 1 Rule 3 blocking — observed `uv.lock` is gitignored and skipped from staging). All tightening, no scope creep. DATA-06 marked complete in REQUIREMENTS.md.
+- **2026-05-01 (Phase 2 / Plan 03 — EDGAR filings)**: `ingestion/filings.py` (252 lines) lands `lookup_cik` (in-process whole-index cache → 10-digit zero-padded CIK) + `fetch_filings` (default `forms=("10-K","10-Q","8-K")`, `limit=20`, sorted by `filed_date` desc). 22 tests green covering probes 2-W2-06 (happy), 2-W2-07 (403 → `NetworkError` with diagnostic), 2-W2-08 (429 retry via shared session adapter). Coverage **98% line / 100% branch** on `ingestion.filings` (gate ≥90%/≥85%). Full repo suite 112/112 green. UA header verified at the responses-lib boundary on BOTH endpoints (company_tickers + submissions). **Decisions:** (1) Whole-index cache is module-level `_CIK_CACHE` — single fetch fills the entire mapping for a process; tests reset via autouse fixture. (2) Unknown ticker returns `[]` (not error) — orchestrator interprets as "no filings, move on". (3) Bad row (unparseable filingDate / failed Pydantic validation) is logged + skipped per-row, never fails the whole fetch. (4) Form-type `"OTHER"` escape-hatch from Plan 02-01 schema is exercised — unknown forms passed through `forms=(...)` map cleanly. (5) Module-level `_LAST_CALL` (110ms gap = 9 req/sec under SEC's 10/sec ceiling) — filings.py is the SOLE owner of EDGAR's politeness budget. (6) urllib3 Retry adapter requires N+1 mocked responses for retry-exhaustion tests (Rule 3 auto-fix). (7) 403 diagnostic includes the exact UA header the session is using — speeds future debugging. Plan-level commits: `04b0316` (RED tests + 3 fixtures), `0fe0171` (GREEN impl + 8 hardening tests). DATA-03 marked complete. **Deviations:** 2 auto-fixed (1 Rule 2 missing-critical — added 8 hardening tests for coverage gate; 1 Rule 3 blocking — N+1 mock-response trick for retry-exhaustion tests). Parallel-safety constraint observed: only `ingestion/filings.py`, `tests/ingestion/test_filings.py`, and `tests/ingestion/fixtures/edgar_*` touched.
 
 ## Context Notes
 
@@ -83,4 +84,4 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 ## Last Touched
 
-2026-05-01 after Phase 2 / Plan 01 (foundation) execution complete; commits `0ffcabf` (scaffold), `b370d9c` (RED http+errors), `b58f932` (GREEN http), `b206206` (RED schemas), `777ff28` (GREEN schemas). Phase 2 progress: 1/6 plans complete (Wave 1 done). Next: Wave 2 — Plans 02-02..02-05 can run in parallel (prices/fundamentals, EDGAR filings, news/RSS, social). Plan 02-06 (refresh orchestrator) gates on all four.
+2026-05-01 after Phase 2 / Plan 03 (EDGAR filings) execution complete; commits `04b0316` (RED tests + fixtures), `0fe0171` (GREEN ingestion/filings.py + 8 hardening tests). Phase 2 progress: 3/6 plans complete (Wave 1 + 02-02 + 02-03; 02-04 + 02-05 parallel; 02-06 gated). Full repo: 112/112 tests green. Coverage on ingestion/filings.py: 98% line / 100% branch. Next: Plans 02-04 (news/RSS) and 02-05 (social) running in parallel; Plan 02-06 (refresh orchestrator) gates on both completing.

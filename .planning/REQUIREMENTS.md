@@ -19,7 +19,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 - [x] **DATA-01**: System fetches daily OHLC + current price for each watchlist ticker via yfinance
 - [x] **DATA-02**: System fetches latest fundamentals (P/E, P/S, ROE, debt/equity, margins, FCF) per ticker via yfinance
-- [ ] **DATA-03**: System fetches latest 10-K, 10-Q, 8-K filings from SEC EDGAR with compliant `User-Agent: <name> <email>` header
+- [x] **DATA-03**: System fetches latest 10-K, 10-Q, 8-K filings from SEC EDGAR with compliant `User-Agent: <name> <email>` header
 - [ ] **DATA-04**: System fetches news headlines per ticker from RSS (Yahoo Finance, Google News per-ticker, FinViz, press wires)
 - [ ] **DATA-05**: System fetches social signal per ticker via anonymous Reddit RSS endpoints + StockTwits unauthenticated trending
 - [x] **DATA-06**: All ingestion modules emit Pydantic-validated objects; sanity checks (price > 0, expected fields present) fail loudly
@@ -160,7 +160,7 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | WATCH-05 | Phase 1 | Complete |
 | DATA-01 | Phase 2 | Complete |
 | DATA-02 | Phase 2 | Complete |
-| DATA-03 | Phase 2 | Pending |
+| DATA-03 | Phase 2 | Complete |
 | DATA-04 | Phase 2 | Pending |
 | DATA-05 | Phase 2 | Pending |
 | DATA-06 | Phase 2 | Complete |
