@@ -10,6 +10,7 @@ dependencies = [
     "requests>=2.31,<3",
     "feedparser>=6.0,<7",
     "beautifulsoup4>=4.12,<5",
+    "vaderSentiment>=3.3,<4",
 ]
 
 [project.scripts]
