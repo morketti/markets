@@ -10,7 +10,7 @@
 | # | Phase | Goal | Requirements | Success Criteria | Dependencies |
 |---|-------|------|--------------|------------------|--------------|
 | 1 | Foundation — Watchlist + Per-Ticker Config (5/5 plans, Complete) | Complete    | 2026-05-01 | 4 | — |
-| 2 | Ingestion — Keyless Data Plane (4/6 plans, In Progress) | All data fetched without API keys, validated, with fallbacks | DATA-01..08 | 5 | Phase 1 |
+| 2 | Ingestion — Keyless Data Plane (7/7 plans, Complete) | Complete    | 2026-05-02 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Scheduled routine produces full TickerDecisions and commits snapshots | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
@@ -67,15 +67,16 @@ Plans:
 
 **Pitfalls addressed:** #1 (yfinance silent breakage — sanity checks + fallback), #2 (EDGAR User-Agent compliance)
 
-**Plans:** 4/6 plans executed
+**Plans:** 7/7 plans complete
 
 Plans:
 - [x] 02-01-foundation-PLAN.md — ingestion/http.py + errors + analysts/data/ schemas + Wave-0 fixtures + responses dep
 - [x] 02-02-prices-fundamentals-PLAN.md — ingestion/prices.py + fundamentals.py (yfinance + yahooquery fallback)
 - [x] 02-03-edgar-filings-PLAN.md — ingestion/filings.py (EDGAR with compliant User-Agent + retry)
-- [ ] 02-04-news-rss-PLAN.md — ingestion/news.py (Yahoo RSS + Google News + FinViz scrape + dedup + sort)
+- [x] 02-04-news-rss-PLAN.md — ingestion/news.py (Yahoo RSS + Google News + FinViz scrape + dedup + sort)
 - [x] 02-05-social-PLAN.md — ingestion/social.py (Reddit RSS + StockTwits trending + per-symbol)
-- [ ] 02-06-refresh-orchestrator-PLAN.md — ingestion/refresh.py + manifest + Snapshot + cli/refresh.py + SUBCOMMANDS extension
+- [x] 02-06-refresh-orchestrator-PLAN.md — ingestion/refresh.py + manifest + Snapshot + cli/refresh.py + SUBCOMMANDS extension
+- [x] 02-07-fundamentals-analyst-fields-PLAN.md — Phase 2 amendment for Phase 3 valuation prerequisite (4 analyst-consensus fields on FundamentalsSnapshot + fetch_prices default period 3mo→1y)
 
 ---
 
