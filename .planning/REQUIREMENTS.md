@@ -28,10 +28,10 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Analytical Agents (ANLY)
 
-- [ ] **ANLY-01**: Fundamentals analyst produces an `AgentSignal` per ticker scoring P/E, P/S, ROE, debt/equity, margins with bullish/bearish/neutral verdict + confidence + evidence list
-- [ ] **ANLY-02**: Technicals analyst produces an `AgentSignal` per ticker covering MA crossovers, momentum (1m/3m/6m), ADX-based trend strength
-- [ ] **ANLY-03**: News/sentiment analyst produces an `AgentSignal` per ticker based on aggregated news with recency weighting and headline-level sentiment classification
-- [ ] **ANLY-04**: Valuation analyst produces an `AgentSignal` per ticker based on current price vs `thesis_price` and `target_multiples` (when configured); deterministic compare to analyst consensus from yfinance
+- [ ] **ANLY-01**: Fundamentals analyst produces an `AgentSignal` per ticker scoring P/E, P/S, ROE, debt/equity, margins with **5-state ladder verdict (strong_bullish | bullish | neutral | bearish | strong_bearish)** + confidence (0-100 int) + evidence list (≤10 items, each ≤200 chars)
+- [ ] **ANLY-02**: Technicals analyst produces an `AgentSignal` per ticker covering MA crossovers, momentum (1m/3m/6m), ADX-based trend strength; **5-state ladder verdict (strong_bullish | bullish | neutral | bearish | strong_bearish)** + confidence (0-100 int) + evidence list
+- [ ] **ANLY-03**: News/sentiment analyst produces an `AgentSignal` per ticker based on aggregated news with recency weighting (3-day half-life) and per-headline sentiment via VADER; **5-state ladder verdict (strong_bullish | bullish | neutral | bearish | strong_bearish)** + confidence (0-100 int) + evidence list
+- [ ] **ANLY-04**: Valuation analyst produces an `AgentSignal` per ticker based on current price vs `thesis_price` and `target_multiples` (when configured); deterministic compare to analyst consensus from yfinance (when available); **5-state ladder verdict (strong_bullish | bullish | neutral | bearish | strong_bearish)** + confidence (0-100 int) + evidence list
 
 ### Position-Adjustment Radar (POSE)
 
