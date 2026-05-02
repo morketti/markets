@@ -11,7 +11,7 @@
 |---|-------|------|--------------|------------------|--------------|
 | 1 | Foundation — Watchlist + Per-Ticker Config (5/5 plans, Complete) | Complete    | 2026-05-01 | 4 | — |
 | 2 | Ingestion — Keyless Data Plane (7/7 plans, Complete) | Complete    | 2026-05-02 | 5 | Phase 1 |
-| 3 | Analytical Agents — Deterministic Scoring | Five Python analyst modules emit structured signals per ticker | ANLY-01..04 | 5 | Phase 2 |
+| 3 | Analytical Agents — Deterministic Scoring | Four Python analyst modules emit structured signals per ticker (5th is Phase 4 POSE) | ANLY-01..04 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar | Multi-indicator overbought/oversold consensus with trend-regime gating | POSE-01..05 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Scheduled routine produces full TickerDecisions and commits snapshots | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
 | 6 | Frontend MVP — Morning Scan + Deep-Dive | Static React app reads snapshots, renders three lenses + ticker detail | VIEW-01..09, VIEW-11..15, INFRA-05 | 7 | Phase 5 |
@@ -82,7 +82,7 @@ Plans:
 
 ### Phase 3: Analytical Agents — Deterministic Scoring
 
-**Goal:** Five Python analyst modules produce structured signals per ticker, all pure-function and unit-testable.
+**Goal:** Four Python analyst modules produce structured signals per ticker, all pure-function and unit-testable. (5th analyst — Position-Adjustment — lives in Phase 4 / POSE-01..05.)
 
 **Requirements:** ANLY-01, ANLY-02, ANLY-03, ANLY-04
 
@@ -96,6 +96,15 @@ Plans:
 **Dependencies:** Phase 2 (needs raw data to score)
 
 **Pitfalls addressed:** #4 (LLM schema drift — these Python scores are stable inputs to LLM personas)
+
+**Plans:** 5 plans
+
+Plans:
+- [ ] 03-01-signals-PLAN.md — AgentSignal schema + tests/analysts/ scaffold + vaderSentiment dep + REQUIREMENTS/ROADMAP touch-ups
+- [ ] 03-02-fundamentals-PLAN.md — fundamentals analyst (5-metric per-config + fallback bands + 5-state ladder)
+- [ ] 03-03-technicals-PLAN.md — technicals analyst (MA20/50/200 + momentum 1m/3m/6m + ADX(14) + warm-up guards; hand-rolled pandas math)
+- [ ] 03-04-news-sentiment-PLAN.md — news/sentiment analyst (VADER per-headline + 3-day-half-life recency + source weighting)
+- [ ] 03-05-valuation-PLAN.md — valuation analyst (thesis_price > target_multiples > yfinance consensus blend; depends on 02-07)
 
 ---
 
