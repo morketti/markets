@@ -38,7 +38,21 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from analysts.schemas import normalize_ticker
 
 Verdict = Literal["strong_bullish", "bullish", "neutral", "bearish", "strong_bearish"]
-AnalystId = Literal["fundamentals", "technicals", "news_sentiment", "valuation"]
+AnalystId = Literal[
+    # Phase 3 analytical analysts (existing 4) — order preserved:
+    "fundamentals",
+    "technicals",
+    "news_sentiment",
+    "valuation",
+    # Phase 5 persona slate (new 6) — order matches the iteration order
+    # used by routine/persona_runner.py asyncio.gather fan-out (Wave 3):
+    "buffett",
+    "munger",
+    "wood",
+    "burry",
+    "lynch",
+    "claude_analyst",
+]
 
 
 class AgentSignal(BaseModel):
