@@ -108,6 +108,17 @@ Plans:
 
 ---
 
+### Phase 4: Position-Adjustment Radar — Plans
+
+**Plans:** 3/3 plans complete
+
+Plans:
+- [x] 04-01-foundation-PLAN.md — extract _build_df + _adx_14 + _total_to_verdict to analysts/_indicator_math.py + 3 synthetic fixtures (oversold/overbought/mean_reverting)
+- [x] 04-02-position-signal-PLAN.md — PositionSignal Pydantic schema (PEER of AgentSignal) + 5-state PositionState + 4-state ActionHint + @model_validator data_unavailable invariant
+- [x] 04-03-position-adjustment-PLAN.md — position_adjustment analyst with 6 indicators + ADX trend-regime gating + state/action_hint mapping + cross-cutting invariant test extension
+
+---
+
 ### Phase 4: Position-Adjustment Radar
 
 **Goal:** Multi-indicator overbought/oversold consensus drives the headline morning-scan view.

@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 3
-status: executing
-last_updated: "2026-05-03T06:30:00.000Z"
+current_plan: null
+status: phase_complete
+last_updated: "2026-05-03T07:30:00.000Z"
 progress:
   total_phases: 9
-  completed_phases: 3
-  total_plans: 19
-  completed_plans: 19
+  completed_phases: 4
+  total_plans: 20
+  completed_plans: 20
 ---
 
 # State: Markets
@@ -20,17 +20,19 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 4 (Position-Adjustment Radar) IN PROGRESS — Wave 0 foundation refactor (Plan 04-01) complete. `analysts/_indicator_math.py` extracted (~165 LOC); `_build_df` + `_adx_14` + `_total_to_verdict` consolidated to single source of truth (DRY trigger fired on 4th copy). 5 ADX module constants live alongside `_adx_14`. 3 caller modules (`analysts/{fundamentals, technicals, valuation}.py`) refactored via import-only changes. 3 new synthetic-history builders appended to `tests/analysts/conftest.py` for explicit overbought/oversold/range regression testing. Phase 3 regression invariant held: all 310 existing tests stayed GREEN. 23 new tests added (19 indicator_math + 4 synthetic_fixtures). Full repo: 333 passed. Wave 1 (04-02 PositionSignal schema) and Wave 2 (04-03 Position-Adjustment analyst) unblocked.
+**Current focus:** Phase 4 (Position-Adjustment Radar) **COMPLETE** — all 3 plans shipped (04-01 foundation, 04-02 PositionSignal schema, 04-03 position_adjustment analyst). POSE-01..05 all `[x]` in REQUIREMENTS.md. analysts/position_adjustment.py provides pure-function score(snapshot, config, *, computed_at=None) -> PositionSignal with 6 hand-rolled pandas indicator helpers (RSI / BB position / z-score-vs-MA50 / Stochastic %K / Williams %R / MACD histogram z-scored over 60 bars), ADX(14) trend-regime gating (>25 downweights mean-reversion to 0.5x; ambiguous zone 20-25 keeps weights at 1.0), 5-state PositionState ladder + 4-state ActionHint mapping, confidence-as-agreement-count formula with abstain rule, empty-data UNIFORM RULE 5 branches. Cross-cutting invariant test extends Phase 3's pattern. Full repo: 428 passed (310 baseline + 118 new across Phase 4); 94% coverage on the analyst module. Phase 5 (Claude Routine Wiring) unblocked — can now read PositionSignal alongside the 4 AgentSignals.
+
+**Phase 4 lineage:** Phase 4 (Position-Adjustment Radar) IN PROGRESS — Wave 0 foundation refactor (Plan 04-01) complete. `analysts/_indicator_math.py` extracted (~165 LOC); `_build_df` + `_adx_14` + `_total_to_verdict` consolidated to single source of truth (DRY trigger fired on 4th copy). 5 ADX module constants live alongside `_adx_14`. 3 caller modules (`analysts/{fundamentals, technicals, valuation}.py`) refactored via import-only changes. 3 new synthetic-history builders appended to `tests/analysts/conftest.py` for explicit overbought/oversold/range regression testing. Phase 3 regression invariant held: all 310 existing tests stayed GREEN. 23 new tests added (19 indicator_math + 4 synthetic_fixtures). Full repo: 333 passed. Wave 1 (04-02 PositionSignal schema) and Wave 2 (04-03 Position-Adjustment analyst) unblocked.
 
 **Phase 3 lineage:** Phase 3 (Analytical Agents — Deterministic Scoring) **COMPLETE** — all 5 plans shipped (03-01 signals scaffold + 03-02 fundamentals + 03-03 technicals + 03-04 news_sentiment + 03-05 valuation). All four analyst modules in `analysts/` (fundamentals.py, technicals.py, news_sentiment.py, valuation.py) emit pure-function `AgentSignal` per ticker with the 5-state ladder verdict + 0-100 confidence + evidence list contract; every analyst respects the empty-data UNIFORM RULE (data_unavailable=True, verdict='neutral', confidence=0, ≥1 evidence string when inputs are missing). The 2 cross-cutting invariant tests in `tests/analysts/test_invariants.py` (`test_always_four_signals` + `test_dark_snapshot_emits_four_unavailable`) flipped GREEN naturally upon Wave-2-closeout xfail-marker removal in 03-05's Task 3 — confirming all four analysts respect the cross-cutting "always 4 signals" + "dark snapshot ⇒ 4 data_unavailable=True" contracts from 03-CONTEXT.md. ANLY-01..04 all `[x]` in REQUIREMENTS.md. Phase 4 (Position-Adjustment Radar) unblocked — POSE-01..05 will reuse the hand-rolled pandas indicator pattern from 03-03 + the multi-method weighted aggregation pattern from 03-05.
 
 ## Current Phase
 
 **Phase:** 04-position-adjustment-radar
-**Status:** In Progress (2/3 plans complete)
-**Current Plan:** 3
+**Status:** **Complete** (3/3 plans)
+**Current Plan:** —
 **Total Plans in Phase:** 3
-**Next:** Execute Plan 04-03 (full position_adjustment analyst — 6 indicator helpers + state/action_hint mapping + cross-cutting invariant test extension). 04-03 is the final plan; closes POSE-01..05 in REQUIREMENTS.md.
+**Next:** Phase 5 (Claude Routine Wiring — Persona Slate + Synthesizer) plan-phase. LLM-01..08 + INFRA-01..04 — phase-research will examine current Claude Code routine constraints (cron syntax, output format, quota visibility, env-var injection, retry behavior) and the persona prompt structure. Phase 5 wires the analytical signals (Phase 3 + 4 outputs) through the LLM persona slate (Buffett, Munger, Wood, Burry, Lynch, Open Claude Analyst) into a synthesizer that produces TickerDecision JSONs.
 
 ## Phase Status
 
@@ -39,7 +41,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 | 1 | Foundation — Watchlist + Per-Ticker Config | Complete (5/5 plans) |
 | 2 | Ingestion — Keyless Data Plane | Complete (7/7 plans) |
 | 3 | Analytical Agents — Deterministic Scoring | Complete (5/5 plans) |
-| 4 | Position-Adjustment Radar | In Progress (2/3 plans) |
+| 4 | Position-Adjustment Radar | Complete (3/3 plans) |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Pending |
 | 6 | Frontend MVP — Morning Scan + Deep-Dive | Pending |
 | 7 | Decision-Support View + Dissent Surface | Pending |
@@ -88,6 +90,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **Hatchling editable-install gotcha confirmed:** When a plan creates a new top-level package listed in `[tool.hatch.build.targets.wheel] packages`, follow with `uv sync --reinstall-package markets` so the editable wheel is rebuilt to include it. (Plan 01 Task 2 hit this.)
 
 ## Last Touched
+
+2026-05-03 after Phase 4 / Plan 03 (position_adjustment analyst — 6-indicator consensus + ADX trend-regime gating + 5-state ladder + 4-state action_hint) execution complete; 2 task commits `3485f5b` (Task 1 RED — ~36 RED tests, parametrized expansion to 59 effective + cross-cutting test_dark_snapshot_emits_pose_unavailable in test_invariants.py) and `11e8639` (Task 2 GREEN — analysts/position_adjustment.py implementation + 4 Rule-1 test-side fixes folded in: sub-signal mapper sign correction; sideways state assertion loosening; ADX range-or-ambiguous union; downweight test rewritten with helper monkeypatch). 59 new tests in `tests/analysts/test_position_adjustment.py` + 1 cross-cutting invariant. Coverage on `analysts/position_adjustment.py`: **94% line+branch combined** (gate ≥90/85). Full repo: **428 passed** (368 baseline + 60 new). PEER-not-subtype contract with AgentSignal locked. ADX boundary discontinuity mitigated by ambiguous zone (20-25); trend-regime gating verified at exactly ADX=25 via monkeypatch. **Phase 4 status: COMPLETE (3/3 plans).** POSE-01..05 all marked complete in REQUIREMENTS.md (Pending → Complete in traceability table; checkboxes `[ ]` → `[x]`); ROADMAP.md Phase 4 row → Complete with completion date 2026-05-03; Phase 4 plan list added with 3 `[x]` entries. **Phases 1-4 complete: 4/9 phases shipped, 428 tests green, 0 xfailed.** Next: Phase 5 (Claude Routine Wiring) plan-phase via `/gmd:plan-phase 5`.
 
 2026-05-03 after Phase 4 / Plan 02 (PositionSignal Pydantic schema) execution complete; 2 task commits `e146a44` (Task 1 RED — 27 failing tests, parametrized expansion to 35 effective) and `fa89b14` (Task 1 GREEN — analysts/position_signal.py implementation, all 35 green on first run, 0 deviations). 35 new tests in `tests/analysts/test_position_signal.py` (above plan's ≥12 floor). Coverage on `analysts/position_signal.py`: **100% line / 100% branch** (gate ≥90/85). Full repo: **368 passed** (333 baseline + 35 new). PEER-not-subtype contract with AgentSignal locked by dedicated issubclass test. Schema-level @model_validator(mode='after') enforces the 5-field data_unavailable=True invariant — closes 04-RESEARCH.md Pitfall #1 at construction time. **Phase 4 status: In Progress (2/3 plans complete).** Wave 1 closes; Wave 2 (04-03 position_adjustment analyst, the final Phase 4 plan) unblocked. Next: `/gmd:execute-plan 04-03`.
 
