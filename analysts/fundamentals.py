@@ -34,6 +34,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
+from analysts._indicator_math import _total_to_verdict
 from analysts.data.snapshot import Snapshot
 from analysts.schemas import TickerConfig
 from analysts.signals import AgentSignal, Verdict
@@ -166,26 +167,6 @@ def _score_pm(pm: Optional[float]) -> tuple[int, Optional[str]]:
             f"(below {PM_BEARISH_BELOW * 100:.0f}% bearish band)"
         )
     return 0, f"profit margin {pm * 100:.1f}% (neutral band)"
-
-
-# ---------------------------------------------------------------------------
-# Verdict tiering — normalize a signed total to [-1, +1] then map to the
-# 5-state ladder. Boundaries are STRICT (> not >=) at 0.6 / 0.2 so a
-# normalized value of exactly 0.6 maps to "bullish" not "strong_bullish"
-# (the partial-bullish boundary case in test_5_state_ladder_bullish_partial).
-# ---------------------------------------------------------------------------
-
-
-def _total_to_verdict(normalized: float) -> Verdict:
-    if normalized > 0.6:
-        return "strong_bullish"
-    if normalized > 0.2:
-        return "bullish"
-    if normalized < -0.6:
-        return "strong_bearish"
-    if normalized < -0.2:
-        return "bearish"
-    return "neutral"
 
 
 # ---------------------------------------------------------------------------

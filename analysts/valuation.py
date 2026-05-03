@@ -52,6 +52,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
+from analysts._indicator_math import _total_to_verdict
 from analysts.data.snapshot import Snapshot
 from analysts.schemas import TickerConfig
 from analysts.signals import AgentSignal, Verdict
@@ -89,22 +90,6 @@ def _signed_gap(anchor: float, current: float) -> float:
     delta = (current - anchor) / anchor
     s = -delta / GAP_SATURATION
     return max(-1.0, min(1.0, s))
-
-
-def _total_to_verdict(normalized: float) -> Verdict:
-    """Map normalized aggregate to the 5-state ladder.
-
-    Strict > boundaries at 0.6 / 0.2, identical to fundamentals + technicals.
-    """
-    if normalized > 0.6:
-        return "strong_bullish"
-    if normalized > 0.2:
-        return "bullish"
-    if normalized < -0.6:
-        return "strong_bearish"
-    if normalized < -0.2:
-        return "bearish"
-    return "neutral"
 
 
 # ---------------------------------------------------------------------------

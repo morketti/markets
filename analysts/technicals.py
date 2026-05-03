@@ -44,14 +44,24 @@ from typing import Optional
 
 import pandas as pd
 
+from analysts._indicator_math import (
+    ADX_MIN_BARS,
+    ADX_PERIOD,
+    ADX_RANGE_BELOW,
+    ADX_STABLE_BARS,
+    ADX_TREND_ABOVE,
+    _adx_14,
+    _build_df,
+    _total_to_verdict,
+)
 from analysts.data.prices import OHLCBar
 from analysts.data.snapshot import Snapshot
 from analysts.schemas import TickerConfig
 from analysts.signals import AgentSignal, Verdict
 
 # ---------------------------------------------------------------------------
-# Module-level constants — tunable by editing this file. Values from
-# 03-CONTEXT.md "Threshold Defaults" + 03-RESEARCH.md ADX walkthrough.
+# Module-level constants — technicals-specific. Shared ADX constants live
+# in analysts/_indicator_math.py and are re-exported above.
 # ---------------------------------------------------------------------------
 
 # SMA periods (bars). MA200 needs 200 bars of history; absent below that.
@@ -67,51 +77,12 @@ MOMENTUM_HORIZONS: tuple[tuple[int, int, float], ...] = (
     (6, 126, 0.15),   # 6 months: 126 trading days, ±15%
 )
 
-# ADX thresholds. > ADX_TREND_ABOVE = trend regime; < ADX_RANGE_BELOW =
-# range regime; in-between = ambiguous. The trend regime amplifies the
-# directional vote when MA + momentum already point the same way.
-ADX_PERIOD: int = 14
-ADX_TREND_ABOVE: float = 25.0
-ADX_RANGE_BELOW: float = 20.0
-
-# ADX warm-up: Wilder smoothing needs 2*N - 1 bars (here 27) for the first
-# valid value to settle. Below ADX_STABLE_BARS the value is mathematically
-# valid but may swing — flagged in the evidence string.
-ADX_MIN_BARS: int = 27
-ADX_STABLE_BARS: int = 150
-
 # Below this, no indicator is meaningful — return data_unavailable=True.
 MIN_BARS_FOR_ANY_INDICATOR: int = 20
 
 # Aggregation: max possible total = 1 (MA) + 3 (momentum) + 1 (ADX
 # amplifier) = 5. Normalize the signed total to [-1, +1] by dividing.
 _MAX_POSSIBLE_SCORE: int = 5
-
-
-# ---------------------------------------------------------------------------
-# DataFrame builder — list[OHLCBar] -> pandas DataFrame with high/low/close.
-# ---------------------------------------------------------------------------
-
-
-def _build_df(history: list[OHLCBar]) -> pd.DataFrame:
-    """Construct a DataFrame indexed by date with high/low/close columns.
-
-    Sorts by date (defensive against out-of-order history lists) and drops
-    rows whose close is NaN (defensive — OHLCBar's gt=0 schema constraint
-    prevents NaN closes today, but a future schema relaxation should not
-    silently produce NaN at iloc[-1] in indicator calculations).
-    """
-    if not history:
-        return pd.DataFrame(columns=["high", "low", "close"])
-    df = pd.DataFrame(
-        {
-            "high": [b.high for b in history],
-            "low": [b.low for b in history],
-            "close": [b.close for b in history],
-        },
-        index=pd.to_datetime([b.date for b in history]),
-    ).sort_index()
-    return df.dropna(subset=["close"])
 
 
 # ---------------------------------------------------------------------------
@@ -190,65 +161,6 @@ def _momentum_one(
     return 0, f"{label} momentum {pct * 100:+.1f}% (neutral band)"
 
 
-def _adx_14(df: pd.DataFrame) -> Optional[float]:
-    """Wilder ADX(14). Returns None below ADX_MIN_BARS (27) or on NaN result.
-
-    Implementation walks through the canonical Wilder recipe using pandas
-    primitives:
-      1. True Range: max(high - low, |high - prev_close|, |low - prev_close|)
-      2. +DM / -DM directional movement (positive when up-move dominates).
-      3. Wilder-smooth (.ewm with alpha = 1/N, adjust=False) TR / +DM / -DM.
-      4. +DI / -DI = 100 * smoothed +DM / smoothed TR (and likewise for -DI).
-      5. DX = 100 * |+DI - -DI| / (+DI + -DI).
-      6. ADX = Wilder-smoothed DX.
-
-    Returns the latest ADX value as a float, or None if it computes to NaN
-    (which can happen when +DI + -DI is identically zero — a flat-line bar
-    series — or when not enough bars have accumulated).
-    """
-    if len(df) < ADX_MIN_BARS:
-        return None
-    high = df["high"]
-    low = df["low"]
-    close = df["close"]
-    prev_close = close.shift(1)
-
-    # True Range
-    tr = pd.concat(
-        [
-            high - low,
-            (high - prev_close).abs(),
-            (low - prev_close).abs(),
-        ],
-        axis=1,
-    ).max(axis=1)
-
-    # Directional Movement
-    up_move = high.diff()
-    down_move = -low.diff()
-    plus_dm = pd.Series(0.0, index=df.index).where(
-        ~((up_move > down_move) & (up_move > 0)), up_move
-    )
-    minus_dm = pd.Series(0.0, index=df.index).where(
-        ~((down_move > up_move) & (down_move > 0)), down_move
-    )
-
-    alpha = 1.0 / ADX_PERIOD
-    atr = tr.ewm(alpha=alpha, adjust=False).mean()
-    plus_di = 100.0 * plus_dm.ewm(alpha=alpha, adjust=False).mean() / atr
-    minus_di = 100.0 * minus_dm.ewm(alpha=alpha, adjust=False).mean() / atr
-
-    di_sum = plus_di + minus_di
-    # Avoid divide-by-zero on flat bars; the resulting NaN is filtered below.
-    dx = 100.0 * (plus_di - minus_di).abs() / di_sum
-    adx = dx.ewm(alpha=alpha, adjust=False).mean()
-    val = adx.iloc[-1]
-    # NaN-defensive: pd.isna handles both numpy NaN and pandas NA.
-    if pd.isna(val):
-        return None
-    return float(val)
-
-
 def _adx_evidence(adx: Optional[float], n_bars: int) -> Optional[str]:
     """Format the ADX evidence string. Returns None when adx is None."""
     if adx is None:
@@ -259,25 +171,6 @@ def _adx_evidence(adx: Optional[float], n_bars: int) -> Optional[str]:
     if adx < ADX_RANGE_BELOW:
         return f"ADX {adx:.0f} — range regime{suffix}"
     return f"ADX {adx:.0f} — ambiguous regime{suffix}"
-
-
-# ---------------------------------------------------------------------------
-# Verdict tiering — same shape as analysts/fundamentals.py:_total_to_verdict.
-# Strict > boundaries at 0.6 / 0.2 so a normalized value of exactly 0.6
-# maps to "bullish" not "strong_bullish".
-# ---------------------------------------------------------------------------
-
-
-def _total_to_verdict(normalized: float) -> Verdict:
-    if normalized > 0.6:
-        return "strong_bullish"
-    if normalized > 0.2:
-        return "bullish"
-    if normalized < -0.6:
-        return "strong_bearish"
-    if normalized < -0.2:
-        return "bearish"
-    return "neutral"
 
 
 # ---------------------------------------------------------------------------
