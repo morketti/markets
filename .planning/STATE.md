@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: null
-status: phase_complete
-last_updated: "2026-05-03T05:30:00.000Z"
+current_plan: 2
+status: executing
+last_updated: "2026-05-03T06:00:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 17
-  completed_plans: 17
+  total_plans: 18
+  completed_plans: 18
 ---
 
 # State: Markets
@@ -20,15 +20,17 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 
 **Core value:** Every morning, in one screen — which watchlist tickers need attention today and why, across short-term tactical and long-term strategic horizons.
 
-**Current focus:** Phase 3 (Analytical Agents — Deterministic Scoring) **COMPLETE** — all 5 plans shipped (03-01 signals scaffold + 03-02 fundamentals + 03-03 technicals + 03-04 news_sentiment + 03-05 valuation). All four analyst modules in `analysts/` (fundamentals.py, technicals.py, news_sentiment.py, valuation.py) emit pure-function `AgentSignal` per ticker with the 5-state ladder verdict + 0-100 confidence + evidence list contract; every analyst respects the empty-data UNIFORM RULE (data_unavailable=True, verdict='neutral', confidence=0, ≥1 evidence string when inputs are missing). The 2 cross-cutting invariant tests in `tests/analysts/test_invariants.py` (`test_always_four_signals` + `test_dark_snapshot_emits_four_unavailable`) flipped GREEN naturally upon Wave-2-closeout xfail-marker removal in 03-05's Task 3 — confirming all four analysts respect the cross-cutting "always 4 signals" + "dark snapshot ⇒ 4 data_unavailable=True" contracts from 03-CONTEXT.md. ANLY-01..04 all `[x]` in REQUIREMENTS.md. Phase 4 (Position-Adjustment Radar) unblocked — POSE-01..05 will reuse the hand-rolled pandas indicator pattern from 03-03 + the multi-method weighted aggregation pattern from 03-05.
+**Current focus:** Phase 4 (Position-Adjustment Radar) IN PROGRESS — Wave 0 foundation refactor (Plan 04-01) complete. `analysts/_indicator_math.py` extracted (~165 LOC); `_build_df` + `_adx_14` + `_total_to_verdict` consolidated to single source of truth (DRY trigger fired on 4th copy). 5 ADX module constants live alongside `_adx_14`. 3 caller modules (`analysts/{fundamentals, technicals, valuation}.py`) refactored via import-only changes. 3 new synthetic-history builders appended to `tests/analysts/conftest.py` for explicit overbought/oversold/range regression testing. Phase 3 regression invariant held: all 310 existing tests stayed GREEN. 23 new tests added (19 indicator_math + 4 synthetic_fixtures). Full repo: 333 passed. Wave 1 (04-02 PositionSignal schema) and Wave 2 (04-03 Position-Adjustment analyst) unblocked.
+
+**Phase 3 lineage:** Phase 3 (Analytical Agents — Deterministic Scoring) **COMPLETE** — all 5 plans shipped (03-01 signals scaffold + 03-02 fundamentals + 03-03 technicals + 03-04 news_sentiment + 03-05 valuation). All four analyst modules in `analysts/` (fundamentals.py, technicals.py, news_sentiment.py, valuation.py) emit pure-function `AgentSignal` per ticker with the 5-state ladder verdict + 0-100 confidence + evidence list contract; every analyst respects the empty-data UNIFORM RULE (data_unavailable=True, verdict='neutral', confidence=0, ≥1 evidence string when inputs are missing). The 2 cross-cutting invariant tests in `tests/analysts/test_invariants.py` (`test_always_four_signals` + `test_dark_snapshot_emits_four_unavailable`) flipped GREEN naturally upon Wave-2-closeout xfail-marker removal in 03-05's Task 3 — confirming all four analysts respect the cross-cutting "always 4 signals" + "dark snapshot ⇒ 4 data_unavailable=True" contracts from 03-CONTEXT.md. ANLY-01..04 all `[x]` in REQUIREMENTS.md. Phase 4 (Position-Adjustment Radar) unblocked — POSE-01..05 will reuse the hand-rolled pandas indicator pattern from 03-03 + the multi-method weighted aggregation pattern from 03-05.
 
 ## Current Phase
 
-**Phase:** 03-analytical-agents-deterministic-scoring
-**Status:** **Complete** (5/5 plans)
-**Current Plan:** —
-**Total Plans in Phase:** 5
-**Next:** Phase 4 (Position-Adjustment Radar) plan-phase. POSE-01..05 indicators (RSI / Bollinger / Stochastic / Williams %R / MACD / Hurst) — phase-research will revisit the ta-lib / pandas-ta-classic dependency-choice debate, then deliver one POSE module that consumes the same Snapshot from Phase 2 and emits a `consensus_score` ∈ [-1, +1] + `state` ∈ {extreme_oversold..extreme_overbought} + ADX-trend-regime gating.
+**Phase:** 04-position-adjustment-radar
+**Status:** In Progress (1/3 plans complete)
+**Current Plan:** 2
+**Total Plans in Phase:** 3
+**Next:** Execute Plan 04-02 (PositionSignal Pydantic schema, ~80 LOC + ≥12 schema tests). Then 04-03 (full position_adjustment analyst with 6 indicator helpers + state/action_hint mapping + cross-cutting invariant). 04-03 is the final plan; closes POSE-01..05 in REQUIREMENTS.md.
 
 ## Phase Status
 
@@ -37,7 +39,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 | 1 | Foundation — Watchlist + Per-Ticker Config | Complete (5/5 plans) |
 | 2 | Ingestion — Keyless Data Plane | Complete (7/7 plans) |
 | 3 | Analytical Agents — Deterministic Scoring | Complete (5/5 plans) |
-| 4 | Position-Adjustment Radar | Pending |
+| 4 | Position-Adjustment Radar | In Progress (1/3 plans) |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Pending |
 | 6 | Frontend MVP — Morning Scan + Deep-Dive | Pending |
 | 7 | Decision-Support View + Dissent Surface | Pending |
@@ -86,6 +88,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **Hatchling editable-install gotcha confirmed:** When a plan creates a new top-level package listed in `[tool.hatch.build.targets.wheel] packages`, follow with `uv sync --reinstall-package markets` so the editable wheel is rebuilt to include it. (Plan 01 Task 2 hit this.)
 
 ## Last Touched
+
+2026-05-03 after Phase 4 / Plan 01 (Wave 0 foundation refactor — extract `_build_df` + `_adx_14` + `_total_to_verdict` to shared `analysts/_indicator_math.py` + 3 new synthetic-history builders for explicit overbought/oversold/range regression testing) execution complete; 4 task commits `bc4d56d` (Task 1 RED — failing tests for indicator_math), `3e35fa8` (Task 1 GREEN — refactor extracts helpers + refactors 3 callers), `0be3138` (Task 2 RED — failing tests for synthetic fixtures), `0328292` (Task 2 GREEN — append 3 builders to conftest.py). 23 new tests added (19 indicator_math + 4 synthetic_fixtures). Coverage on `analysts/_indicator_math.py`: **97% line+branch combined** (gate ≥90/85). Phase 3 regression invariant: ALL 310 existing tests stayed GREEN through both refactor and fixture additions. Full repo: **333 passed** (310 baseline + 23 new). **Phase 4 status: In Progress (1/3 plans complete).** Wave 0 closes; Wave 1 (04-02 PositionSignal schema) and Wave 2 (04-03 position_adjustment analyst) unblocked. Next: `/gmd:execute-plan 04-02`.
 
 2026-05-03 after Phase 3 / Plan 05 (valuation analyst — thesis/targets/consensus 3-tier blend with density-weighted confidence + Wave 2 closeout removing xfail markers) execution complete; 3 task commits `037324e` (Task 1 RED — failing tests for valuation analyst), `e89b293` (Task 2 GREEN — analysts/valuation.py implementation, all 23 tests green on first try, 0 deviations), `36f3912` (Task 3 — Wave 2 closeout, xfail markers REMOVED from tests/analysts/test_invariants.py; both cross-cutting tests flipped GREEN naturally). 23 new tests in `tests/analysts/test_valuation.py` (above plan's ≥18 floor). Coverage on `analysts/valuation.py`: **100% line / 100% branch** (gate ≥90/85). Full repo suite **310 passed, 0 xfailed** (up from 285 + 2 xfailed at end of 03-04: +23 valuation tests + 2 invariants flipping from xfail → pass). **Phase 3 status: COMPLETE (5/5 plans).** ANLY-04 marked complete in REQUIREMENTS.md (Pending → Complete); ANLY-01..04 ALL `[x]` (full Phase 3 traceability closed). Wave 2 closeout verified: the strict=True markers held throughout Wave 2 (Plans 03-02 / 03-03 / 03-04 / 03-05) — they did NOT unexpectedly turn GREEN at any earlier plan; the 2 cross-cutting invariants flipped GREEN ONLY when the markers were removed in 03-05's Task 3, confirming all four analysts respect the cross-cutting contracts. Next: `/gmd:plan-phase 4` (Position-Adjustment Radar — POSE-01..05).
 
