@@ -35,11 +35,11 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Position-Adjustment Radar (POSE)
 
-- [ ] **POSE-01**: Position-Adjustment Analyzer computes multi-indicator consensus from RSI(14), Bollinger Bands position, z-score vs 50-day MA, Stochastic %K, Williams %R, MACD divergence
-- [ ] **POSE-02**: Output `state` ∈ {extreme_oversold, oversold, fair, overbought, extreme_overbought}; `consensus_score` ∈ [-1, +1]; `confidence` reflects indicator agreement count
-- [ ] **POSE-03**: ADX(14) > 25 triggers trend-regime gating: mean-reversion indicators are downweighted in scoring
-- [ ] **POSE-04**: `action_hint` derived from state ∈ {consider_add, hold_position, consider_trim, consider_take_profits}
-- [ ] **POSE-05**: Position-Adjustment output is the headline data structure powering the Morning Scan's primary lens
+- [x] **POSE-01**: Position-Adjustment Analyzer computes multi-indicator consensus from RSI(14), Bollinger Bands position, z-score vs 50-day MA, Stochastic %K, Williams %R, MACD divergence
+- [x] **POSE-02**: Output `state` ∈ {extreme_oversold, oversold, fair, overbought, extreme_overbought}; `consensus_score` ∈ [-1, +1]; `confidence` reflects indicator agreement count
+- [x] **POSE-03**: ADX(14) > 25 triggers trend-regime gating: mean-reversion indicators are downweighted in scoring
+- [x] **POSE-04**: `action_hint` derived from state ∈ {consider_add, hold_position, consider_trim, consider_take_profits}
+- [x] **POSE-05**: Position-Adjustment output is the headline data structure powering the Morning Scan's primary lens
 
 ### LLM Persona + Synthesizer (LLM)
 
@@ -170,11 +170,11 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | ANLY-02 | Phase 3 | Complete |
 | ANLY-03 | Phase 3 | Complete |
 | ANLY-04 | Phase 3 | Complete |
-| POSE-01 | Phase 4 | Pending |
-| POSE-02 | Phase 4 | Pending |
-| POSE-03 | Phase 4 | Pending |
-| POSE-04 | Phase 4 | Pending |
-| POSE-05 | Phase 4 | Pending |
+| POSE-01 | Phase 4 | Complete |
+| POSE-02 | Phase 4 | Complete |
+| POSE-03 | Phase 4 | Complete |
+| POSE-04 | Phase 4 | Complete |
+| POSE-05 | Phase 4 | Complete |
 | LLM-01 | Phase 5 | Pending |
 | LLM-02 | Phase 5 | Pending |
 | LLM-03 | Phase 5 | Pending |
