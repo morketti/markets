@@ -212,3 +212,59 @@ def test_verdict_and_analyst_id_types_exposed() -> None:
     # Smoke-import — confirms the names exist and survive future refactors.
     assert Verdict is not None
     assert AnalystId is not None
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 / Plan 05-01 — AnalystId widening from 4 IDs to 10 IDs
+# (4 analytical + 6 persona slate)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "analyst_id",
+    [
+        # Phase 3 analytical (existing 4):
+        "fundamentals",
+        "technicals",
+        "news_sentiment",
+        "valuation",
+        # Phase 5 persona slate (new 6):
+        "buffett",
+        "munger",
+        "wood",
+        "burry",
+        "lynch",
+        "claude_analyst",
+    ],
+)
+def test_analyst_id_widened_to_10(analyst_id: str, frozen_now) -> None:
+    """AnalystId Literal accepts all 10 IDs after Wave 0 widening (Plan 05-01)."""
+    sig = AgentSignal(
+        ticker="AAPL",
+        analyst_id=analyst_id,
+        computed_at=frozen_now,
+    )
+    assert sig.analyst_id == analyst_id
+
+
+def test_analyst_id_rejects_invalid(frozen_now) -> None:
+    """AnalystId Literal still rejects non-listed strings — narrowness preserved."""
+    with pytest.raises(ValidationError) as exc_info:
+        AgentSignal(
+            ticker="AAPL",
+            analyst_id="not_a_persona",
+            computed_at=frozen_now,
+        )
+    assert any("analyst_id" in str(err) for err in exc_info.value.errors())
+
+
+def test_analyst_id_literal_arity_is_10() -> None:
+    """The widened Literal has exactly 10 args — guards against accidental drift."""
+    from typing import get_args
+
+    args = get_args(AnalystId)
+    assert len(args) == 10, f"AnalystId has {len(args)} args (expected 10): {args}"
+    assert set(args) == {
+        "fundamentals", "technicals", "news_sentiment", "valuation",
+        "buffett", "munger", "wood", "burry", "lynch", "claude_analyst",
+    }

@@ -11,6 +11,7 @@ dependencies = [
     "feedparser>=6.0,<7",
     "beautifulsoup4>=4.12,<5",
     "vaderSentiment>=3.3,<4",
+    "anthropic>=0.95,<1",
 ]
 
 [project.scripts]
@@ -29,7 +30,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["analysts", "watchlist", "cli", "ingestion"]
+packages = ["analysts", "watchlist", "cli", "ingestion", "routine", "synthesis"]
 
 [tool.ruff]
 line-length = 100
@@ -43,5 +44,5 @@ testpaths = ["tests"]
 addopts = "-ra --strict-markers"
 
 [tool.coverage.run]
-source = ["analysts", "watchlist", "cli", "ingestion"]
+source = ["analysts", "watchlist", "cli", "ingestion", "routine", "synthesis"]
 branch = true
