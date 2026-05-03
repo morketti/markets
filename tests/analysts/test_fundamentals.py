@@ -131,6 +131,38 @@ def test_per_config_ps_bullish_undervalued(
     assert "undervalued" in ps_evidence[0].lower()
 
 
+def test_per_config_ps_bearish_overvalued(
+    make_snapshot, make_ticker_config, frozen_now
+) -> None:
+    """target_multiples.ps_target=5 + actual ps=8 → overvalued (>120%)."""
+    cfg = make_ticker_config(
+        target_multiples=FundamentalTargets(ps_target=5.0),
+    )
+    snap = make_snapshot(fundamentals=_fund(ps=8.0))
+
+    sig = score(snap, cfg, computed_at=frozen_now)
+
+    ps_evidence = [e for e in sig.evidence if "P/S" in e]
+    assert len(ps_evidence) == 1
+    assert "overvalued" in ps_evidence[0].lower()
+
+
+def test_per_config_ps_neutral_within_band(
+    make_snapshot, make_ticker_config, frozen_now
+) -> None:
+    """target_multiples.ps_target=5 + actual ps=5.5 (within ±20%) → near target."""
+    cfg = make_ticker_config(
+        target_multiples=FundamentalTargets(ps_target=5.0),
+    )
+    snap = make_snapshot(fundamentals=_fund(ps=5.5))
+
+    sig = score(snap, cfg, computed_at=frozen_now)
+
+    ps_evidence = [e for e in sig.evidence if "P/S" in e]
+    assert len(ps_evidence) == 1
+    assert "near target" in ps_evidence[0].lower()
+
+
 # ---------------------------------------------------------------------------
 # Fallback path (no target_multiples set, or target is None for that metric)
 # ---------------------------------------------------------------------------
