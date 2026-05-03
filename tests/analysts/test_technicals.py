@@ -309,11 +309,17 @@ def test_ma_alignment_bearish_stack(
 def test_ma_alignment_mixed(
     make_snapshot, make_ticker_config, frozen_now
 ) -> None:
-    """V-shape: long downtrend then sharp recovery → MA stack mixed."""
-    # First 150 bars trending down, last 50 trending up sharply — produces
-    # MA20 (recent high) > MA50 (mixed) but MA200 (legacy low) > MA50.
-    down = synthetic_downtrend_history(150, start=200.0, daily_drift=-0.005)
-    up = synthetic_uptrend_history(50, start=down[-1].close, daily_drift=0.020)
+    """V-shape: long downtrend then mild recovery → MA stack mixed.
+
+    Construction must keep MA200 elevated above MA50 (legacy downtrend-era
+    bars dominate the 200-bar window) while MA20 > MA50 (recent recovery).
+    A short, mild recovery is required — a long or sharp recovery pulls
+    MA50 above MA200 and produces a fully bullish stack instead.
+    """
+    # 200 bars down (200 → ~73.4) + 30 bars up at mild +0.5% drift.
+    # MA20 (~80) > MA50 (~78) but MA200 (~95) > MA50 → mixed (not bullish).
+    down = synthetic_downtrend_history(200, start=200.0, daily_drift=-0.005)
+    up = synthetic_uptrend_history(30, start=down[-1].close, daily_drift=0.005)
     # Re-date the up segment so it follows the down segment chronologically.
     from datetime import timedelta
     last_down_date = down[-1].date
@@ -417,15 +423,22 @@ def test_provenance_header_present() -> None:
 
 
 def test_pandas_imported_no_pandas_ta() -> None:
-    """analysts/technicals.py uses hand-rolled pandas — no ta-lib / pandas-ta deps."""
+    """analysts/technicals.py uses hand-rolled pandas — no ta-lib / pandas-ta IMPORTS.
+
+    The provenance docstring legitimately mentions pandas-ta / ta-lib by name to
+    enumerate the deps we deliberately rejected (per 03-RESEARCH.md "don't
+    hand-roll" anti-pattern guidance). So this test inspects actual `import` /
+    `from … import` statements, not raw substrings.
+    """
+    import re
     src = Path("analysts/technicals.py").read_text(encoding="utf-8")
     assert "import pandas as pd" in src
-    # No pandas-ta / ta-lib in any form (case insensitive substring search).
-    lowered = src.lower()
-    assert "pandas_ta" not in lowered
-    assert "pandas-ta" not in lowered
-    assert "talib" not in lowered
-    assert "ta_lib" not in lowered
+    forbidden = re.compile(
+        r"^\s*(?:import|from)\s+(pandas_ta|talib|ta_lib)\b",
+        re.MULTILINE,
+    )
+    matches = forbidden.findall(src)
+    assert not matches, f"forbidden indicator-library imports found: {matches}"
 
 
 def test_computed_at_passes_through(
