@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 2
+current_plan: 3
 status: executing
-last_updated: "2026-05-03T06:00:00.000Z"
+last_updated: "2026-05-03T06:30:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 19
+  completed_plans: 19
 ---
 
 # State: Markets
@@ -27,10 +27,10 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 04-position-adjustment-radar
-**Status:** In Progress (1/3 plans complete)
-**Current Plan:** 2
+**Status:** In Progress (2/3 plans complete)
+**Current Plan:** 3
 **Total Plans in Phase:** 3
-**Next:** Execute Plan 04-02 (PositionSignal Pydantic schema, ~80 LOC + ≥12 schema tests). Then 04-03 (full position_adjustment analyst with 6 indicator helpers + state/action_hint mapping + cross-cutting invariant). 04-03 is the final plan; closes POSE-01..05 in REQUIREMENTS.md.
+**Next:** Execute Plan 04-03 (full position_adjustment analyst — 6 indicator helpers + state/action_hint mapping + cross-cutting invariant test extension). 04-03 is the final plan; closes POSE-01..05 in REQUIREMENTS.md.
 
 ## Phase Status
 
@@ -39,7 +39,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 | 1 | Foundation — Watchlist + Per-Ticker Config | Complete (5/5 plans) |
 | 2 | Ingestion — Keyless Data Plane | Complete (7/7 plans) |
 | 3 | Analytical Agents — Deterministic Scoring | Complete (5/5 plans) |
-| 4 | Position-Adjustment Radar | In Progress (1/3 plans) |
+| 4 | Position-Adjustment Radar | In Progress (2/3 plans) |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer | Pending |
 | 6 | Frontend MVP — Morning Scan + Deep-Dive | Pending |
 | 7 | Decision-Support View + Dissent Surface | Pending |
@@ -88,6 +88,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 - **Hatchling editable-install gotcha confirmed:** When a plan creates a new top-level package listed in `[tool.hatch.build.targets.wheel] packages`, follow with `uv sync --reinstall-package markets` so the editable wheel is rebuilt to include it. (Plan 01 Task 2 hit this.)
 
 ## Last Touched
+
+2026-05-03 after Phase 4 / Plan 02 (PositionSignal Pydantic schema) execution complete; 2 task commits `e146a44` (Task 1 RED — 27 failing tests, parametrized expansion to 35 effective) and `fa89b14` (Task 1 GREEN — analysts/position_signal.py implementation, all 35 green on first run, 0 deviations). 35 new tests in `tests/analysts/test_position_signal.py` (above plan's ≥12 floor). Coverage on `analysts/position_signal.py`: **100% line / 100% branch** (gate ≥90/85). Full repo: **368 passed** (333 baseline + 35 new). PEER-not-subtype contract with AgentSignal locked by dedicated issubclass test. Schema-level @model_validator(mode='after') enforces the 5-field data_unavailable=True invariant — closes 04-RESEARCH.md Pitfall #1 at construction time. **Phase 4 status: In Progress (2/3 plans complete).** Wave 1 closes; Wave 2 (04-03 position_adjustment analyst, the final Phase 4 plan) unblocked. Next: `/gmd:execute-plan 04-03`.
 
 2026-05-03 after Phase 4 / Plan 01 (Wave 0 foundation refactor — extract `_build_df` + `_adx_14` + `_total_to_verdict` to shared `analysts/_indicator_math.py` + 3 new synthetic-history builders for explicit overbought/oversold/range regression testing) execution complete; 4 task commits `bc4d56d` (Task 1 RED — failing tests for indicator_math), `3e35fa8` (Task 1 GREEN — refactor extracts helpers + refactors 3 callers), `0be3138` (Task 2 RED — failing tests for synthetic fixtures), `0328292` (Task 2 GREEN — append 3 builders to conftest.py). 23 new tests added (19 indicator_math + 4 synthetic_fixtures). Coverage on `analysts/_indicator_math.py`: **97% line+branch combined** (gate ≥90/85). Phase 3 regression invariant: ALL 310 existing tests stayed GREEN through both refactor and fixture additions. Full repo: **333 passed** (310 baseline + 23 new). **Phase 4 status: In Progress (1/3 plans complete).** Wave 0 closes; Wave 1 (04-02 PositionSignal schema) and Wave 2 (04-03 position_adjustment analyst) unblocked. Next: `/gmd:execute-plan 04-02`.
 
