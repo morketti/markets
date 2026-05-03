@@ -1,11 +1,12 @@
-"""Cross-cutting invariant tests for the four Wave 2 Phase 3 analysts.
+"""Cross-cutting invariant tests for the Phase 3 analysts + Phase 4 PositionSignal.
 
-Both tests exercise contracts that span all four analyst modules:
-`test_always_four_signals` confirms each (snapshot, config) input produces
-exactly 4 AgentSignals (one per analyst); `test_dark_snapshot_emits_four_unavailable`
-confirms the UNIFORM RULE — every analyst's empty-data path emits a
-data_unavailable=True signal with verdict='neutral', confidence=0, and
-exactly one explanatory evidence string.
+`test_always_four_signals` and `test_dark_snapshot_emits_four_unavailable`
+exercise contracts spanning all four Phase 3 analyst modules.
+`test_dark_snapshot_emits_pose_unavailable` extends the same UNIFORM RULE
+to Phase 4's position_adjustment — its dark-snapshot path emits a
+data_unavailable=True PositionSignal with state='fair', consensus_score=0.0,
+confidence=0, action_hint='hold_position', trend_regime=False, exactly one
+evidence string.
 """
 from __future__ import annotations
 
@@ -76,3 +77,34 @@ def test_dark_snapshot_emits_four_unavailable(
         assert sig.verdict == "neutral"
         assert sig.confidence == 0
         assert len(sig.evidence) == 1
+
+
+def test_dark_snapshot_emits_pose_unavailable(
+    make_snapshot,
+    make_ticker_config,
+    frozen_now,
+) -> None:
+    """Phase 4 extension: dark snapshot → PositionSignal(data_unavailable=True, ...)
+    with the canonical no-opinion shape (state='fair', consensus_score=0.0,
+    confidence=0, action_hint='hold_position', trend_regime=False, 1 evidence).
+    """
+    from analysts import position_adjustment
+
+    snap = make_snapshot(
+        data_unavailable=True,
+        prices=None,
+        fundamentals=None,
+        news=[],
+        social=None,
+        filings=[],
+    )
+    cfg = make_ticker_config()
+    sig = position_adjustment.score(snap, cfg)
+
+    assert sig.data_unavailable is True
+    assert sig.state == "fair"
+    assert sig.consensus_score == 0.0
+    assert sig.confidence == 0
+    assert sig.action_hint == "hold_position"
+    assert sig.trend_regime is False
+    assert len(sig.evidence) == 1
