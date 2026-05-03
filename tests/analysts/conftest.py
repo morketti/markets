@@ -14,9 +14,15 @@ tests/analysts/test_invariants.py in this plan):
         make_snapshot        — builder closure over Snapshot with sensible defaults
 
     Module-level builders (NOT fixtures — importable directly so tests can pin n):
-        synthetic_uptrend_history(n, start, daily_drift)  -> list[OHLCBar]
-        synthetic_downtrend_history(n, start, daily_drift) -> list[OHLCBar]
-        synthetic_sideways_history(n, start, amplitude)    -> list[OHLCBar]
+        synthetic_uptrend_history(n, start, daily_drift)        -> list[OHLCBar]
+        synthetic_downtrend_history(n, start, daily_drift)      -> list[OHLCBar]
+        synthetic_sideways_history(n, start, amplitude)         -> list[OHLCBar]
+        synthetic_oversold_history(n, start, daily_drift,
+                                   final_drop_bars, final_drop_pct)  -> list[OHLCBar]
+        synthetic_overbought_history(n, start, daily_drift,
+                                     final_pop_bars, final_pop_pct)  -> list[OHLCBar]
+        synthetic_mean_reverting_history(n, start, amplitude,
+                                         period_bars)           -> list[OHLCBar]
 
 Determinism contract: builders use NO random sources. Two calls with identical
 arguments produce byte-identical OHLCBar lists. Tests that depend on this
@@ -131,6 +137,73 @@ def synthetic_sideways_history(
     """
     def _close(i: int, _prev: float, s: float) -> float:
         return s * (1.0 + amplitude * math.sin(2.0 * math.pi * i / 20.0))
+
+    return _build_ohlc_bars(n, start, close_fn=_close)
+
+
+def synthetic_oversold_history(
+    n: int = 252,
+    start: float = 200.0,
+    daily_drift: float = -0.005,
+    final_drop_bars: int = 5,
+    final_drop_pct: float = 0.05,
+) -> list[OHLCBar]:
+    """n daily bars in a downtrend ending with a sharp drop — explicit oversold regime.
+
+    Trend portion (first n - final_drop_bars bars): synthetic_downtrend_history shape
+    (geometric drift + small bounded noise). Final final_drop_bars (default 5) bars
+    drop an additional final_drop_pct (default 5%) cumulatively to push RSI < 30,
+    BB position < -1, Stoch %K < 20, Williams %R < -80 in Phase 4 regression tests.
+    """
+    drop_start_index = n - final_drop_bars
+
+    def _close(i: int, prev: float, _start: float) -> float:
+        if i < drop_start_index:
+            return prev * (1.0 + daily_drift) + 0.001 * ((i % 5) - 2)
+        return prev * (1.0 - final_drop_pct) + 0.001 * ((i % 5) - 2)
+
+    return _build_ohlc_bars(n, start, close_fn=_close)
+
+
+def synthetic_overbought_history(
+    n: int = 252,
+    start: float = 100.0,
+    daily_drift: float = 0.005,
+    final_pop_bars: int = 5,
+    final_pop_pct: float = 0.05,
+) -> list[OHLCBar]:
+    """Mirror of synthetic_oversold_history. n daily bars in an uptrend ending with a sharp pop.
+
+    Produces RSI > 70, BB position > +1, Stoch %K > 80, Williams %R > -20 in Phase 4
+    regression tests.
+    """
+    pop_start_index = n - final_pop_bars
+
+    def _close(i: int, prev: float, _start: float) -> float:
+        if i < pop_start_index:
+            return prev * (1.0 + daily_drift) + 0.001 * ((i % 5) - 2)
+        return prev * (1.0 + final_pop_pct) + 0.001 * ((i % 5) - 2)
+
+    return _build_ohlc_bars(n, start, close_fn=_close)
+
+
+def synthetic_mean_reverting_history(
+    n: int = 252,
+    start: float = 150.0,
+    amplitude: float = 0.10,
+    period_bars: int = 50,
+) -> list[OHLCBar]:
+    """n daily bars oscillating around start with controlled period and amplitude.
+
+    close[i] = start * (1 + amplitude * sin(2π i / period_bars)).
+
+    Default amplitude=0.10 (vs sideways=0.02) is wide enough to push BB position
+    to ±1.5 at peaks/troughs but mean-reverting enough that ADX(14) < 20 (range
+    regime). Used by Phase 4 to test "mean-reversion indicators score correctly
+    when ADX confirms range" path.
+    """
+    def _close(i: int, _prev: float, s: float) -> float:
+        return s * (1.0 + amplitude * math.sin(2.0 * math.pi * i / period_bars))
 
     return _build_ohlc_bars(n, start, close_fn=_close)
 
