@@ -469,13 +469,32 @@ def test_computed_at_default_uses_now(make_snapshot, make_ticker_config) -> None
 
 
 def test_no_module_level_clock_in_helpers() -> None:
-    """`datetime.now(` must appear ONLY inside score() — helpers receive `now` as parameter (Pitfall #7)."""
+    """`datetime.now(...)` must be CALLED only inside score() — helpers receive `now` as parameter (Pitfall #7).
+
+    Substring scans false-positive on docstring text (the provenance docstring
+    legitimately mentions `datetime.now(timezone.utc)` to document the
+    contract). Walks the AST and checks call sites only.
+    """
+    import ast
     src = Path("analysts/news_sentiment.py").read_text(encoding="utf-8")
-    # Count occurrences of datetime.now(
-    occurrences = src.count("datetime.now(")
-    # At most 1 — inside score(). Could be 0 if implementation uses a different default expression,
-    # but if any datetime.now() exists, it must be inside score().
-    assert occurrences <= 1, f"datetime.now() appears {occurrences}x in source — must be only inside score()"
+    tree = ast.parse(src)
+
+    def calls_datetime_now(node: ast.AST) -> bool:
+        for child in ast.walk(node):
+            if isinstance(child, ast.Call):
+                func = child.func
+                if isinstance(func, ast.Attribute) and func.attr == "now":
+                    if isinstance(func.value, ast.Name) and func.value.id == "datetime":
+                        return True
+        return False
+
+    for node in ast.iter_child_nodes(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.name == "score":
+                continue  # allowed: score() establishes `now` once at the top
+            assert not calls_datetime_now(node), (
+                f"datetime.now() called inside helper '{node.name}' — Pitfall #7 violation"
+            )
 
 
 def test_provenance_header_present() -> None:
