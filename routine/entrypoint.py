@@ -36,6 +36,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from analysts.data.snapshot import Snapshot
+from ingestion.refresh import run_refresh
 from routine.git_publish import commit_and_push
 from routine.quota import (
     DEFAULT_MARKETS_DAILY_QUOTA_TOKENS,
@@ -82,12 +84,29 @@ def main() -> int:
             estimated, quota, lite_mode,
         )
 
+        ingestion_root = Path("snapshots")
+        logger.info("running ingestion refresh into %s", ingestion_root)
+        manifest = run_refresh(
+            snapshots_root=ingestion_root,
+            now=run_started_at,
+        )
+        logger.info(
+            "ingestion: %d tickers fetched, %d run errors",
+            len(manifest.tickers),
+            len(manifest.errors),
+        )
+
+        def _load_snapshot_from_disk(ticker: str) -> Snapshot:
+            path = ingestion_root / date_str / f"{ticker}.json"
+            return Snapshot.model_validate_json(path.read_text(encoding="utf-8"))
+
         results = asyncio.run(
             run_for_watchlist(
                 watchlist,
                 lite_mode=lite_mode,
                 snapshots_root=snapshots_root,
                 computed_at=run_started_at,
+                snapshot_loader=_load_snapshot_from_disk,
             )
         )
 
