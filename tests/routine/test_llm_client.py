@@ -510,3 +510,72 @@ def test_try_extract_raw_returns_none_on_extraction_exception() -> None:
 
     # Best-effort: must NOT propagate the inner exception.
     assert _try_extract_raw(_RaisingExc()) is None  # type: ignore[arg-type]
+
+
+# ---------------------------------------------------------------------------
+# Append-only contract — pre-existing records on disk must SURVIVE a new
+# failure being logged. Sister test test_failure_log_append_only_across_invocations
+# locks the SEQUENTIAL append behavior (one process, multiple call_with_retry
+# invocations); this test locks the CROSS-PROCESS append behavior (file pre-
+# exists from an earlier process, e.g. yesterday's routine, and today's run
+# must not truncate it). The Nyquist hot-spot per the audit instructions:
+# "is there a test that asserts the file is never truncated, only appended to".
+# ---------------------------------------------------------------------------
+
+
+def test_log_failure_preserves_pre_existing_records(
+    isolated_failure_log,
+) -> None:
+    """Records written by a prior process MUST survive a new _log_failure call.
+
+    Simulates the cross-routine-run case: yesterday's run wrote 2 failures
+    to memory/llm_failures.jsonl; today's routine starts fresh, calls
+    _log_failure, and the prior 2 records MUST still be present afterwards
+    (file opened in append mode 'a', never truncated by 'w').
+    """
+    from routine.llm_client import _log_failure
+
+    # Simulate prior-run records on disk.
+    isolated_failure_log.parent.mkdir(parents=True, exist_ok=True)
+    prior_record_a = json.dumps(
+        {
+            "kind": "validation_error",
+            "label": "buffett:AAPL",
+            "message": "yesterday's failure A",
+            "raw": None,
+            "timestamp": "2026-05-03T11:00:00+00:00",
+        },
+        sort_keys=True,
+    )
+    prior_record_b = json.dumps(
+        {
+            "kind": "api_error",
+            "label": "synthesizer:MSFT",
+            "message": "yesterday's failure B",
+            "raw": None,
+            "timestamp": "2026-05-03T11:05:00+00:00",
+        },
+        sort_keys=True,
+    )
+    isolated_failure_log.write_text(
+        prior_record_a + "\n" + prior_record_b + "\n",
+        encoding="utf-8",
+    )
+
+    # Today's routine logs a new failure.
+    _log_failure("munger:GOOG", "validation_error", "today's failure", None)
+
+    # All 3 records present, in arrival order. Yesterday's records are
+    # byte-for-byte preserved.
+    lines = isolated_failure_log.read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 3, (
+        f"expected 3 records (2 prior + 1 new), got {len(lines)}: {lines!r}"
+    )
+    assert lines[0] == prior_record_a
+    assert lines[1] == prior_record_b
+
+    # New record appended last, with the expected payload.
+    new_record = json.loads(lines[2])
+    assert new_record["label"] == "munger:GOOG"
+    assert new_record["message"] == "today's failure"
+    assert new_record["kind"] == "validation_error"

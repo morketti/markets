@@ -485,3 +485,100 @@ def test_write_failure_status_emits_success_false(tmp_path: Path) -> None:
     assert status["lite_mode"] is False
     assert "error" in status
     assert "boom" in status["error"]
+
+
+# ---------------------------------------------------------------------------
+# Test 13 (Nyquist gap-fill): both _status.json writers satisfy LLM-08
+# minimum-key contract. Verifier Important finding #2 flagged the divergence
+# between happy-path (write_daily_snapshot, 7 keys) and failure-path
+# (write_failure_status, 9 keys) shapes. LLM-08 spec mandates 6 minimum keys:
+# {success, partial, completed_tickers, failed_tickers, skipped_tickers,
+# llm_failure_count}. Phase 6 frontend zod validation MUST tolerate either
+# shape; this test pins both writers' contract conformance so a future
+# refactor that adds/removes a top-level key from EITHER writer is caught.
+# ---------------------------------------------------------------------------
+
+LLM_08_MIN_KEYS = {
+    "success",
+    "partial",
+    "completed_tickers",
+    "failed_tickers",
+    "skipped_tickers",
+    "llm_failure_count",
+    "lite_mode",
+}
+
+
+def test_status_json_both_writers_satisfy_llm_08_minimum_keys(
+    tmp_path: Path,
+) -> None:
+    """Both write_daily_snapshot AND write_failure_status emit the LLM-08 keys.
+
+    LLM-08 contract: _status.json MUST contain at minimum the 7 keys listed
+    in LLM_08_MIN_KEYS. Two separate writers exist (happy-path
+    write_daily_snapshot + failure-path write_failure_status); both MUST
+    satisfy the contract independently so the Phase 6 frontend can assume
+    these keys exist regardless of which path produced the file.
+
+    Stage-2 verifier Important finding #2 documents the schema divergence
+    (failure-path adds run_started_at + error; happy-path adds nothing
+    extra). This test pins BOTH writers' minimum contract; a future change
+    that drops `lite_mode` from the failure-path (for example) is caught.
+    """
+    from routine import storage
+
+    # Happy-path writer.
+    happy_dir = tmp_path / "happy"
+    storage.write_daily_snapshot(
+        [_make_ticker_result("AAPL")],
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        run_completed_at=RUN_COMPLETED,
+        lite_mode=False,
+        total_token_count_estimate=19_800,
+        snapshots_root=happy_dir,
+    )
+    happy_status = json.loads(
+        (happy_dir / "2026-05-04" / "_status.json").read_text(encoding="utf-8"),
+    )
+
+    # Failure-path writer.
+    failure_dir = tmp_path / "failure"
+    storage.write_failure_status(
+        snapshots_root=failure_dir,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        error_msg="entrypoint crash",
+    )
+    failure_status = json.loads(
+        (failure_dir / "2026-05-04" / "_status.json").read_text(encoding="utf-8"),
+    )
+
+    # Both shapes MUST contain every LLM-08 minimum key.
+    happy_missing = LLM_08_MIN_KEYS - set(happy_status.keys())
+    failure_missing = LLM_08_MIN_KEYS - set(failure_status.keys())
+    assert not happy_missing, (
+        f"write_daily_snapshot _status.json missing LLM-08 keys: {happy_missing}"
+    )
+    assert not failure_missing, (
+        f"write_failure_status _status.json missing LLM-08 keys: {failure_missing}"
+    )
+
+    # The keys' value types are consistent across both shapes (Phase 6 zod
+    # can use a single base validator with optional extensions).
+    for shape_name, status in (("happy", happy_status), ("failure", failure_status)):
+        assert isinstance(status["success"], bool), shape_name
+        assert isinstance(status["partial"], bool), shape_name
+        assert isinstance(status["completed_tickers"], list), shape_name
+        assert isinstance(status["failed_tickers"], list), shape_name
+        assert isinstance(status["skipped_tickers"], list), shape_name
+        assert isinstance(status["llm_failure_count"], int), shape_name
+        assert isinstance(status["lite_mode"], bool), shape_name
+
+    # The DIVERGENCE is also locked: failure-path includes 'error' +
+    # 'run_started_at'; happy-path does not. If a future refactor unifies
+    # the shapes, that's an INTENTIONAL contract change; this assertion
+    # reminds the maintainer to update Phase 6 zod schemas in lockstep.
+    assert "error" in failure_status
+    assert "run_started_at" in failure_status
+    assert "error" not in happy_status

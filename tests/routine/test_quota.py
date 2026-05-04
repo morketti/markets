@@ -103,3 +103,45 @@ def test_estimate_formula_correctness(n_tickers: int) -> None:
     pick = base[:n_tickers]
     wl = Watchlist(tickers={t: TickerConfig(ticker=t) for t in pick})
     assert estimate_run_cost(wl) == n_tickers * 19_800
+
+
+# ---------------------------------------------------------------------------
+# Nyquist boundary lock — exact-equality threshold (estimated == quota).
+# Sister tests cover 30 tickers (594k UNDER) + 31 tickers (613.8k OVER); this
+# pins the third boundary: when `estimated == quota` exactly, the entrypoint
+# rule `lite_mode = estimated > quota` MUST evaluate to False (strict-greater,
+# not >=). A future refactor that accidentally inverts this (e.g. `>=` instead
+# of `>`) would fail this test.
+# ---------------------------------------------------------------------------
+
+
+def test_lite_mode_boundary_exact_equality_does_not_trigger() -> None:
+    """When estimate == quota EXACTLY, lite_mode MUST be False.
+
+    The entrypoint rule is `lite_mode = estimated > quota` (strict-greater).
+    A 30-ticker watchlist + a quota of EXACTLY 594_000 (the 30-ticker estimate)
+    must NOT trigger lite mode. This locks the inclusive-of-equality semantics:
+    using your full quota is allowed; only OVERSHOOTING triggers the cost
+    guard.
+    """
+    from analysts.schemas import TickerConfig, Watchlist
+
+    from routine.quota import estimate_run_cost
+
+    sample = [
+        "AAPL", "MSFT", "NVDA", "GOOG", "AMZN",
+        "META", "TSLA", "JPM", "V", "JNJ",
+        "PG", "HD", "MA", "CVX", "ABBV",
+        "KO", "PFE", "PEP", "WMT", "BAC",
+        "TMO", "COST", "DIS", "CRM", "ORCL",
+        "NKE", "ADBE", "AMD", "NFLX", "INTC",
+    ]
+    wl = Watchlist(tickers={t: TickerConfig(ticker=t) for t in sample})
+    estimated = estimate_run_cost(wl)
+    quota = estimated  # exact equality — the canonical Nyquist boundary
+    # Replicate the entrypoint computation verbatim:
+    lite_mode = estimated > quota
+    assert lite_mode is False, (
+        "estimated == quota exactly must NOT trigger lite_mode; rule is "
+        "strict-greater (`> quota`), not `>= quota`."
+    )

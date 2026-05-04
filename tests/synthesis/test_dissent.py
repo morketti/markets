@@ -360,3 +360,36 @@ def test_dissent_strong_verdicts_treated_as_directional(
     pid, summary = compute_dissent(signals)
     assert pid == "burry"
     assert "strong_bearish" in summary
+
+
+# ---------------------------------------------------------------------------
+# Nyquist boundary lock — explicit conf=31 (just-above-threshold) test.
+# Sister tests already cover conf=29 (exclusive) and conf=30 (inclusive); this
+# pins the third side of the Nyquist boundary so a future refactor that
+# accidentally inverts the comparison (e.g., `>=` → `==`, or off-by-one
+# `> THRESHOLD`) gets caught at conf=31 too.
+# ---------------------------------------------------------------------------
+
+
+def test_dissent_boundary_strictly_above_threshold_at_31(
+    frozen_now: datetime,
+) -> None:
+    """confidence==31 (just above DISSENT_THRESHOLD) MUST trigger.
+
+    Sister tests pin conf=29 (exclusive) and conf=30 (inclusive); this test
+    locks the third boundary point — strictly-above-threshold — so the
+    contract `confidence >= DISSENT_THRESHOLD` is invariant under refactor.
+    A bug that flipped to `confidence == DISSENT_THRESHOLD` (exact match)
+    would pass conf=30 but fail conf=31; this test is the discriminator.
+    """
+    signals = [
+        _persona("buffett", "bullish", 50, computed_at=frozen_now),
+        _persona("munger", "bullish", 50, computed_at=frozen_now),
+        _persona("wood", "bullish", 50, computed_at=frozen_now),
+        _persona("burry", "bearish", 31, computed_at=frozen_now),
+        _persona("lynch", "bullish", 50, computed_at=frozen_now),
+        _persona("claude_analyst", "bullish", 50, computed_at=frozen_now),
+    ]
+    pid, summary = compute_dissent(signals)
+    assert pid == "burry"
+    assert "conf=31" in summary
