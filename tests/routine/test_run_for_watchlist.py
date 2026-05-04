@@ -436,3 +436,123 @@ def test_ticker_result_threads_ohlc_history_and_headlines() -> None:
     assert r.ohlc_history[0].close == 100.5
     assert len(r.headlines) == 1
     assert r.headlines[0]["source"] == "yahoo-rss"
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 / Plan 08-01 / Task 2: Phase E memory log hook.
+#
+# After per-ticker pipeline produces persona_signals (6 AgentSignals when
+# non-lite), run_for_watchlist appends one record per (ticker, persona) to
+# memory/historical_signals.jsonl. Skipped when persona_signals empty
+# (lite_mode OR per-ticker failure both leave the list empty).
+# ---------------------------------------------------------------------------
+
+
+async def test_phase_e_writes_one_record_per_persona(
+    mock_anthropic_client, frozen_now, tmp_path,
+) -> None:
+    """Non-lite single-ticker run ⇒ one memory log record per persona (6 total).
+
+    Note: with a *dark* snapshot (data_unavailable=True), the synthesizer
+    short-circuits but the persona slate still runs (6 signals regardless).
+    """
+    from routine.run_for_watchlist import run_for_watchlist
+
+    log_path = tmp_path / "memory" / "historical_signals.jsonl"
+    watchlist = _build_watchlist(["AAPL"])
+
+    persona_ids = ["buffett", "munger", "wood", "burry", "lynch", "claude_analyst"]
+    for pid in persona_ids:
+        mock_anthropic_client.messages.queue_response(
+            _make_persona_signal(pid, "AAPL"),
+        )
+    mock_anthropic_client.messages.queue_response(_make_decision("AAPL"))
+
+    def loader(t: str) -> Snapshot:
+        return _make_dark_snapshot(t)
+
+    results = await run_for_watchlist(
+        watchlist,
+        lite_mode=False,
+        snapshots_root=Path("/tmp"),
+        computed_at=frozen_now,
+        client=mock_anthropic_client,
+        snapshot_loader=loader,
+        memory_log_path=log_path,
+    )
+
+    assert len(results) == 1
+    r = results[0]
+    assert len(r.persona_signals) == 6
+
+    import json
+
+    assert log_path.exists(), "memory log file should be written"
+    lines = log_path.read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 6, f"expected 6 records, got {len(lines)}"
+
+    records = [json.loads(line) for line in lines]
+    record_personas = {rec["persona_id"] for rec in records}
+    assert record_personas == set(persona_ids)
+    for rec in records:
+        assert rec["ticker"] == "AAPL"
+        assert rec["date"] == frozen_now.date().isoformat()
+        assert rec["verdict"] == "bullish"
+        assert rec["confidence"] == 70
+        assert rec["evidence_count"] == 1
+
+
+async def test_lite_mode_skips_phase_e(
+    mock_anthropic_client, frozen_now, tmp_path,
+) -> None:
+    """lite_mode=True ⇒ persona_signals=[] ⇒ NO memory log records written."""
+    from routine.run_for_watchlist import run_for_watchlist
+
+    log_path = tmp_path / "memory" / "historical_signals.jsonl"
+    watchlist = _build_watchlist(["AAPL"])
+
+    def loader(t: str) -> Snapshot:
+        return _make_dark_snapshot(t)
+
+    await run_for_watchlist(
+        watchlist,
+        lite_mode=True,
+        snapshots_root=Path("/tmp"),
+        computed_at=frozen_now,
+        client=mock_anthropic_client,
+        snapshot_loader=loader,
+        memory_log_path=log_path,
+    )
+
+    assert not log_path.exists(), (
+        "lite_mode should skip memory log writes entirely"
+    )
+
+
+async def test_phase_e_per_ticker_failure_skips_log(
+    mock_anthropic_client, frozen_now, tmp_path,
+) -> None:
+    """Per-ticker pipeline failure leaves persona_signals=[] ⇒ NO memory log records."""
+    from routine.run_for_watchlist import run_for_watchlist
+
+    log_path = tmp_path / "memory" / "historical_signals.jsonl"
+    watchlist = _build_watchlist(["AAPL"])
+
+    def boom_loader(t: str) -> Snapshot:
+        raise FileNotFoundError(f"snapshot missing for {t}")
+
+    results = await run_for_watchlist(
+        watchlist,
+        lite_mode=False,
+        snapshots_root=Path("/tmp"),
+        computed_at=frozen_now,
+        client=mock_anthropic_client,
+        snapshot_loader=boom_loader,
+        memory_log_path=log_path,
+    )
+
+    assert len(results) == 1
+    r = results[0]
+    assert r.errors
+    assert r.persona_signals == []
+    assert not log_path.exists()
