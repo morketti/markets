@@ -273,6 +273,11 @@ Plans:
 
 **v1.x successors:** ENDORSE-04..07 (corp-action-aware performance, vs S&P alpha, performance number rendering, corp-action notice surface)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 09-01-endorsement-capture-PLAN.md — analysts/endorsement_schema.py + endorsements/log.py + cli/add_endorsement.py (SUBCOMMANDS extension) + frontend/src/schemas/endorsement.ts + frontend/src/lib/loadEndorsements.ts + frontend/src/components/EndorsementsList.tsx + DecisionRoute mount (after DissentPanel, before open_observation) + Playwright endorsements.spec.ts; closes ENDORSE-01, ENDORSE-02, ENDORSE-03 (v1 complete)
+
 ---
 
 ## Phase Ordering Rationale
