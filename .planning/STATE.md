@@ -2,9 +2,9 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: null
-status: phase_complete
-last_updated: "2026-05-04T12:27:34.000Z"
+current_plan: Not started
+status: planning
+last_updated: "2026-05-04T12:42:46.798Z"
 progress:
   total_phases: 9
   completed_phases: 5
@@ -29,8 +29,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 05-claude-routine-wiring **COMPLETE**
-**Status:** **Complete** (6/6 plans complete — Wave 0 foundation + Wave 1 schema + Wave 2 LLM client + Wave 3 persona slate + Wave 4 synthesizer triad + Wave 5 routine entrypoint shipped; ALL 12 LLM-XX + INFRA-XX requirements `[x]`)
-**Current Plan:** none (phase closed 2026-05-04)
+**Status:** Ready to plan
+**Current Plan:** Not started
 **Total Plans in Phase:** 6
 **Next:** Phase 6 (Frontend MVP — Morning Scan + Deep-Dive) plan-phase via `/gmd:plan-phase 6`. Phase 5 closes complete: routine.{quota, storage, git_publish, run_for_watchlist, entrypoint} shipped; daily Claude Code routine runs end-to-end (load_watchlist → estimate quota → per-ticker pipeline of 4 analyticals + PositionSignal + 6 personas + synthesizer → write daily snapshot folder atomically per Pattern #4 → commit/push to GitHub per Pattern #11 → exit). Phase 6 (Frontend MVP — VIEW-01..09 + VIEW-11..15 + INFRA-05) UNBLOCKED — frontend can now read data/YYYY-MM-DD/{TICKER}.json + _index.json + _status.json from the routine's daily snapshot folder via raw.githubusercontent.com.
 
