@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 ingested-data schema (project-original).
 """Price-data schemas: PriceSnapshot (current + history) and OHLCBar.
 
 Single source of truth for the shape ingestion/prices.py emits. All ticker

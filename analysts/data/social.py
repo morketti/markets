@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 ingested-data schema (project-original).
 """Social-signal schemas: SocialSignal aggregating RedditPost + StockTwitsPost.
 
 Three nested models because the shapes are genuinely different — Reddit RSS

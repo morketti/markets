@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 5 routine package marker (project-original).
 """Phase 5 daily-routine package — orchestration for the scheduled Claude Code routine.
 
 Modules (filled in Waves 2-5):

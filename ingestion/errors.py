@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 exception hierarchy (project-original).
 """Custom exception hierarchy for the ingestion package.
 
 Three levels:

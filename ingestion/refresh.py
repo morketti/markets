@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 refresh orchestrator (project-original).
 """Refresh orchestrator — Plan 02-06 / DATA-06 + DATA-07.
 
 The integration story for Phase 2: ties together all five Wave-2 ingestion

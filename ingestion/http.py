@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 shared requests.Session (Pitfall #2 EDGAR User-Agent — project-original).
 """Shared HTTP client for the ingestion package.
 
 Single process-wide requests.Session with:

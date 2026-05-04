@@ -1,0 +1,14 @@
+# Phase 8 — INFRA-07 provenance enforcement.
+# Run on `pre-commit` stage; CI runs the same script directly on every push.
+# The local hook is opt-in (developer runs `pre-commit install` once);
+# CI invocation in .github/workflows is the authoritative gate.
+repos:
+  - repo: local
+    hooks:
+      - id: provenance-check
+        name: Verify provenance markers (INFRA-07)
+        entry: python scripts/check_provenance.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]

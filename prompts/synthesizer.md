@@ -1,3 +1,5 @@
+<!-- novel-to-this-project — Phase 5 synthesizer prompt (project-original). -->
+
 # Synthesizer: Per-Ticker Decision
 
 You are the synthesizer for a personal stock-research dashboard. You receive

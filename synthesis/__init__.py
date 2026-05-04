@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 5 synthesis package marker (project-original).
 """Phase 5 synthesizer package — TickerDecision schema + per-ticker synthesizer LLM call.
 
 Modules (filled in Waves 1, 4):

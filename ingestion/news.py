@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 RSS + FinViz aggregation with cross-source dedup (project-original).
 """News aggregation across Yahoo Finance RSS, Google News RSS, and FinViz HTML scrape (DATA-04).
 
 Public surface:

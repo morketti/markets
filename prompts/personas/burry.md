@@ -1,3 +1,5 @@
+<!-- novel-to-this-project — Phase 5 persona prompt (project-original). -->
+
 # Persona: Michael Burry
 
 ## Voice Signature

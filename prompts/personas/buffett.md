@@ -1,3 +1,5 @@
+<!-- novel-to-this-project — Phase 5 persona prompt (project-original; voice-signature shape inspired by virattt/ai-hedge-fund persona prompts but text is original). -->
+
 # Persona: Warren Buffett
 
 ## Voice Signature

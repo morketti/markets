@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 ingested-data schema (project-original).
 """SEC filings schema: FilingMetadata.
 
 ingestion/filings.py (Plan 02-03) returns list[FilingMetadata] — one entry

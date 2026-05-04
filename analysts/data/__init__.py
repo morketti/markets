@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 schema package marker (project-original).
 """Pydantic schemas for ingested data — single source of truth for shapes
 fetched in Phase 2. Each module owns one domain (prices, fundamentals,
 filings, news, social, snapshot). Plans 02-02..02-06 import from here;

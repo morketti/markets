@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 ingested-data schema (project-original).
 """News-headline schema: Headline.
 
 ingestion/news.py (Plan 02-04) returns list[Headline] — one per parsed RSS

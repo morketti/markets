@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 ingested-data schema (project-original).
 """Fundamentals schema: FundamentalsSnapshot.
 
 All metrics are Optional[float] with NO positivity constraint at the schema

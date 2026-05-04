@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 5 deterministic dissent computation (LLM-07 / Pattern #7 — project-original).
 """synthesis.dissent — Python-computed dissent rule per LLM-07 + Pattern #7.
 
 The dissent rule is structural: "≥1 persona disagrees by ≥30 confidence

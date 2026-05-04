@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 atomic-write manifest (project-original).
 """Run manifest — Plan 02-06 / DATA-06.
 
 Every refresh run writes one `manifest.json` per snapshot directory under

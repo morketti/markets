@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 anonymous Reddit + StockTwits aggregator (project-original).
 """Social-signal ingestion — Plan 02-05 / DATA-05.
 
 Anonymous-only protocol: per-ticker posts from Reddit (RSS search across

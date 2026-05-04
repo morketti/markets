@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 EDGAR fetch + atomic JSON parsing (project-original; SEC API is unique to this project's keyless plan).
 """SEC EDGAR filings fetch — Plan 02-03 / DATA-03.
 
 Fetches recent 10-K, 10-Q, 8-K filing metadata for a watchlist ticker via the

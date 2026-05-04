@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 yfinance fundamentals adapter (project-original).
 """Fundamentals ingestion: yfinance.Ticker(t).info → FundamentalsSnapshot.
 
 Implements DATA-02 (P/E, P/S, P/B, ROE, debt/equity, profit margin, FCF,

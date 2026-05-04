@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 4 schema (PEER of AgentSignal); state ladder + action_hint not present in reference repos.
 """PositionSignal — locked output schema for Phase 4 Position-Adjustment Radar.
 
 Separate from AgentSignal because state ladder + action_hint + per-indicator

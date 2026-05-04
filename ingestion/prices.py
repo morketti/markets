@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 yfinance + yahooquery dual-source fallback path (project-original).
 """Price ingestion: yfinance primary + yahooquery fallback.
 
 Implements DATA-01 (daily OHLC + current price), DATA-07 (data_unavailable

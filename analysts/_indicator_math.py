@@ -1,3 +1,4 @@
+# novel-to-this-project — DRY-extracted indicator helpers (Phase 4 / Plan 04-01).
 """Shared indicator math used across the analyst suite.
 
 Extracted from analysts/technicals.py (Phase 3 / Plan 03-03) and

@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 5 atomic-write orchestration (Pattern #4 — project-original).
 """routine.storage — three-phase atomic write per Pattern #4.
 
 Order (locked, not-up-for-debate):

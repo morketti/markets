@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 1 watchlist + per-ticker config schemas (project-original).
 """Pydantic v2 schemas for the markets watchlist.
 
 This module is the locked source of truth for ticker configuration shape and

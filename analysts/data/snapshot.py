@@ -1,3 +1,4 @@
+# novel-to-this-project — Phase 2 per-ticker aggregate schema (project-original).
 """Per-ticker Snapshot — Plan 02-06 / DATA-06 / DATA-07.
 
 A Snapshot is the per-ticker JSON object the Plan 02-06 orchestrator writes
