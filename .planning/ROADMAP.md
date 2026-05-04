@@ -13,7 +13,7 @@
 | 2 | Ingestion — Keyless Data Plane (7/7 plans, Complete) | Complete    | 2026-05-02 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring (5/5 plans, Complete) | Complete    | 2026-05-03 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
-| 5 | Claude Routine Wiring — Persona Slate + Synthesizer (2/6 plans, In Progress) | In Progress | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
+| 5 | Claude Routine Wiring — Persona Slate + Synthesizer (3/6 plans, In Progress) | In Progress | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
 | 6 | Frontend MVP — Morning Scan + Deep-Dive | Static React app reads snapshots, renders three lenses + ticker detail | VIEW-01..09, VIEW-11..15, INFRA-05 | 7 | Phase 5 |
 | 7 | Decision-Support View + Dissent Surface | User reads buy/trim/hold recommendation with drivers + dissent | VIEW-10 | 4 | Phases 5, 6 |
 | 8 | Mid-Day Refresh + Resilience | On-open refresh layer + lite-mode fallback + memory writes verified | REFRESH-01..04, INFRA-06..07 | 5 | Phase 6 |
@@ -140,12 +140,12 @@ Plans:
 
 ### Phase 5: Claude Routine Wiring — Persona Slate + Synthesizer — Plans
 
-**Plans:** 2/6 plans complete
+**Plans:** 3/6 plans complete
 
 Plans:
 - [x] 05-01-foundation-PLAN.md — anthropic SDK install (>=0.95,<1) + AnalystId Literal widening 4→10 + 4 package markers + 7 prompt markdown stubs (6 personas + synthesizer) + 2 SDK smoke tests + 12 widening tests
 - [x] 05-02-decision-schema-PLAN.md — TickerDecision + DissentSection + TimeframeBand Pydantic v2 schemas (PEER of AgentSignal AND PositionSignal) + 6-state DecisionRecommendation + 3-state ConvictionBand + 2-state Timeframe Literals + @model_validator data_unavailable invariant + 45 schema tests
-- [ ] 05-03-llm-client-PLAN.md — routine/llm_client.py thin wrapper over claude.messages.parse(... output_format=PydanticModel) + retry + Pydantic-default-factory fallback per LLM-05 + memory/llm_failures.jsonl raw-response logging
+- [x] 05-03-llm-client-PLAN.md — routine/llm_client.py thin async wrapper over client.messages.parse(output_format=PydanticModel) generic over T bound=BaseModel + retry policy DEFAULT_MAX_RETRIES=2 + 4 exception-path branches (ValidationError / APIStatusError / APIError / unknown) + default_factory() on exhaustion (LLM-05) + append-only memory/llm_failures.jsonl with sort_keys + UTC + truncation; tests/routine/conftest.py MockAnthropicClient fixture-replay (reused by Wave 3-5); pytest-asyncio dev dep; 17 tests; 100% line/branch coverage
 - [ ] 05-04-personas-PLAN.md — 6 persona prompt markdown files (real content) + routine/persona_runner.py loading + dispatch + AgentSignal validation
 - [ ] 05-05-synthesizer-PLAN.md — synthesis/synthesizer.py + prompts/synthesizer.md (real content) + dissent rule (compute_dissent in Python) + recommendation derivation
 - [ ] 05-06-routine-entrypoint-PLAN.md — routine/entrypoint.py + run_for_watchlist.py + storage.py (atomic writes, _index.json, _status.json) + git_publish.py + lite-mode estimator (INFRA-02)
