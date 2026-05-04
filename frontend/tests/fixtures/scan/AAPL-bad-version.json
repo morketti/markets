@@ -1,0 +1,18 @@
+{
+  "ticker": "AAPL",
+  "schema_version": 1,
+  "analytical_signals": [],
+  "position_signal": null,
+  "persona_signals": [],
+  "ticker_decision": null,
+  "ohlc_history": [],
+  "indicators": {
+    "ma20": [],
+    "ma50": [],
+    "bb_upper": [],
+    "bb_lower": [],
+    "rsi14": []
+  },
+  "headlines": [],
+  "errors": []
+}

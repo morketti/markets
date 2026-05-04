@@ -3,6 +3,8 @@ import { Outlet, Link, useMatches, useNavigate } from 'react-router'
 
 import { useHeaderScanMeta } from '@/lib/loadScanData'
 import { StalenessBadge } from '@/components/StalenessBadge'
+import { DateSelector } from '@/components/DateSelector'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 // Root — Wave 2-3 layout. Header renders:
 //   - brand link (left)
@@ -78,7 +80,7 @@ function TickerSearch() {
       ref={inputRef}
       type="text"
       placeholder="Ticker (e.g. AAPL)"
-      className="w-40 rounded border border-border bg-bg px-3 py-1.5 font-mono text-sm uppercase placeholder:text-fg-muted placeholder:normal-case focus:border-accent focus:outline-none"
+      className="w-32 rounded border border-border bg-bg px-3 py-1.5 font-mono text-sm uppercase placeholder:text-fg-muted placeholder:normal-case focus:border-accent focus:outline-none sm:w-40"
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault()
@@ -94,8 +96,8 @@ function TickerSearch() {
 export default function Root() {
   return (
     <div className="flex min-h-full flex-col bg-bg text-fg">
-      <header className="border-b border-border px-6 py-4">
-        <div className="flex items-center justify-between gap-6">
+      <header className="border-b border-border px-4 py-3 sm:px-6 sm:py-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <Link
             to="/scan/today"
             className="font-mono text-sm font-semibold tracking-tight text-fg"
@@ -103,7 +105,8 @@ export default function Root() {
           >
             MARKETS
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <DateSelector />
             <TickerSearch />
             <div
               data-testid="staleness-slot"
@@ -114,8 +117,10 @@ export default function Root() {
           </div>
         </div>
       </header>
-      <main className="flex-1 px-6 py-8">
-        <Outlet />
+      <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   )
