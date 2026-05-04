@@ -1,0 +1,603 @@
+{
+  "ticker": "NVDA",
+  "schema_version": 2,
+  "analytical_signals": [
+    {
+      "ticker": "NVDA",
+      "analyst_id": "fundamentals",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "bullish",
+      "confidence": 65,
+      "evidence": [
+        "NVDA: P/E within sector range",
+        "NVDA: ROE above peers"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "technicals",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "neutral",
+      "confidence": 50,
+      "evidence": [
+        "NVDA: MA20 flat",
+        "NVDA: ADX 18"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "news_sentiment",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "bullish",
+      "confidence": 60,
+      "evidence": [
+        "NVDA: Positive earnings preview"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "valuation",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "NVDA: At fair value relative to thesis_price"
+      ],
+      "data_unavailable": false
+    }
+  ],
+  "position_signal": {
+    "ticker": "NVDA",
+    "computed_at": "2026-05-04T12:25:00Z",
+    "state": "overbought",
+    "consensus_score": 0.78,
+    "confidence": 70,
+    "action_hint": "consider_take_profits",
+    "indicators": {
+      "rsi14": 65,
+      "bb_position": 0.5,
+      "zscore_ma50": 1.2,
+      "stoch_k": 70,
+      "williams_r": -30,
+      "macd_hist_z": 0.4
+    },
+    "evidence": [
+      "NVDA: RSI(14)=65 elevated",
+      "NVDA: Price above BB upper",
+      "NVDA: z-score vs MA50 = +1.2",
+      "NVDA: ADX(14) below 25 — mean-reversion regime"
+    ],
+    "data_unavailable": false,
+    "trend_regime": false
+  },
+  "persona_signals": [
+    {
+      "ticker": "NVDA",
+      "analyst_id": "buffett",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "NVDA: Wide moat but valuation rich"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "munger",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bullish",
+      "confidence": 65,
+      "evidence": [
+        "NVDA: Quality compounder, hold"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "wood",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "strong_bullish",
+      "confidence": 80,
+      "evidence": [
+        "NVDA: Disruptive thesis intact"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "burry",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bearish",
+      "confidence": 60,
+      "evidence": [
+        "NVDA: Frothy market, risk-off"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "lynch",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bullish",
+      "confidence": 62,
+      "evidence": [
+        "NVDA: Story still compounding"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "NVDA",
+      "analyst_id": "claude_analyst",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "NVDA: Mixed signals — directional view low conviction"
+      ],
+      "data_unavailable": false
+    }
+  ],
+  "ticker_decision": {
+    "ticker": "NVDA",
+    "computed_at": "2026-05-04T12:28:00Z",
+    "schema_version": 2,
+    "recommendation": "take_profits",
+    "conviction": "medium",
+    "short_term": {
+      "summary": "NVDA short-term: take_profits",
+      "drivers": [
+        "NVDA: technicals neutral, news_sentiment bullish",
+        "NVDA: position_signal state=overbought",
+        "NVDA: 4 of 6 personas constructive"
+      ],
+      "confidence": 65,
+      "thesis_status": "n/a"
+    },
+    "long_term": {
+      "summary": "NVDA long-term thesis: broken",
+      "drivers": [
+        "NVDA: fundamentals bullish on ROE",
+        "NVDA: valuation neutral at thesis_price",
+        "NVDA: structural moat tested by sector rotation"
+      ],
+      "confidence": 50,
+      "thesis_status": "broken"
+    },
+    "open_observation": "NVDA: Open Claude analyst flags mixed signal — short-term tactical bias diverges from long-term thesis posture.",
+    "dissent": {
+      "has_dissent": true,
+      "dissenting_persona": "burry",
+      "dissent_summary": "NVDA: Burry persona flags ≥30-pt confidence gap vs consensus"
+    },
+    "data_unavailable": false
+  },
+  "ohlc_history": [
+    {
+      "date": "2026-04-01",
+      "open": 849.5,
+      "high": 851,
+      "low": 849,
+      "close": 850,
+      "volume": 1000000
+    },
+    {
+      "date": "2026-04-02",
+      "open": 850.25,
+      "high": 851.75,
+      "low": 849.75,
+      "close": 850.75,
+      "volume": 1010000
+    },
+    {
+      "date": "2026-04-03",
+      "open": 850.94,
+      "high": 852.44,
+      "low": 850.44,
+      "close": 851.44,
+      "volume": 1020000
+    },
+    {
+      "date": "2026-04-04",
+      "open": 851.48,
+      "high": 852.98,
+      "low": 850.98,
+      "close": 851.98,
+      "volume": 1030000
+    },
+    {
+      "date": "2026-04-05",
+      "open": 851.84,
+      "high": 853.34,
+      "low": 851.34,
+      "close": 852.34,
+      "volume": 1040000
+    },
+    {
+      "date": "2026-04-06",
+      "open": 851.99,
+      "high": 853.49,
+      "low": 851.49,
+      "close": 852.49,
+      "volume": 1050000
+    },
+    {
+      "date": "2026-04-07",
+      "open": 851.92,
+      "high": 853.42,
+      "low": 851.42,
+      "close": 852.42,
+      "volume": 1060000
+    },
+    {
+      "date": "2026-04-08",
+      "open": 851.65,
+      "high": 853.15,
+      "low": 851.15,
+      "close": 852.15,
+      "volume": 1070000
+    },
+    {
+      "date": "2026-04-09",
+      "open": 851.21,
+      "high": 852.71,
+      "low": 850.71,
+      "close": 851.71,
+      "volume": 1080000
+    },
+    {
+      "date": "2026-04-10",
+      "open": 850.68,
+      "high": 852.18,
+      "low": 850.18,
+      "close": 851.18,
+      "volume": 1090000
+    },
+    {
+      "date": "2026-04-11",
+      "open": 850.12,
+      "high": 851.62,
+      "low": 849.62,
+      "close": 850.62,
+      "volume": 1100000
+    },
+    {
+      "date": "2026-04-12",
+      "open": 849.6,
+      "high": 851.1,
+      "low": 849.1,
+      "close": 850.1,
+      "volume": 1110000
+    },
+    {
+      "date": "2026-04-13",
+      "open": 849.19,
+      "high": 850.69,
+      "low": 848.69,
+      "close": 849.69,
+      "volume": 1120000
+    },
+    {
+      "date": "2026-04-14",
+      "open": 848.94,
+      "high": 850.44,
+      "low": 848.44,
+      "close": 849.44,
+      "volume": 1130000
+    },
+    {
+      "date": "2026-04-15",
+      "open": 848.9,
+      "high": 850.4,
+      "low": 848.4,
+      "close": 849.4,
+      "volume": 1140000
+    },
+    {
+      "date": "2026-04-16",
+      "open": 849.08,
+      "high": 850.58,
+      "low": 848.58,
+      "close": 849.58,
+      "volume": 1150000
+    },
+    {
+      "date": "2026-04-17",
+      "open": 849.47,
+      "high": 850.97,
+      "low": 848.97,
+      "close": 849.97,
+      "volume": 1160000
+    },
+    {
+      "date": "2026-04-18",
+      "open": 850.04,
+      "high": 851.54,
+      "low": 849.54,
+      "close": 850.54,
+      "volume": 1170000
+    },
+    {
+      "date": "2026-04-19",
+      "open": 850.74,
+      "high": 852.24,
+      "low": 850.24,
+      "close": 851.24,
+      "volume": 1180000
+    },
+    {
+      "date": "2026-04-20",
+      "open": 851.5,
+      "high": 853,
+      "low": 851,
+      "close": 852,
+      "volume": 1190000
+    },
+    {
+      "date": "2026-04-21",
+      "open": 852.25,
+      "high": 853.75,
+      "low": 851.75,
+      "close": 852.75,
+      "volume": 1200000
+    },
+    {
+      "date": "2026-04-22",
+      "open": 852.91,
+      "high": 854.41,
+      "low": 852.41,
+      "close": 853.41,
+      "volume": 1210000
+    },
+    {
+      "date": "2026-04-23",
+      "open": 853.43,
+      "high": 854.93,
+      "low": 852.93,
+      "close": 853.93,
+      "volume": 1220000
+    },
+    {
+      "date": "2026-04-24",
+      "open": 853.77,
+      "high": 855.27,
+      "low": 853.27,
+      "close": 854.27,
+      "volume": 1230000
+    },
+    {
+      "date": "2026-04-25",
+      "open": 853.88,
+      "high": 855.38,
+      "low": 853.38,
+      "close": 854.38,
+      "volume": 1240000
+    },
+    {
+      "date": "2026-04-26",
+      "open": 853.77,
+      "high": 855.27,
+      "low": 853.27,
+      "close": 854.27,
+      "volume": 1250000
+    },
+    {
+      "date": "2026-04-27",
+      "open": 853.48,
+      "high": 854.98,
+      "low": 852.98,
+      "close": 853.98,
+      "volume": 1260000
+    },
+    {
+      "date": "2026-04-28",
+      "open": 853.02,
+      "high": 854.52,
+      "low": 852.52,
+      "close": 853.52,
+      "volume": 1270000
+    },
+    {
+      "date": "2026-04-29",
+      "open": 852.48,
+      "high": 853.98,
+      "low": 851.98,
+      "close": 852.98,
+      "volume": 1280000
+    },
+    {
+      "date": "2026-04-30",
+      "open": 851.92,
+      "high": 853.42,
+      "low": 851.42,
+      "close": 852.42,
+      "volume": 1290000
+    }
+  ],
+  "indicators": {
+    "ma20": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      851.7,
+      852.45,
+      853.11,
+      853.63,
+      853.97,
+      854.08,
+      853.97,
+      853.68,
+      853.22,
+      852.68,
+      852.12
+    ],
+    "ma50": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "bb_upper": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      854,
+      854.75,
+      855.41,
+      855.93,
+      856.27,
+      856.38,
+      856.27,
+      855.98,
+      855.52,
+      854.98,
+      854.42
+    ],
+    "bb_lower": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      850,
+      850.75,
+      851.41,
+      851.93,
+      852.27,
+      852.38,
+      852.27,
+      851.98,
+      851.52,
+      850.98,
+      850.42
+    ],
+    "rsi14": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74
+    ]
+  },
+  "headlines": [
+    {
+      "source": "Yahoo Finance",
+      "published_at": "2026-05-03T18:00:00Z",
+      "title": "NVDA: Earnings preview — analysts expect beat",
+      "url": "https://finance.yahoo.com/news/NVDA-earnings-preview"
+    },
+    {
+      "source": "Reuters",
+      "published_at": "2026-05-03T15:30:00Z",
+      "title": "NVDA: Sector rotation continues",
+      "url": "https://reuters.com/markets/NVDA"
+    },
+    {
+      "source": "Bloomberg RSS",
+      "published_at": "2026-05-02T10:00:00Z",
+      "title": "NVDA: Insider buying notice filed",
+      "url": "https://bloomberg.com/news/NVDA-insider"
+    }
+  ],
+  "errors": []
+}

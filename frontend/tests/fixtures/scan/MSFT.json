@@ -1,0 +1,603 @@
+{
+  "ticker": "MSFT",
+  "schema_version": 2,
+  "analytical_signals": [
+    {
+      "ticker": "MSFT",
+      "analyst_id": "fundamentals",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "bullish",
+      "confidence": 65,
+      "evidence": [
+        "MSFT: P/E within sector range",
+        "MSFT: ROE above peers"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "technicals",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "neutral",
+      "confidence": 50,
+      "evidence": [
+        "MSFT: MA20 flat",
+        "MSFT: ADX 18"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "news_sentiment",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "bullish",
+      "confidence": 60,
+      "evidence": [
+        "MSFT: Positive earnings preview"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "valuation",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "MSFT: At fair value relative to thesis_price"
+      ],
+      "data_unavailable": false
+    }
+  ],
+  "position_signal": {
+    "ticker": "MSFT",
+    "computed_at": "2026-05-04T12:25:00Z",
+    "state": "fair",
+    "consensus_score": 0.05,
+    "confidence": 70,
+    "action_hint": "hold_position",
+    "indicators": {
+      "rsi14": 65,
+      "bb_position": 0.5,
+      "zscore_ma50": 1.2,
+      "stoch_k": 70,
+      "williams_r": -30,
+      "macd_hist_z": 0.4
+    },
+    "evidence": [
+      "MSFT: RSI(14)=65 elevated",
+      "MSFT: Price above BB upper",
+      "MSFT: z-score vs MA50 = +1.2",
+      "MSFT: ADX(14) below 25 — mean-reversion regime"
+    ],
+    "data_unavailable": false,
+    "trend_regime": false
+  },
+  "persona_signals": [
+    {
+      "ticker": "MSFT",
+      "analyst_id": "buffett",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "MSFT: Wide moat but valuation rich"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "munger",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bullish",
+      "confidence": 65,
+      "evidence": [
+        "MSFT: Quality compounder, hold"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "wood",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "strong_bullish",
+      "confidence": 80,
+      "evidence": [
+        "MSFT: Disruptive thesis intact"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "burry",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bearish",
+      "confidence": 60,
+      "evidence": [
+        "MSFT: Frothy market, risk-off"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "lynch",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bullish",
+      "confidence": 62,
+      "evidence": [
+        "MSFT: Story still compounding"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "MSFT",
+      "analyst_id": "claude_analyst",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "MSFT: Mixed signals — directional view low conviction"
+      ],
+      "data_unavailable": false
+    }
+  ],
+  "ticker_decision": {
+    "ticker": "MSFT",
+    "computed_at": "2026-05-04T12:28:00Z",
+    "schema_version": 2,
+    "recommendation": "buy",
+    "conviction": "medium",
+    "short_term": {
+      "summary": "MSFT short-term: buy",
+      "drivers": [
+        "MSFT: technicals neutral, news_sentiment bullish",
+        "MSFT: position_signal state=fair",
+        "MSFT: 4 of 6 personas constructive"
+      ],
+      "confidence": 85,
+      "thesis_status": "n/a"
+    },
+    "long_term": {
+      "summary": "MSFT long-term thesis: weakening",
+      "drivers": [
+        "MSFT: fundamentals bullish on ROE",
+        "MSFT: valuation neutral at thesis_price",
+        "MSFT: structural moat tested by sector rotation"
+      ],
+      "confidence": 60,
+      "thesis_status": "weakening"
+    },
+    "open_observation": "MSFT: Open Claude analyst flags mixed signal — short-term tactical bias diverges from long-term thesis posture.",
+    "dissent": {
+      "has_dissent": true,
+      "dissenting_persona": "burry",
+      "dissent_summary": "MSFT: Burry persona flags ≥30-pt confidence gap vs consensus"
+    },
+    "data_unavailable": false
+  },
+  "ohlc_history": [
+    {
+      "date": "2026-04-01",
+      "open": 409.5,
+      "high": 411,
+      "low": 409,
+      "close": 410,
+      "volume": 1000000
+    },
+    {
+      "date": "2026-04-02",
+      "open": 410.25,
+      "high": 411.75,
+      "low": 409.75,
+      "close": 410.75,
+      "volume": 1010000
+    },
+    {
+      "date": "2026-04-03",
+      "open": 410.94,
+      "high": 412.44,
+      "low": 410.44,
+      "close": 411.44,
+      "volume": 1020000
+    },
+    {
+      "date": "2026-04-04",
+      "open": 411.48,
+      "high": 412.98,
+      "low": 410.98,
+      "close": 411.98,
+      "volume": 1030000
+    },
+    {
+      "date": "2026-04-05",
+      "open": 411.84,
+      "high": 413.34,
+      "low": 411.34,
+      "close": 412.34,
+      "volume": 1040000
+    },
+    {
+      "date": "2026-04-06",
+      "open": 411.99,
+      "high": 413.49,
+      "low": 411.49,
+      "close": 412.49,
+      "volume": 1050000
+    },
+    {
+      "date": "2026-04-07",
+      "open": 411.92,
+      "high": 413.42,
+      "low": 411.42,
+      "close": 412.42,
+      "volume": 1060000
+    },
+    {
+      "date": "2026-04-08",
+      "open": 411.65,
+      "high": 413.15,
+      "low": 411.15,
+      "close": 412.15,
+      "volume": 1070000
+    },
+    {
+      "date": "2026-04-09",
+      "open": 411.21,
+      "high": 412.71,
+      "low": 410.71,
+      "close": 411.71,
+      "volume": 1080000
+    },
+    {
+      "date": "2026-04-10",
+      "open": 410.68,
+      "high": 412.18,
+      "low": 410.18,
+      "close": 411.18,
+      "volume": 1090000
+    },
+    {
+      "date": "2026-04-11",
+      "open": 410.12,
+      "high": 411.62,
+      "low": 409.62,
+      "close": 410.62,
+      "volume": 1100000
+    },
+    {
+      "date": "2026-04-12",
+      "open": 409.6,
+      "high": 411.1,
+      "low": 409.1,
+      "close": 410.1,
+      "volume": 1110000
+    },
+    {
+      "date": "2026-04-13",
+      "open": 409.19,
+      "high": 410.69,
+      "low": 408.69,
+      "close": 409.69,
+      "volume": 1120000
+    },
+    {
+      "date": "2026-04-14",
+      "open": 408.94,
+      "high": 410.44,
+      "low": 408.44,
+      "close": 409.44,
+      "volume": 1130000
+    },
+    {
+      "date": "2026-04-15",
+      "open": 408.9,
+      "high": 410.4,
+      "low": 408.4,
+      "close": 409.4,
+      "volume": 1140000
+    },
+    {
+      "date": "2026-04-16",
+      "open": 409.08,
+      "high": 410.58,
+      "low": 408.58,
+      "close": 409.58,
+      "volume": 1150000
+    },
+    {
+      "date": "2026-04-17",
+      "open": 409.47,
+      "high": 410.97,
+      "low": 408.97,
+      "close": 409.97,
+      "volume": 1160000
+    },
+    {
+      "date": "2026-04-18",
+      "open": 410.04,
+      "high": 411.54,
+      "low": 409.54,
+      "close": 410.54,
+      "volume": 1170000
+    },
+    {
+      "date": "2026-04-19",
+      "open": 410.74,
+      "high": 412.24,
+      "low": 410.24,
+      "close": 411.24,
+      "volume": 1180000
+    },
+    {
+      "date": "2026-04-20",
+      "open": 411.5,
+      "high": 413,
+      "low": 411,
+      "close": 412,
+      "volume": 1190000
+    },
+    {
+      "date": "2026-04-21",
+      "open": 412.25,
+      "high": 413.75,
+      "low": 411.75,
+      "close": 412.75,
+      "volume": 1200000
+    },
+    {
+      "date": "2026-04-22",
+      "open": 412.91,
+      "high": 414.41,
+      "low": 412.41,
+      "close": 413.41,
+      "volume": 1210000
+    },
+    {
+      "date": "2026-04-23",
+      "open": 413.43,
+      "high": 414.93,
+      "low": 412.93,
+      "close": 413.93,
+      "volume": 1220000
+    },
+    {
+      "date": "2026-04-24",
+      "open": 413.77,
+      "high": 415.27,
+      "low": 413.27,
+      "close": 414.27,
+      "volume": 1230000
+    },
+    {
+      "date": "2026-04-25",
+      "open": 413.88,
+      "high": 415.38,
+      "low": 413.38,
+      "close": 414.38,
+      "volume": 1240000
+    },
+    {
+      "date": "2026-04-26",
+      "open": 413.77,
+      "high": 415.27,
+      "low": 413.27,
+      "close": 414.27,
+      "volume": 1250000
+    },
+    {
+      "date": "2026-04-27",
+      "open": 413.48,
+      "high": 414.98,
+      "low": 412.98,
+      "close": 413.98,
+      "volume": 1260000
+    },
+    {
+      "date": "2026-04-28",
+      "open": 413.02,
+      "high": 414.52,
+      "low": 412.52,
+      "close": 413.52,
+      "volume": 1270000
+    },
+    {
+      "date": "2026-04-29",
+      "open": 412.48,
+      "high": 413.98,
+      "low": 411.98,
+      "close": 412.98,
+      "volume": 1280000
+    },
+    {
+      "date": "2026-04-30",
+      "open": 411.92,
+      "high": 413.42,
+      "low": 411.42,
+      "close": 412.42,
+      "volume": 1290000
+    }
+  ],
+  "indicators": {
+    "ma20": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      411.7,
+      412.45,
+      413.11,
+      413.63,
+      413.97,
+      414.08,
+      413.97,
+      413.68,
+      413.22,
+      412.68,
+      412.12
+    ],
+    "ma50": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "bb_upper": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      414,
+      414.75,
+      415.41,
+      415.93,
+      416.27,
+      416.38,
+      416.27,
+      415.98,
+      415.52,
+      414.98,
+      414.42
+    ],
+    "bb_lower": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      410,
+      410.75,
+      411.41,
+      411.93,
+      412.27,
+      412.38,
+      412.27,
+      411.98,
+      411.52,
+      410.98,
+      410.42
+    ],
+    "rsi14": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74
+    ]
+  },
+  "headlines": [
+    {
+      "source": "Yahoo Finance",
+      "published_at": "2026-05-03T18:00:00Z",
+      "title": "MSFT: Earnings preview — analysts expect beat",
+      "url": "https://finance.yahoo.com/news/MSFT-earnings-preview"
+    },
+    {
+      "source": "Reuters",
+      "published_at": "2026-05-03T15:30:00Z",
+      "title": "MSFT: Sector rotation continues",
+      "url": "https://reuters.com/markets/MSFT"
+    },
+    {
+      "source": "Bloomberg RSS",
+      "published_at": "2026-05-02T10:00:00Z",
+      "title": "MSFT: Insider buying notice filed",
+      "url": "https://bloomberg.com/news/MSFT-insider"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,603 @@
+{
+  "ticker": "AAPL",
+  "schema_version": 2,
+  "analytical_signals": [
+    {
+      "ticker": "AAPL",
+      "analyst_id": "fundamentals",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "bullish",
+      "confidence": 65,
+      "evidence": [
+        "AAPL: P/E within sector range",
+        "AAPL: ROE above peers"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "technicals",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "neutral",
+      "confidence": 50,
+      "evidence": [
+        "AAPL: MA20 flat",
+        "AAPL: ADX 18"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "news_sentiment",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "bullish",
+      "confidence": 60,
+      "evidence": [
+        "AAPL: Positive earnings preview"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "valuation",
+      "computed_at": "2026-05-04T12:15:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "AAPL: At fair value relative to thesis_price"
+      ],
+      "data_unavailable": false
+    }
+  ],
+  "position_signal": {
+    "ticker": "AAPL",
+    "computed_at": "2026-05-04T12:25:00Z",
+    "state": "oversold",
+    "consensus_score": -0.65,
+    "confidence": 70,
+    "action_hint": "consider_add",
+    "indicators": {
+      "rsi14": 65,
+      "bb_position": 0.5,
+      "zscore_ma50": 1.2,
+      "stoch_k": 70,
+      "williams_r": -30,
+      "macd_hist_z": 0.4
+    },
+    "evidence": [
+      "AAPL: RSI(14)=65 elevated",
+      "AAPL: Price above BB upper",
+      "AAPL: z-score vs MA50 = +1.2",
+      "AAPL: ADX(14) below 25 — mean-reversion regime"
+    ],
+    "data_unavailable": false,
+    "trend_regime": false
+  },
+  "persona_signals": [
+    {
+      "ticker": "AAPL",
+      "analyst_id": "buffett",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "AAPL: Wide moat but valuation rich"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "munger",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bullish",
+      "confidence": 65,
+      "evidence": [
+        "AAPL: Quality compounder, hold"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "wood",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "strong_bullish",
+      "confidence": 80,
+      "evidence": [
+        "AAPL: Disruptive thesis intact"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "burry",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bearish",
+      "confidence": 60,
+      "evidence": [
+        "AAPL: Frothy market, risk-off"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "lynch",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "bullish",
+      "confidence": 62,
+      "evidence": [
+        "AAPL: Story still compounding"
+      ],
+      "data_unavailable": false
+    },
+    {
+      "ticker": "AAPL",
+      "analyst_id": "claude_analyst",
+      "computed_at": "2026-05-04T12:20:00Z",
+      "verdict": "neutral",
+      "confidence": 55,
+      "evidence": [
+        "AAPL: Mixed signals — directional view low conviction"
+      ],
+      "data_unavailable": false
+    }
+  ],
+  "ticker_decision": {
+    "ticker": "AAPL",
+    "computed_at": "2026-05-04T12:28:00Z",
+    "schema_version": 2,
+    "recommendation": "add",
+    "conviction": "medium",
+    "short_term": {
+      "summary": "AAPL short-term: add",
+      "drivers": [
+        "AAPL: technicals neutral, news_sentiment bullish",
+        "AAPL: position_signal state=oversold",
+        "AAPL: 4 of 6 personas constructive"
+      ],
+      "confidence": 70,
+      "thesis_status": "n/a"
+    },
+    "long_term": {
+      "summary": "AAPL long-term thesis: intact",
+      "drivers": [
+        "AAPL: fundamentals bullish on ROE",
+        "AAPL: valuation neutral at thesis_price",
+        "AAPL: structural moat tested by sector rotation"
+      ],
+      "confidence": 75,
+      "thesis_status": "intact"
+    },
+    "open_observation": "AAPL: Open Claude analyst flags mixed signal — short-term tactical bias diverges from long-term thesis posture.",
+    "dissent": {
+      "has_dissent": true,
+      "dissenting_persona": "burry",
+      "dissent_summary": "AAPL: Burry persona flags ≥30-pt confidence gap vs consensus"
+    },
+    "data_unavailable": false
+  },
+  "ohlc_history": [
+    {
+      "date": "2026-04-01",
+      "open": 194.5,
+      "high": 196,
+      "low": 194,
+      "close": 195,
+      "volume": 1000000
+    },
+    {
+      "date": "2026-04-02",
+      "open": 195.25,
+      "high": 196.75,
+      "low": 194.75,
+      "close": 195.75,
+      "volume": 1010000
+    },
+    {
+      "date": "2026-04-03",
+      "open": 195.94,
+      "high": 197.44,
+      "low": 195.44,
+      "close": 196.44,
+      "volume": 1020000
+    },
+    {
+      "date": "2026-04-04",
+      "open": 196.48,
+      "high": 197.98,
+      "low": 195.98,
+      "close": 196.98,
+      "volume": 1030000
+    },
+    {
+      "date": "2026-04-05",
+      "open": 196.84,
+      "high": 198.34,
+      "low": 196.34,
+      "close": 197.34,
+      "volume": 1040000
+    },
+    {
+      "date": "2026-04-06",
+      "open": 196.99,
+      "high": 198.49,
+      "low": 196.49,
+      "close": 197.49,
+      "volume": 1050000
+    },
+    {
+      "date": "2026-04-07",
+      "open": 196.92,
+      "high": 198.42,
+      "low": 196.42,
+      "close": 197.42,
+      "volume": 1060000
+    },
+    {
+      "date": "2026-04-08",
+      "open": 196.65,
+      "high": 198.15,
+      "low": 196.15,
+      "close": 197.15,
+      "volume": 1070000
+    },
+    {
+      "date": "2026-04-09",
+      "open": 196.21,
+      "high": 197.71,
+      "low": 195.71,
+      "close": 196.71,
+      "volume": 1080000
+    },
+    {
+      "date": "2026-04-10",
+      "open": 195.68,
+      "high": 197.18,
+      "low": 195.18,
+      "close": 196.18,
+      "volume": 1090000
+    },
+    {
+      "date": "2026-04-11",
+      "open": 195.12,
+      "high": 196.62,
+      "low": 194.62,
+      "close": 195.62,
+      "volume": 1100000
+    },
+    {
+      "date": "2026-04-12",
+      "open": 194.6,
+      "high": 196.1,
+      "low": 194.1,
+      "close": 195.1,
+      "volume": 1110000
+    },
+    {
+      "date": "2026-04-13",
+      "open": 194.19,
+      "high": 195.69,
+      "low": 193.69,
+      "close": 194.69,
+      "volume": 1120000
+    },
+    {
+      "date": "2026-04-14",
+      "open": 193.94,
+      "high": 195.44,
+      "low": 193.44,
+      "close": 194.44,
+      "volume": 1130000
+    },
+    {
+      "date": "2026-04-15",
+      "open": 193.9,
+      "high": 195.4,
+      "low": 193.4,
+      "close": 194.4,
+      "volume": 1140000
+    },
+    {
+      "date": "2026-04-16",
+      "open": 194.08,
+      "high": 195.58,
+      "low": 193.58,
+      "close": 194.58,
+      "volume": 1150000
+    },
+    {
+      "date": "2026-04-17",
+      "open": 194.47,
+      "high": 195.97,
+      "low": 193.97,
+      "close": 194.97,
+      "volume": 1160000
+    },
+    {
+      "date": "2026-04-18",
+      "open": 195.04,
+      "high": 196.54,
+      "low": 194.54,
+      "close": 195.54,
+      "volume": 1170000
+    },
+    {
+      "date": "2026-04-19",
+      "open": 195.74,
+      "high": 197.24,
+      "low": 195.24,
+      "close": 196.24,
+      "volume": 1180000
+    },
+    {
+      "date": "2026-04-20",
+      "open": 196.5,
+      "high": 198,
+      "low": 196,
+      "close": 197,
+      "volume": 1190000
+    },
+    {
+      "date": "2026-04-21",
+      "open": 197.25,
+      "high": 198.75,
+      "low": 196.75,
+      "close": 197.75,
+      "volume": 1200000
+    },
+    {
+      "date": "2026-04-22",
+      "open": 197.91,
+      "high": 199.41,
+      "low": 197.41,
+      "close": 198.41,
+      "volume": 1210000
+    },
+    {
+      "date": "2026-04-23",
+      "open": 198.43,
+      "high": 199.93,
+      "low": 197.93,
+      "close": 198.93,
+      "volume": 1220000
+    },
+    {
+      "date": "2026-04-24",
+      "open": 198.77,
+      "high": 200.27,
+      "low": 198.27,
+      "close": 199.27,
+      "volume": 1230000
+    },
+    {
+      "date": "2026-04-25",
+      "open": 198.88,
+      "high": 200.38,
+      "low": 198.38,
+      "close": 199.38,
+      "volume": 1240000
+    },
+    {
+      "date": "2026-04-26",
+      "open": 198.77,
+      "high": 200.27,
+      "low": 198.27,
+      "close": 199.27,
+      "volume": 1250000
+    },
+    {
+      "date": "2026-04-27",
+      "open": 198.48,
+      "high": 199.98,
+      "low": 197.98,
+      "close": 198.98,
+      "volume": 1260000
+    },
+    {
+      "date": "2026-04-28",
+      "open": 198.02,
+      "high": 199.52,
+      "low": 197.52,
+      "close": 198.52,
+      "volume": 1270000
+    },
+    {
+      "date": "2026-04-29",
+      "open": 197.48,
+      "high": 198.98,
+      "low": 196.98,
+      "close": 197.98,
+      "volume": 1280000
+    },
+    {
+      "date": "2026-04-30",
+      "open": 196.92,
+      "high": 198.42,
+      "low": 196.42,
+      "close": 197.42,
+      "volume": 1290000
+    }
+  ],
+  "indicators": {
+    "ma20": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      196.7,
+      197.45,
+      198.11,
+      198.63,
+      198.97,
+      199.08,
+      198.97,
+      198.68,
+      198.22,
+      197.68,
+      197.12
+    ],
+    "ma50": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "bb_upper": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      199,
+      199.75,
+      200.41,
+      200.93,
+      201.27,
+      201.38,
+      201.27,
+      200.98,
+      200.52,
+      199.98,
+      199.42
+    ],
+    "bb_lower": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      195,
+      195.75,
+      196.41,
+      196.93,
+      197.27,
+      197.38,
+      197.27,
+      196.98,
+      196.52,
+      195.98,
+      195.42
+    ],
+    "rsi14": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74
+    ]
+  },
+  "headlines": [
+    {
+      "source": "Yahoo Finance",
+      "published_at": "2026-05-03T18:00:00Z",
+      "title": "AAPL: Earnings preview — analysts expect beat",
+      "url": "https://finance.yahoo.com/news/AAPL-earnings-preview"
+    },
+    {
+      "source": "Reuters",
+      "published_at": "2026-05-03T15:30:00Z",
+      "title": "AAPL: Sector rotation continues",
+      "url": "https://reuters.com/markets/AAPL"
+    },
+    {
+      "source": "Bloomberg RSS",
+      "published_at": "2026-05-02T10:00:00Z",
+      "title": "AAPL: Insider buying notice filed",
+      "url": "https://bloomberg.com/news/AAPL-insider"
+    }
+  ],
+  "errors": []
+}

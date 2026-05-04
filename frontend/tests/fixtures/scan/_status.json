@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "partial": false,
+  "completed_tickers": ["AAPL", "NVDA", "MSFT"],
+  "failed_tickers": [],
+  "skipped_tickers": [],
+  "llm_failure_count": 0,
+  "lite_mode": false
+}
