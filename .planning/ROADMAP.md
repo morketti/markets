@@ -14,7 +14,7 @@
 | 3 | Analytical Agents — Deterministic Scoring (5/5 plans, Complete) | Complete    | 2026-05-03 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer (6/6 plans, Complete) | Complete    | 2026-05-04 | 6 | Phases 3, 4 |
-| 6 | Frontend MVP — Morning Scan + Deep-Dive | Static React app reads snapshots, renders three lenses + ticker detail | VIEW-01..09, VIEW-11..15, INFRA-05 | 7 | Phase 5 |
+| 6 | Frontend MVP — Morning Scan + Deep-Dive (1/5 plans, In Progress) | Static React app reads snapshots, renders three lenses + ticker detail | VIEW-01..09, VIEW-11..15, INFRA-05 | 7 | Phase 5 |
 | 7 | Decision-Support View + Dissent Surface | User reads buy/trim/hold recommendation with drivers + dissent | VIEW-10 | 4 | Phases 5, 6 |
 | 8 | Mid-Day Refresh + Resilience | On-open refresh layer + lite-mode fallback + memory writes verified | REFRESH-01..04, INFRA-06..07 | 5 | Phase 6 |
 | 9 | Endorsement Capture | Endorsements as first-class signal (capture only — performance math deferred) | ENDORSE-01..03 | 3 | Phase 7 |
@@ -176,10 +176,10 @@ Plans:
 
 ### Phase 6: Frontend MVP — Morning Scan + Deep-Dive — Plans
 
-**Plans:** 5 plans (0/5 complete)
+**Plans:** 5 plans (1/5 complete)
 
 Plans:
-- [ ] 06-01-storage-amendment-PLAN.md — Wave 0 Phase 5 amendment: ohlc_history + 5 indicator series + headlines + ThesisStatus + schema_version 1→2 + data/_dates.json index + ROADMAP staleness threshold doc fix
+- [x] 06-01-storage-amendment-PLAN.md — Wave 0 Phase 5 amendment: ohlc_history + 5 indicator series + headlines + ThesisStatus + schema_version 1→2 + data/_dates.json index + ROADMAP staleness threshold doc fix (no-op — bug not present)
 - [ ] 06-02-frontend-scaffold-PLAN.md — Wave 1: Vite 6 + React 19 + TS + Tailwind v4 + shadcn/ui + 6 zod schemas + fetchSnapshot + staleness (VIEW-11 thresholds) + Vercel deploy config
 - [ ] 06-03-morning-scan-PLAN.md — Wave 2: 3-lens URL-synced tabs + StalenessBadge + Position/Short-Term/Long-Term lens components + ScanRoute + Playwright morning-scan E2E (VIEW-01, VIEW-02, VIEW-03, VIEW-11)
 - [ ] 06-04-deep-dive-PLAN.md — Wave 3: TickerRoute + lightweight-charts wrapper + OpenClaudePin (pinned at TOP per user MEMORY) + 5 PersonaCards + 4 AnalyticalSignalCards + dual TimeframeCards + NewsList grouped-by-source + ticker search typeahead (VIEW-04..09 + VIEW-13)
