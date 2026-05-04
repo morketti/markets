@@ -21,6 +21,14 @@ vi.mock('@/lib/useRefreshData', () => ({
   useRefreshData: vi.fn(),
 }))
 
+// Mock the Chart component — lightweight-charts requires WebGL/canvas APIs
+// that jsdom lacks (window.matchMedia, devicePixelRatio observable). The
+// component itself is covered by Chart.test.tsx; here we just need a stub
+// that renders the container testid so TickerRoute composition is testable.
+vi.mock('@/components/Chart', () => ({
+  Chart: () => <div data-testid="chart-container" />,
+}))
+
 import { useTickerData } from '@/lib/loadTickerData'
 import { useRefreshData } from '@/lib/useRefreshData'
 
@@ -28,7 +36,6 @@ const mockedUseTickerData = vi.mocked(useTickerData)
 const mockedUseRefreshData = vi.mocked(useRefreshData)
 
 function makeSnapshot(): Snapshot {
-  const now = new Date().toISOString()
   return {
     ticker: 'AAPL',
     schema_version: 2,

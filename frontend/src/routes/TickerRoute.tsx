@@ -7,6 +7,7 @@ import { Chart } from '@/components/Chart'
 import { PersonaCard } from '@/components/PersonaCard'
 import { AnalyticalSignalCard } from '@/components/AnalyticalSignalCard'
 import { NewsList } from '@/components/NewsList'
+import { CurrentPriceDelta } from '@/components/CurrentPriceDelta'
 import { Separator } from '@/components/ui/separator'
 import { FetchNotFoundError, SchemaMismatchError } from '@/lib/fetchSnapshot'
 
@@ -16,6 +17,8 @@ import { FetchNotFoundError, SchemaMismatchError } from '@/lib/fetchSnapshot'
 // personas, never replaced"):
 //   1. Heading: ticker symbol + back-to-scan link
 //   2. OpenClaudePin (claude_analyst signal — pinned, distinct, ALWAYS rendered)
+//   2b. CurrentPriceDelta — Phase 8 Wave 1 mount. Refresh hook dedupes by
+//       queryKey ['refresh', symbol] across TickerRoute + DecisionRoute.
 //   3. TimeframeCards (short_term + long_term, side-by-side on lg)
 //   4. Chart (OHLC + MA20/MA50/BB upper/lower + RSI sub-pane)
 //   5. PersonaCards grid (5 personas EXCLUDING claude_analyst)
@@ -145,6 +148,19 @@ export default function TickerRoute() {
 
       {/* 2. Open Claude Analyst pinned at TOP — VIEW-09 + MEMORY.md lock */}
       <OpenClaudePin signal={claudeSig} />
+
+      {/* 2b. Current price + delta — Phase 8 Wave 1. snapshotLastPrice from
+          the final ohlc bar's close (snapshot baseline). Hook is shared with
+          DecisionRoute via queryKey ['refresh', symbol]. */}
+      <CurrentPriceDelta
+        symbol={symbol}
+        snapshotLastPrice={
+          snap.ohlc_history.length > 0
+            ? snap.ohlc_history[snap.ohlc_history.length - 1].close
+            : null
+        }
+        snapshotComputedAt={snapshotComputedAt}
+      />
 
       {/* 3. Dual-timeframe cards — VIEW-05 (side-by-side on lg, stacked on mobile) */}
       {dec && (

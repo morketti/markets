@@ -4,6 +4,7 @@ import { useTickerData } from '@/lib/loadTickerData'
 import { RecommendationBanner } from '@/components/RecommendationBanner'
 import { DriversList } from '@/components/DriversList'
 import { DissentPanel } from '@/components/DissentPanel'
+import { CurrentPriceDelta } from '@/components/CurrentPriceDelta'
 import { Separator } from '@/components/ui/separator'
 import { FetchNotFoundError, SchemaMismatchError } from '@/lib/fetchSnapshot'
 
@@ -19,8 +20,8 @@ import { FetchNotFoundError, SchemaMismatchError } from '@/lib/fetchSnapshot'
 //   1. Heading + ← Deep dive cross-link (date preserved on round-trip)
 //   2. data_unavailable notice (only when dec.data_unavailable === true)
 //   3. RecommendationBanner — hero
-//   4. PHASE-8-HOOK: current-price-delta placeholder (load-bearing — Phase 8
-//      grep target — DO NOT REMOVE the source comment OR the data-testid)
+//   4. CurrentPriceDelta — Phase 8 Wave 1 (replaced the Phase-7 placeholder).
+//      data-testid='current-price-placeholder' preserved for grep continuity.
 //   5. DriversList — short_term + long_term card pair
 //   6. Separator
 //   7. DissentPanel — always rendered
@@ -174,20 +175,20 @@ export default function DecisionRoute() {
         conviction={dec.conviction}
       />
 
-      {/* 4. PHASE-8-HOOK: current-price-delta — Phase 8 (api/refresh.py)
-          replaces this placeholder with <CurrentPriceDelta /> fed by
-          useRefreshData(symbol). The data-testid below is the deterministic
-          search target for Phase 8's planner; keep BOTH the source comment
-          (this string) AND the data-testid attribute for the grep contract. */}
-      <div
-        data-testid="current-price-placeholder"
-        className="rounded-md border border-dashed border-border bg-surface px-4 py-3 text-sm text-fg-muted"
-      >
-        Snapshot price as of {new Date(dec.computed_at).toLocaleString()} ET.{' '}
-        <span className="italic">
-          Current-price delta arrives via mid-day refresh in Phase 8.
-        </span>
-      </div>
+      {/* 4. CurrentPriceDelta — Phase 8 Wave 1 close. Replaces the Phase-7
+          placeholder. data-testid='current-price-placeholder' is preserved
+          on the new element for grep-target continuity. snapshotLastPrice
+          derives from the latest ohlc_history close (final bar in the v2
+          snapshot's price series). */}
+      <CurrentPriceDelta
+        symbol={symbol}
+        snapshotLastPrice={
+          snap.ohlc_history.length > 0
+            ? snap.ohlc_history[snap.ohlc_history.length - 1].close
+            : null
+        }
+        snapshotComputedAt={dec.computed_at}
+      />
 
       {/* 5. DriversList — short_term + long_term card pair */}
       <DriversList shortTerm={dec.short_term} longTerm={dec.long_term} />
