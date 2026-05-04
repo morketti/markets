@@ -41,6 +41,17 @@ interface ChartProps {
   height?: number
 }
 
+// Mobile responsive height: lightweight-charts respects pinch-zoom on touch
+// devices natively when handleScroll/handleScale are enabled. We also size
+// the container shorter on narrow viewports so the chart fits without
+// pushing the rest of the page below the fold.
+function pickHeight(viewportWidth: number, override?: number): number {
+  if (override !== undefined) return override
+  if (viewportWidth < 640) return 280 // sm-: phone portrait
+  if (viewportWidth < 1024) return 360 // md: tablet
+  return 480 // lg+: desktop
+}
+
 // Notion-Clean palette tokens — kept in sync with src/index.css @theme.
 const PALETTE = {
   bg: '#0E0F11',
@@ -54,15 +65,21 @@ const PALETTE = {
   amber: '#FBBF24',
 } as const
 
-export function Chart({ ohlcHistory, indicators, height = 400 }: ChartProps) {
+export function Chart({ ohlcHistory, indicators, height }: ChartProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
 
-    const chart = createChart(containerRef.current, {
+    const initialWidth = containerRef.current.clientWidth || 800
+    const initialHeight = pickHeight(
+      typeof window !== 'undefined' ? window.innerWidth : 1024,
       height,
+    )
+
+    const chart = createChart(containerRef.current, {
+      height: initialHeight,
       layout: {
         background: { type: ColorType.Solid, color: PALETTE.bg },
         textColor: PALETTE.fg,
@@ -81,6 +98,22 @@ export function Chart({ ohlcHistory, indicators, height = 400 }: ChartProps) {
         secondsVisible: false,
       },
       crosshair: { mode: 1 /* CrosshairMode.Normal */ },
+      // VIEW-12 mobile touch: pan via horiz drag, pinch-zoom via pinch.
+      // vertTouchDrag stays false so vertical page-scroll passes through —
+      // otherwise the chart "captures" the gesture and the user can't scroll
+      // past the chart on mobile.
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: false,
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: true,
+        pinch: true,
+      },
+      width: initialWidth,
     })
     chartRef.current = chart
 
@@ -176,9 +209,16 @@ export function Chart({ ohlcHistory, indicators, height = 400 }: ChartProps) {
     chart.timeScale().fitContent()
 
     // ---- Resize observer: keep chart width matched to container ----
+    // Also recomputes height bracket on viewport changes (rotate phone /
+    // resize desktop window across the sm/md/lg breakpoints).
     const resizeObs = new ResizeObserver((entries) => {
       for (const e of entries) {
-        chart.applyOptions({ width: e.contentRect.width })
+        const w = e.contentRect.width
+        const h = pickHeight(
+          typeof window !== 'undefined' ? window.innerWidth : 1024,
+          height,
+        )
+        chart.applyOptions({ width: w, height: h })
       }
     })
     resizeObs.observe(containerRef.current)

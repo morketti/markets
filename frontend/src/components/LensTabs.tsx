@@ -57,30 +57,35 @@ export function LensTabs({
       {/* TabsList: explicit Notion-Clean palette overrides. The shadcn default
           uses bg-muted (which we don't have); we replace with bg-surface +
           border-border for the strip and rely on data-[state=active] hooks
-          to surface the accent underline. */}
-      <TabsList className="h-auto w-full justify-start gap-2 rounded-md border border-border bg-surface p-1 text-fg-muted">
-        <TabsTrigger
-          value="position"
-          className="rounded-sm px-3 py-1.5 text-sm font-medium data-[state=active]:bg-bg data-[state=active]:text-accent data-[state=active]:shadow-none"
-          data-testid="lens-tab-position"
-        >
-          Position Adjustment
-        </TabsTrigger>
-        <TabsTrigger
-          value="short"
-          className="rounded-sm px-3 py-1.5 text-sm font-medium data-[state=active]:bg-bg data-[state=active]:text-accent data-[state=active]:shadow-none"
-          data-testid="lens-tab-short"
-        >
-          Short-Term Opportunities
-        </TabsTrigger>
-        <TabsTrigger
-          value="long"
-          className="rounded-sm px-3 py-1.5 text-sm font-medium data-[state=active]:bg-bg data-[state=active]:text-accent data-[state=active]:shadow-none"
-          data-testid="lens-tab-long"
-        >
-          Long-Term Thesis Status
-        </TabsTrigger>
-      </TabsList>
+          to surface the accent underline.
+          Mobile: overflow-x-auto wrapper protects narrow viewports (<360px)
+          from forcing horizontal page-scroll when all 3 tab labels are long.
+          Tap-target: min-h-11 (44px Apple HIG) ensures tabs are easy to tap. */}
+      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <TabsList className="h-auto w-full min-w-max justify-start gap-2 rounded-md border border-border bg-surface p-1 text-fg-muted">
+          <TabsTrigger
+            value="position"
+            className="min-h-11 rounded-sm px-3 py-2 text-sm font-medium data-[state=active]:bg-bg data-[state=active]:text-accent data-[state=active]:shadow-none"
+            data-testid="lens-tab-position"
+          >
+            Position Adjustment
+          </TabsTrigger>
+          <TabsTrigger
+            value="short"
+            className="min-h-11 rounded-sm px-3 py-2 text-sm font-medium data-[state=active]:bg-bg data-[state=active]:text-accent data-[state=active]:shadow-none"
+            data-testid="lens-tab-short"
+          >
+            Short-Term Opportunities
+          </TabsTrigger>
+          <TabsTrigger
+            value="long"
+            className="min-h-11 rounded-sm px-3 py-2 text-sm font-medium data-[state=active]:bg-bg data-[state=active]:text-accent data-[state=active]:shadow-none"
+            data-testid="lens-tab-long"
+          >
+            Long-Term Thesis Status
+          </TabsTrigger>
+        </TabsList>
+      </div>
       {/* Each TabsContent only mounts its children when value===lens.
           DO NOT pass forceMount — that would defeat Pitfall #8. */}
       <TabsContent value="position" data-testid="lens-content-position">
