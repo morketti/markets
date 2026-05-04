@@ -14,7 +14,7 @@
 | 3 | Analytical Agents — Deterministic Scoring (5/5 plans, Complete) | Complete    | 2026-05-03 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer (6/6 plans, Complete) | Complete    | 2026-05-04 | 6 | Phase 4 | Complete    | 2026-05-04 | Frontend MVP — Morning Scan + Deep-Dive (5/5 plans, Complete) | Complete    | 2026-05-04 | 7 | Phase 5 | Complete    | 2026-05-04 | Decision-Support View + Dissent Surface (1/1 plans, Complete) | Complete    | 2026-05-04 | 4 | Phases 5, 6 |
-| 8 | Mid-Day Refresh + Resilience (1/2 plans, In Progress) | On-open refresh layer + lite-mode fallback + memory writes verified | REFRESH-01..04, INFRA-06..07 | 5 | Phase 6 |
+| 8 | Mid-Day Refresh + Resilience (2/2 plans, Complete) | Complete    | 2026-05-04 | 5 | Phase 6 |
 | 9 | Endorsement Capture | Endorsements as first-class signal (capture only — performance math deferred) | ENDORSE-01..03 | 3 | Phase 7 |
 
 ## Phase Detail
@@ -248,11 +248,11 @@ Plans:
 
 **Research flag:** Verify Vercel Python serverless cold-start timing under realistic ticker fetch + RSS parse path before declaring done.
 
-**Plans:** 1/2 plans complete (In Progress)
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 08-01-backend-refresh-PLAN.md — api/refresh.py Vercel Python serverless function (BaseHTTPRequestHandler + sys.path bootstrap + happy/partial/full-failure envelopes) + vercel.json at repo root (maxDuration=30) + frontend/vercel.json SPA-rewrite narrowing to /((?!api/).*) + routine/memory_log.py (INFRA-06 JSONL append mirroring _log_failure pattern) + routine/run_for_watchlist.py Phase E hook + scripts/check_provenance.py (INFRA-07 walker accepting 3 marker forms) + .pre-commit-config.yaml + 2 prices resilience tests + 1 news resilience test + codebase audit pass; closes REFRESH-01, INFRA-06, INFRA-07, REFRESH-04 (backend half)
-- [ ] 08-02-frontend-refresh-PLAN.md — frontend/src/schemas/refresh.ts (zod discriminated union over success/partial/full-failure) + frontend/src/lib/useRefreshData.ts (TanStack hook with keepPreviousData + 5-min staleTime + retry: 1) + frontend/src/components/CurrentPriceDelta.tsx (preserves data-testid=current-price-placeholder; covers loading + 4 happy + partial + full-failure + isError; Notion-Clean palette) + dual-route mount (TickerRoute + DecisionRoute replacing the Phase-7 PHASE-8-HOOK placeholder) + frontend/tests/e2e/resilience.spec.ts (3 specs: 500-on-ticker, 500-on-decision, partial-response); closes REFRESH-02, REFRESH-03, REFRESH-04 (frontend half — REFRESH-04 fully closes once both plans green)
+- [x] 08-02-frontend-refresh-PLAN.md — frontend/src/schemas/refresh.ts (z.union of Success + Failure variants mirroring api/refresh.py envelopes; isRefreshFailure narrowing) + frontend/src/lib/useRefreshData.ts (TanStack hook with keepPreviousData + 5-min staleTime + retry: 1 + queryKey-based dedup across dual routes) + frontend/src/components/CurrentPriceDelta.tsx (3-branch render preserving data-testid='current-price-placeholder' in EVERY branch; Notion-Clean palette tokens — zero inline hex) + dual-route mount (TickerRoute section 2b after OpenClaudePin + DecisionRoute replacing the Phase-7 PHASE-8-HOOK placeholder) + frontend/tests/e2e/resilience.spec.ts (3 specs: 500-on-ticker, 500-on-decision, partial-response); closes REFRESH-02, REFRESH-03, REFRESH-04 (frontend half — REFRESH-04 fully closed by both plans). vitest 234→260 (+26); Playwright 64→72 (+8)
 
 ---
 

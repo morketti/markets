@@ -73,9 +73,9 @@ Requirements for initial release. Each maps to a roadmap phase.
 ### Mid-Day Refresh (REFRESH)
 
 - [x] **REFRESH-01**: Mid-day refresh runs as Vercel Python serverless function at `api/refresh.py`
-- [ ] **REFRESH-02**: Refresh accepts `?ticker=X` query, fetches current price (yfinance) + headlines published since the snapshot timestamp (RSS) — no LLM calls
-- [ ] **REFRESH-03**: Frontend Deep-Dive page triggers refresh on open and merges results into rendered state
-- [ ] **REFRESH-04**: Refresh function completes within 10s Vercel timeout; on yfinance/RSS failure returns partial response with explicit `error: true` flag and frontend continues to show snapshot data
+- [x] **REFRESH-02**: Refresh accepts `?ticker=X` query, fetches current price (yfinance) + headlines published since the snapshot timestamp (RSS) — no LLM calls
+- [x] **REFRESH-03**: Frontend Deep-Dive page triggers refresh on open and merges results into rendered state
+- [x] **REFRESH-04**: Refresh function completes within 10s Vercel timeout; on yfinance/RSS failure returns partial response with explicit `error: true` flag and frontend continues to show snapshot data
 
 ### Endorsements (ENDORSE — capture only in v1)
 
@@ -199,9 +199,9 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | VIEW-14 | Phase 6 | Complete |
 | VIEW-15 | Phase 6 | Complete |
 | REFRESH-01 | Phase 8 | Complete |
-| REFRESH-02 | Phase 8 | Pending |
-| REFRESH-03 | Phase 8 | Pending |
-| REFRESH-04 | Phase 8 | Pending (backend half complete — frontend resilience.spec.ts in Wave 1) |
+| REFRESH-02 | Phase 8 | Complete |
+| REFRESH-03 | Phase 8 | Complete |
+| REFRESH-04 | Phase 8 | Complete |
 | ENDORSE-01 | Phase 9 | Pending |
 | ENDORSE-02 | Phase 9 | Pending |
 | ENDORSE-03 | Phase 9 | Pending |
@@ -220,4 +220,4 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-05-04 — Phase 8 / Plan 01 (Wave 0 backend) complete: REFRESH-01 + INFRA-06 + INFRA-07 flipped to Complete after api/refresh.py (Vercel Python serverless BaseHTTPRequestHandler subclass `handler` with sys.path bootstrap so ingestion.* imports resolve under Vercel's runtime; pure _build_response builder + 3 locked envelope shapes — success / partial / full-failure-without-current-price-field; NO LLM imports; NO CORS headers same-origin lock; 13 tests covering happy + 4 failure modes + headline serialization + do_GET integration + ticker normalization), repo-root vercel.json maxDuration=30, **frontend/vercel.json SPA rewrite narrowed `/(.*)` → `/((?!api/).*)`** (load-bearing — without it /api/* requests silently return the SPA HTML shell), routine/memory_log.py mirroring _log_failure atomic-append discipline + 13 schema-strictness tests + 3 Phase E integration tests appended to test_run_for_watchlist (Phase E hook gated by `if result.persona_signals:` naturally skips lite_mode AND per-ticker pipeline failures), scripts/check_provenance.py walking 6 source roots accepting 3 marker forms (case-insensitive on keyword phrases; comment OR docstring location) + 13 tests, .pre-commit-config.yaml local hook entry, codebase audit pass adding 22+6 markers (live `python scripts/check_provenance.py` exits 0 against 48 files), 2 explicit prices resilience + 1 explicit news resilience tests characterizing existing graceful-failure contract. Full repo Python pytest 704 (659 baseline + 45 new). REFRESH-04 stays Pending — backend half complete (api/refresh.py error envelope tested across 4 failure modes + 3 ingestion resilience tests); full closure with Wave 1 frontend resilience.spec.ts. Phase 8 progress: 1/2 plans complete.*
+*Last updated: 2026-05-04 — Phase 8 COMPLETE (both plans shipped). Plan 02 (Wave 1 frontend) closes REFRESH-02, REFRESH-03, REFRESH-04 (frontend half — REFRESH-04 fully closed by Wave 0 + Wave 1 combined): frontend/src/schemas/refresh.ts (z.union of Success + Failure variants mirroring api/refresh.py envelopes; isRefreshFailure narrowing helper; permissive published_at on RefreshHeadline matching Phase 6 HeadlineSchema discipline) + frontend/src/lib/useRefreshData.ts (TanStack Query hook with queryKey ['refresh', symbol], staleTime 5min, placeholderData keepPreviousData v5 idiom, retry 1, enabled gate) + frontend/src/components/CurrentPriceDelta.tsx 3-branch render (loading / failure-fallback / success+partial; preserves data-testid='current-price-placeholder' on outer div in EVERY branch; Notion-Clean palette tokens — text-bullish/text-bearish/text-fg-muted/border-border/bg-surface; zero inline hex anywhere) + dual-route mount (TickerRoute section 2b after OpenClaudePin; DecisionRoute REPLACES the Phase-7 PHASE-8-HOOK placeholder block while preserving the testid grep contract) + frontend/tests/e2e/resilience.spec.ts 3 specs locking the snapshot-stays-canonical UX (500 on TickerRoute → ticker hero + open-claude-pin still render + 'Refresh unavailable' notice; 500 on DecisionRoute → banner + drivers + dissent intact; partial response → $178.42 + 'Headlines unavailable' footnote). vitest 234→260 (+26 net: 8 schema + 7 hook + 9 component + 1 TickerRoute mount + 1 DecisionRoute Phase-8 mount); Playwright 64→72 (+8 net: 3 specs × 3 projects = 9 new minus 1 unrelated skip). Python pytest stays GREEN at 704. TypeScript typecheck clean. Phase 8 progress: 2/2 plans complete.*

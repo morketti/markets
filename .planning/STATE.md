@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 08-02
-status: in_progress
-last_updated: "2026-05-04T18:48:00.000Z"
+current_plan: null
+status: phase_complete
+last_updated: "2026-05-04T19:08:28.208Z"
 progress:
   total_phases: 9
-  completed_phases: 7
-  total_plans: 33
-  completed_plans: 33
+  completed_phases: 8
+  total_plans: 34
+  completed_plans: 34
 ---
 
 # State: Markets
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 08-mid-day-refresh-resilience **In Progress (1/2 plans complete)**
-**Status:** in_progress
+**Status:** Phase complete — ready for verification
 **Current Plan:** 08-02-frontend-refresh-PLAN.md (Wave 1 frontend integration)
 **Total Plans in Phase:** 2
 **Next:** `/gmd:execute-plan 08-02` for Wave 1 — frontend/src/schemas/refresh.ts (zod discriminated union over the 3 envelope shapes locked by api/refresh.py + tests/api/test_refresh.py) + frontend/src/lib/useRefreshData.ts (TanStack hook with keepPreviousData + 5-min staleTime + retry: 1) + frontend/src/components/CurrentPriceDelta.tsx (preserves data-testid="current-price-placeholder"; covers loading + 4 happy + partial + full-failure + isError) + dual-route mount (TickerRoute + DecisionRoute replacing the Phase 7 PHASE-8-HOOK placeholder) + frontend/tests/e2e/resilience.spec.ts (3 specs: 500-on-ticker, 500-on-decision, partial-response). Plan 08-01 just closed: backend Vercel Python serverless `/api/refresh` (BaseHTTPRequestHandler + sys.path bootstrap; 3 locked envelope shapes — success / partial / full-failure-without-current-price-field), repo-root vercel.json maxDuration=30, **frontend/vercel.json SPA rewrite narrowed `/(.*)` → `/((?!api/).*)`** so /api/* requests stop silently returning the SPA shell, routine/memory_log.py + Phase E hook in run_for_watchlist (one record per (ticker, persona) per non-lite run; gated by `if result.persona_signals:`), scripts/check_provenance.py walking 6 source roots accepting 3 marker forms (case-insensitive on keyword phrases; either comment or docstring location), .pre-commit-config.yaml local hook entry, codebase audit pass adding 22+6 markers. Python pytest 704 (659 baseline + 45 new). REFRESH-01 + INFRA-06 + INFRA-07 closed; REFRESH-04 backend half closed (waiting on Wave 1 frontend resilience.spec.ts).
