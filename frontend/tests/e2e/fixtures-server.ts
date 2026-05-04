@@ -29,6 +29,12 @@ export interface MountOptions {
   partialFailure?: boolean
   /** Ages run_completed_at by the given hours (defaults to 2h). */
   ageHours?: number
+  /**
+   * If true, MSFT.json route fulfills from MSFT-no-dissent.json instead.
+   * Used by Phase 7 decision.spec.ts to exercise the has_dissent: false
+   * branch of DissentPanel (Pitfall #12 — intentional silence path).
+   */
+  msftNoDissent?: boolean
 }
 
 export async function mountScanFixtures(
@@ -78,10 +84,16 @@ export async function mountScanFixtures(
         await route.fulfill({ status: 404, body: 'simulated partial failure' })
         return
       }
+      // Phase 7: optionally swap MSFT.json → MSFT-no-dissent.json for the
+      // decision.spec.ts has_dissent: false branch.
+      const fixtureName =
+        options.msftNoDissent && ticker === 'MSFT'
+          ? 'MSFT-no-dissent.json'
+          : `${ticker}.json`
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: readFix(`${ticker}.json`),
+        body: readFix(fixtureName),
       })
     },
   )

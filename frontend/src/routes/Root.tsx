@@ -14,8 +14,12 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 //     for the currently-active scan date
 //
 // Active date detection: useMatches scans the matched route hierarchy and
-// pulls the :date param from /scan/:date or /ticker/:symbol/:date?. If no
-// scan/ticker route is active (e.g. on `/`), default to 'today'.
+// pulls the :date param from /scan/:date or /ticker/:symbol/:date? or
+// /decision/:symbol/:date? (Phase 7). The implementation is route-shape-
+// agnostic — react-router populates m.params.date for ANY matched route
+// with a :date segment so adding a third route shape requires zero code
+// change here. If no scan/ticker/decision route is active (e.g. on `/`),
+// default to 'today'.
 //
 // VIEW-13 typeahead surface: v1 is intentionally simple — direct text→
 // /ticker/:symbol navigation on Enter. Company-name fuzzy match is v1.x;

@@ -117,7 +117,7 @@ export default function TickerRoute() {
 
   return (
     <section className="flex flex-col gap-8 pb-12" data-testid="ticker-route">
-      {/* 1. Heading */}
+      {/* 1. Heading + Phase 7 cross-link to /decision/:symbol/:date — preserves date */}
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <h1
           className="font-mono text-3xl font-semibold tracking-tight"
@@ -125,13 +125,22 @@ export default function TickerRoute() {
         >
           {snap.ticker}
         </h1>
-        <Link
-          to={`/scan/${date}`}
-          className="text-sm text-fg-muted hover:text-accent"
-          data-testid="back-to-scan-link"
-        >
-          ← Back to scan
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            to={`/decision/${symbol}/${date}`}
+            className="text-sm text-fg-muted hover:text-accent"
+            data-testid="to-decision-link"
+          >
+            → Decision view
+          </Link>
+          <Link
+            to={`/scan/${date}`}
+            className="text-sm text-fg-muted hover:text-accent"
+            data-testid="back-to-scan-link"
+          >
+            ← Back to scan
+          </Link>
+        </div>
       </div>
 
       {/* 2. Open Claude Analyst pinned at TOP — VIEW-09 + MEMORY.md lock */}
