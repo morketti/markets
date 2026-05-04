@@ -57,16 +57,16 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **VIEW-01**: Morning-Scan view shows three lens tabs: **Position Adjustment**, **Short-Term Opportunities**, **Long-Term Thesis Status**; one lens visible at a time (no all-at-once dump)
 - [x] **VIEW-02**: Position Adjustment lens lists watchlist tickers sorted by extremity (`|consensus_score|` descending); shows state, evidence list, action_hint
 - [x] **VIEW-03**: Short-Term Opportunities lens lists tickers with bullish short_term signal sorted by confidence; shows drivers
-- [ ] **VIEW-04**: Long-Term Thesis Status lens lists tickers with thesis_status ∈ {weakening, broken} sorted by severity
-- [ ] **VIEW-05**: Per-Ticker Deep-Dive page shows dual-timeframe cards (short_term + long_term) side-by-side at top
-- [ ] **VIEW-06**: Deep-dive shows OHLC chart (lightweight-charts) with MA20/MA50, Bollinger Bands, RSI overlay
-- [ ] **VIEW-07**: Deep-dive shows persona signals as individual cards (each persona: verdict, confidence, reasoning, evidence)
-- [ ] **VIEW-08**: Deep-dive shows news feed grouped by source with timestamps; "since snapshot" delta surfaced
-- [ ] **VIEW-09**: Deep-dive shows Open Claude Analyst observation pinned at top
+- [x] **VIEW-04**: Long-Term Thesis Status lens lists tickers with thesis_status ∈ {weakening, broken} sorted by severity
+- [x] **VIEW-05**: Per-Ticker Deep-Dive page shows dual-timeframe cards (short_term + long_term) side-by-side at top
+- [x] **VIEW-06**: Deep-dive shows OHLC chart (lightweight-charts) with MA20/MA50, Bollinger Bands, RSI overlay
+- [x] **VIEW-07**: Deep-dive shows persona signals as individual cards (each persona: verdict, confidence, reasoning, evidence)
+- [x] **VIEW-08**: Deep-dive shows news feed grouped by source with timestamps; "since snapshot" delta surfaced
+- [x] **VIEW-09**: Deep-dive shows Open Claude Analyst observation pinned at top
 - [ ] **VIEW-10**: Decision-Support view shows recommendation banner (action + conviction band), drivers list, dissent section, and snapshot vs current-price delta
 - [x] **VIEW-11**: Header shows snapshot date + staleness badge (GREEN < 6h, AMBER 6-24h, RED > 24h or partial)
-- [ ] **VIEW-12**: All views are mobile-responsive; morning-scan and deep-dive have phone-optimized layouts (collapsed cards, swipeable tabs)
-- [ ] **VIEW-13**: Search/add ticker via typeahead with company name fuzzy match
+- [x] **VIEW-12**: All views are mobile-responsive; morning-scan and deep-dive have phone-optimized layouts (collapsed cards, swipeable tabs)
+- [x] **VIEW-13**: Search/add ticker via typeahead with company name fuzzy match
 - [ ] **VIEW-14**: Snapshot date selector lets user load historical snapshots from `data/YYYY-MM-DD/`
 - [ ] **VIEW-15**: All JSON reads from `raw.githubusercontent.com` are zod-validated; schema mismatches render error state, not crash
 
@@ -186,16 +186,16 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | VIEW-01 | Phase 6 | Complete |
 | VIEW-02 | Phase 6 | Complete |
 | VIEW-03 | Phase 6 | Complete |
-| VIEW-04 | Phase 6 | Pending |
-| VIEW-05 | Phase 6 | Pending |
-| VIEW-06 | Phase 6 | Pending |
-| VIEW-07 | Phase 6 | Pending |
-| VIEW-08 | Phase 6 | Pending |
-| VIEW-09 | Phase 6 | Pending |
+| VIEW-04 | Phase 6 | Complete |
+| VIEW-05 | Phase 6 | Complete |
+| VIEW-06 | Phase 6 | Complete |
+| VIEW-07 | Phase 6 | Complete |
+| VIEW-08 | Phase 6 | Complete |
+| VIEW-09 | Phase 6 | Complete |
 | VIEW-10 | Phase 7 | Pending |
 | VIEW-11 | Phase 6 | Complete |
-| VIEW-12 | Phase 6 | Pending |
-| VIEW-13 | Phase 6 | Pending |
+| VIEW-12 | Phase 6 | Complete |
+| VIEW-13 | Phase 6 | Complete |
 | VIEW-14 | Phase 6 | Pending |
 | VIEW-15 | Phase 6 | Pending |
 | REFRESH-01 | Phase 8 | Pending |
@@ -220,4 +220,4 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-05-04 — Phase 5 / Plan 06 complete: LLM-08 + INFRA-01..04 flipped to Complete after `routine/{quota, storage, git_publish, run_for_watchlist, entrypoint}.py` shipped with three-phase atomic write (Pattern #4) + 5-step git fail-loudly (Pattern #11) + lite-mode quota guard (Pattern #6 / INFRA-02). Phase 5 closes complete (6/6 plans, 12/12 requirements LLM-01..08 + INFRA-01..04). Phase 6 (Frontend MVP) unblocked.*
+*Last updated: 2026-05-04 — Phase 6 / Plan 04 complete: VIEW-04..09 + VIEW-12 (groundwork) + VIEW-13 flipped to Complete after `frontend/src/components/{Chart, PersonaCard, OpenClaudePin, TimeframeCard, AnalyticalSignalCard, NewsList}.tsx` + `frontend/src/lib/loadTickerData.ts` + `frontend/src/routes/TickerRoute.tsx` shipped — `/ticker/:symbol/:date?` Per-Ticker Deep-Dive view with 7 stacked sections (OpenClaudePin pinned at TOP per VIEW-09 + user MEMORY.md lock — always rendered, never silently absent + accent-tinted distinct styling; 5 PersonaCards in grid with claude_analyst FILTERED OUT — separation lock at React layer; Chart via lightweight-charts 5.2 v5-API rendering OHLC + MA20/MA50/BB upper-lower/RSI(14) sub-pane; NewsList grouped by source with NEW tag for post-snapshot headlines). VIEW-13 ticker search input in Root header with Enter→navigate + uppercase normalization. 179 vitest + 12 Playwright E2E specs all green. Phase 6 progress: 4/5 plans (Wave 4 06-05 polish + responsive + Vercel deploy pending). VIEW-12 marked Complete on responsive groundwork — full mobile-safari Playwright verification lands in Wave 4.*
