@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -13,14 +13,22 @@ import {
 // DecisionRoute tests — 5 cases mirroring TickerRoute's loading/error/data
 // branches, plus the data_unavailable=true happy path. We mock useTickerData
 // at the loadTickerData module boundary; this keeps the test focused on the
-// route's composition + branch logic.
+// route's composition + branch logic. Phase 8 Wave 1 adds a 6th case that
+// asserts the Phase-7 placeholder text is gone after CurrentPriceDelta
+// replaces it (data-testid preserved as the grep contract).
 
 vi.mock('@/lib/loadTickerData', () => ({
   useTickerData: vi.fn(),
 }))
 
+vi.mock('@/lib/useRefreshData', () => ({
+  useRefreshData: vi.fn(),
+}))
+
 import { useTickerData } from '@/lib/loadTickerData'
+import { useRefreshData } from '@/lib/useRefreshData'
 const mockedUseTickerData = vi.mocked(useTickerData)
+const mockedUseRefreshData = vi.mocked(useRefreshData)
 
 function makeDecision(overrides: Partial<TickerDecision> = {}): TickerDecision {
   return {
@@ -90,6 +98,22 @@ function renderRoute() {
 }
 
 describe('DecisionRoute', () => {
+  beforeEach(() => {
+    // Default useRefreshData stub — isPending so the mounted CurrentPriceDelta
+    // shows the muted "Refreshing" placeholder. Individual tests can override.
+    mockedUseRefreshData.mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isError: false,
+      isSuccess: false,
+      isLoading: true,
+      isFetching: true,
+      isPlaceholderData: false,
+      dataUpdatedAt: 0,
+      error: null,
+    } as unknown as ReturnType<typeof useRefreshData>)
+  })
+
   it('loading branch → renders decision-loading testid', () => {
     mockedUseTickerData.mockReturnValue({
       data: undefined,
@@ -161,5 +185,27 @@ describe('DecisionRoute', () => {
     const banner = screen.getByTestId('recommendation-banner')
     expect(banner.getAttribute('data-recommendation')).toBe('hold')
     expect(banner.getAttribute('data-conviction')).toBe('low')
+  })
+
+  it('Phase 8 Wave 1: mounts CurrentPriceDelta, preserves data-testid, replaces Phase-7 placeholder copy', () => {
+    mockedUseTickerData.mockReturnValue({
+      data: makeSnapshot(makeDecision()),
+      isLoading: false,
+      error: null,
+    } as unknown as ReturnType<typeof useTickerData>)
+    renderRoute()
+
+    // Grep contract — data-testid="current-price-placeholder" still present
+    // on the new component.
+    const el = screen.getByTestId('current-price-placeholder')
+    expect(el).toBeInTheDocument()
+
+    // The Phase-7 placeholder copy MUST be GONE — replaced by CurrentPriceDelta.
+    expect(
+      screen.queryByText(/Current-price delta arrives via mid-day refresh/i),
+    ).toBeNull()
+    expect(
+      screen.queryByText(/Snapshot price as of .* ET/i),
+    ).toBeNull()
   })
 })
