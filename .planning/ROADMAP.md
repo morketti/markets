@@ -13,7 +13,7 @@
 | 2 | Ingestion — Keyless Data Plane (7/7 plans, Complete) | Complete    | 2026-05-02 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring (5/5 plans, Complete) | Complete    | 2026-05-03 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
-| 5 | Claude Routine Wiring — Persona Slate + Synthesizer (4/6 plans, In Progress) | In Progress | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
+| 5 | Claude Routine Wiring — Persona Slate + Synthesizer (5/6 plans, In Progress) | In Progress | LLM-01..08, INFRA-01..04 | 6 | Phases 3, 4 |
 | 6 | Frontend MVP — Morning Scan + Deep-Dive | Static React app reads snapshots, renders three lenses + ticker detail | VIEW-01..09, VIEW-11..15, INFRA-05 | 7 | Phase 5 |
 | 7 | Decision-Support View + Dissent Surface | User reads buy/trim/hold recommendation with drivers + dissent | VIEW-10 | 4 | Phases 5, 6 |
 | 8 | Mid-Day Refresh + Resilience | On-open refresh layer + lite-mode fallback + memory writes verified | REFRESH-01..04, INFRA-06..07 | 5 | Phase 6 |
@@ -140,14 +140,14 @@ Plans:
 
 ### Phase 5: Claude Routine Wiring — Persona Slate + Synthesizer — Plans
 
-**Plans:** 4/6 plans complete
+**Plans:** 5/6 plans complete
 
 Plans:
 - [x] 05-01-foundation-PLAN.md — anthropic SDK install (>=0.95,<1) + AnalystId Literal widening 4→10 + 4 package markers + 7 prompt markdown stubs (6 personas + synthesizer) + 2 SDK smoke tests + 12 widening tests
 - [x] 05-02-decision-schema-PLAN.md — TickerDecision + DissentSection + TimeframeBand Pydantic v2 schemas (PEER of AgentSignal AND PositionSignal) + 6-state DecisionRecommendation + 3-state ConvictionBand + 2-state Timeframe Literals + @model_validator data_unavailable invariant + 45 schema tests
 - [x] 05-03-llm-client-PLAN.md — routine/llm_client.py thin async wrapper over client.messages.parse(output_format=PydanticModel) generic over T bound=BaseModel + retry policy DEFAULT_MAX_RETRIES=2 + 4 exception-path branches (ValidationError / APIStatusError / APIError / unknown) + default_factory() on exhaustion (LLM-05) + append-only memory/llm_failures.jsonl with sort_keys + UTC + truncation; tests/routine/conftest.py MockAnthropicClient fixture-replay (reused by Wave 3-5); pytest-asyncio dev dep; 17 tests; 100% line/branch coverage
 - [x] 05-04-personas-PLAN.md — 6 persona markdown prompts (Buffett/Munger/Wood/Burry/Lynch/Open Claude Analyst) at prompts/personas/{persona}.md (98-106 lines each; 5-section locked structure: H1 + Voice Signature + Input Context + Task + Output Schema; voice-signature anchors per LLM-03; claude_analyst.md "NOT a persona, NOT a lens" per user MEMORY.md feedback) + routine/persona_runner.py (~290 LOC: PERSONA_IDS canonical tuple + 3 module constants + load_persona_prompt with @functools.lru_cache + build_persona_user_context + closure-bound _persona_default_factory + run_one + run_persona_slate async fan-out via asyncio.gather(return_exceptions=True), Pattern #3) + 45 tests; 100% line/branch coverage; LLM-01..04 closed
-- [ ] 05-05-synthesizer-PLAN.md — synthesis/synthesizer.py + prompts/synthesizer.md (real content) + dissent rule (compute_dissent in Python) + recommendation derivation
+- [x] 05-05-synthesizer-PLAN.md — prompts/synthesizer.md full content (201 lines, 4 locked sections + 3-layer recommendation priority order + conviction band rule + dual-timeframe instructions + pre-computed dissent rendering instruction + locked TauricResearch phrase "Ground every conclusion in specific evidence") + synthesis/dissent.py (~190 LOC: compute_dissent + VERDICT_TO_DIRECTION + DISSENT_THRESHOLD=30 + signed-weighted-vote majority + tie-break by confidence-then-alphabetical via _neg_alpha helper) + synthesis/synthesizer.py (~340 LOC: 3 module constants SYNTHESIZER_MODEL='claude-opus-4-7' + SYNTHESIZER_MAX_TOKENS=4000 + load_synthesizer_prompt with @lru_cache + build_synthesizer_user_context deterministic + 4 private formatters + _data_unavailable_decision single-source-of-truth canonical shape + _decision_default_factory + async synthesize with 2 cost-saving skip paths + Pattern #7 dissent-in-Python lock); 16 dissent tests + 30 synthesizer tests; 100% line/branch coverage on both modules; LLM-06 + LLM-07 closed
 - [ ] 05-06-routine-entrypoint-PLAN.md — routine/entrypoint.py + run_for_watchlist.py + storage.py (atomic writes, _index.json, _status.json) + git_publish.py + lite-mode estimator (INFRA-02)
 
 ---

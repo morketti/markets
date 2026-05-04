@@ -49,7 +49,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **LLM-04**: Each persona invocation outputs Pydantic-validated `AgentSignal` (signal, confidence, reasoning ≤ 200 chars, evidence list)
 - [x] **LLM-05**: When persona LLM response fails Pydantic validation, `default_factory` returns `(neutral, 0, "schema_failure")` and the raw response is logged to `memory/llm_failures.jsonl`
 - [x] **LLM-06**: Synthesizer prompt (`prompts/synthesizer.md`) produces a per-ticker `TickerDecision` with `short_term`, `long_term`, `recommendation`, `open_observation`
-- [ ] **LLM-07**: Synthesizer always renders a "Dissent" section identifying the most-bearish persona reasoning when ≥1 persona disagrees by ≥30 confidence points
+- [x] **LLM-07**: Synthesizer always renders a "Dissent" section identifying the most-bearish persona reasoning when ≥1 persona disagrees by ≥30 confidence points
 - [ ] **LLM-08**: Routine emits `data/YYYY-MM-DD/_status.json` at end of run with `{success: bool, partial: bool, completed_tickers: [], failed_tickers: [], skipped_tickers: [], llm_failure_count: int}`
 
 ### Frontend Views (VIEW)
@@ -181,7 +181,7 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | LLM-04 | Phase 5 | Complete |
 | LLM-05 | Phase 5 | Complete |
 | LLM-06 | Phase 5 | Complete |
-| LLM-07 | Phase 5 | Pending |
+| LLM-07 | Phase 5 | Complete |
 | LLM-08 | Phase 5 | Pending |
 | VIEW-01 | Phase 6 | Pending |
 | VIEW-02 | Phase 6 | Pending |
