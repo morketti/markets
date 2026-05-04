@@ -22,3 +22,14 @@ Thumbs.db
 # Project
 watchlist.json.tmp
 watchlist.json.*.tmp
+
+# Frontend (Phase 6)
+frontend/node_modules
+frontend/dist
+frontend/.vite
+frontend/playwright-report
+frontend/test-results
+frontend/coverage
+frontend/.env.local
+frontend/*.tsbuildinfo
+
