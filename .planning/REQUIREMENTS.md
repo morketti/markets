@@ -79,9 +79,9 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Endorsements (ENDORSE — capture only in v1)
 
-- [ ] **ENDORSE-01**: System captures endorsement entries via append-only `endorsements.jsonl`: `{ticker, source, date, price_at_call, notes, captured_at}`
-- [ ] **ENDORSE-02**: User can add endorsements via CLI utility (frontend form deferred to v1.x)
-- [ ] **ENDORSE-03**: Decision-Support view shows recent endorsements (last 90 days) for the active ticker; performance math (% vs S&P, corp-action-aware) deferred to v1.x
+- [x] **ENDORSE-01**: System captures endorsement entries via append-only `endorsements.jsonl`: `{ticker, source, date, price_at_call, notes, captured_at}`
+- [x] **ENDORSE-02**: User can add endorsements via CLI utility (frontend form deferred to v1.x)
+- [x] **ENDORSE-03**: Decision-Support view shows recent endorsements (last 90 days) for the active ticker; performance math (% vs S&P, corp-action-aware) deferred to v1.x
 
 ### Infrastructure (INFRA)
 
@@ -202,9 +202,9 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | REFRESH-02 | Phase 8 | Complete |
 | REFRESH-03 | Phase 8 | Complete |
 | REFRESH-04 | Phase 8 | Complete |
-| ENDORSE-01 | Phase 9 | Pending |
-| ENDORSE-02 | Phase 9 | Pending |
-| ENDORSE-03 | Phase 9 | Pending |
+| ENDORSE-01 | Phase 9 | Complete |
+| ENDORSE-02 | Phase 9 | Complete |
+| ENDORSE-03 | Phase 9 | Complete |
 | INFRA-01 | Phase 5 | Complete |
 | INFRA-02 | Phase 5 | Complete |
 | INFRA-03 | Phase 5 | Complete |
@@ -220,4 +220,4 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-05-04 — Phase 8 COMPLETE (both plans shipped). Plan 02 (Wave 1 frontend) closes REFRESH-02, REFRESH-03, REFRESH-04 (frontend half — REFRESH-04 fully closed by Wave 0 + Wave 1 combined): frontend/src/schemas/refresh.ts (z.union of Success + Failure variants mirroring api/refresh.py envelopes; isRefreshFailure narrowing helper; permissive published_at on RefreshHeadline matching Phase 6 HeadlineSchema discipline) + frontend/src/lib/useRefreshData.ts (TanStack Query hook with queryKey ['refresh', symbol], staleTime 5min, placeholderData keepPreviousData v5 idiom, retry 1, enabled gate) + frontend/src/components/CurrentPriceDelta.tsx 3-branch render (loading / failure-fallback / success+partial; preserves data-testid='current-price-placeholder' on outer div in EVERY branch; Notion-Clean palette tokens — text-bullish/text-bearish/text-fg-muted/border-border/bg-surface; zero inline hex anywhere) + dual-route mount (TickerRoute section 2b after OpenClaudePin; DecisionRoute REPLACES the Phase-7 PHASE-8-HOOK placeholder block while preserving the testid grep contract) + frontend/tests/e2e/resilience.spec.ts 3 specs locking the snapshot-stays-canonical UX (500 on TickerRoute → ticker hero + open-claude-pin still render + 'Refresh unavailable' notice; 500 on DecisionRoute → banner + drivers + dissent intact; partial response → $178.42 + 'Headlines unavailable' footnote). vitest 234→260 (+26 net: 8 schema + 7 hook + 9 component + 1 TickerRoute mount + 1 DecisionRoute Phase-8 mount); Playwright 64→72 (+8 net: 3 specs × 3 projects = 9 new minus 1 unrelated skip). Python pytest stays GREEN at 704. TypeScript typecheck clean. Phase 8 progress: 2/2 plans complete.*
+*Last updated: 2026-05-04 — Phase 9 COMPLETE (final v1 phase). Plan 09-01 (single wave, three tasks) closes ENDORSE-01, ENDORSE-02, ENDORSE-03: analysts/endorsement_schema.py (Pydantic v2 with schema_version: Literal[1] = 1 LOAD-BEARING lock + normalize_ticker reuse + extra='forbid') + endorsements/log.py (append-only JSONL writer + reader mirroring routine/memory_log.py atomic-append discipline) + cli/add_endorsement.py (flag-only argparse + atomic-on-success) + cli/main.py SUBCOMMANDS extension + endorsements.jsonl committed at repo root (NOT gitignored — first-class signal, diverges from memory_log.jsonl) + frontend/src/schemas/endorsement.ts (zod with z.literal(1) + .strict()) + frontend/src/lib/loadEndorsements.ts (JSONL fetch + 90-day filter on `date` NOT captured_at + date-desc sort + useEndorsements TanStack hook) + frontend/src/components/EndorsementsList.tsx (4 render states: loading/error/empty/populated; Notion-Clean palette only; NO performance number anywhere — regex-guarded) + DecisionRoute mount immediately AFTER DissentPanel + Playwright endorsements.spec.ts (3 specs locking empty-state / populated-with-NO-perf / 90-day cutoff). Python pytest 704→738 (+34); vitest 260→291 (+31); Playwright 72→81 (+9 = 3 specs × 3 projects). Provenance markers + check_provenance.py walker green. v1 COMPLETE: all 59 v1 requirements closed.*
