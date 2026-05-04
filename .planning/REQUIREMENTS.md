@@ -43,9 +43,9 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### LLM Persona + Synthesizer (LLM)
 
-- [ ] **LLM-01**: Persona prompts live as markdown files in `prompts/personas/`: `buffett.md`, `munger.md`, `wood.md`, `burry.md`, `lynch.md`, `claude_analyst.md`
-- [ ] **LLM-02**: Each persona prompt is loaded at runtime by `routine/entrypoint.py`; never hardcoded as Python string
-- [ ] **LLM-03**: Each persona prompt has a "voice signature" anchor section at the top defining non-negotiable lens characteristics
+- [x] **LLM-01**: Persona prompts live as markdown files in `prompts/personas/`: `buffett.md`, `munger.md`, `wood.md`, `burry.md`, `lynch.md`, `claude_analyst.md`
+- [x] **LLM-02**: Each persona prompt is loaded at runtime by `routine/entrypoint.py`; never hardcoded as Python string
+- [x] **LLM-03**: Each persona prompt has a "voice signature" anchor section at the top defining non-negotiable lens characteristics
 - [x] **LLM-04**: Each persona invocation outputs Pydantic-validated `AgentSignal` (signal, confidence, reasoning ≤ 200 chars, evidence list)
 - [x] **LLM-05**: When persona LLM response fails Pydantic validation, `default_factory` returns `(neutral, 0, "schema_failure")` and the raw response is logged to `memory/llm_failures.jsonl`
 - [x] **LLM-06**: Synthesizer prompt (`prompts/synthesizer.md`) produces a per-ticker `TickerDecision` with `short_term`, `long_term`, `recommendation`, `open_observation`
@@ -175,9 +175,9 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | POSE-03 | Phase 4 | Complete |
 | POSE-04 | Phase 4 | Complete |
 | POSE-05 | Phase 4 | Complete |
-| LLM-01 | Phase 5 | Pending |
-| LLM-02 | Phase 5 | Pending |
-| LLM-03 | Phase 5 | Pending |
+| LLM-01 | Phase 5 | Complete |
+| LLM-02 | Phase 5 | Complete |
+| LLM-03 | Phase 5 | Complete |
 | LLM-04 | Phase 5 | Complete |
 | LLM-05 | Phase 5 | Complete |
 | LLM-06 | Phase 5 | Complete |
