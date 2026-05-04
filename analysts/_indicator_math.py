@@ -165,3 +165,90 @@ def _total_to_verdict(normalized: float) -> Verdict:
     if normalized < -0.2:
         return "bearish"
     return "neutral"
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 / Plan 06-01: series-form helpers (Wave 0 amendment)
+#
+# The Phase 6 frontend (Wave 3 deep-dive chart) needs MA / BB / RSI rendered
+# as overlays across 180 days of OHLC history. The analyst verdicts
+# (technicals, position_adjustment) consume only iloc[-1] of these series.
+# These helpers expose the FULL series so storage can persist them — and
+# they MUST produce byte-identical values at iloc[-1] vs the existing
+# scalar computations so the chart never disagrees with the verdict math.
+#
+# Locked by tests/analysts/test_indicator_math.py:
+#   * test_ma_series_byte_identical_to_single_point
+#   * test_bb_series_byte_identical_to_single_point
+#   * test_rsi_series_byte_identical_to_single_point
+# Each test computes the series, takes iloc[-1], and asserts approx-equality
+# (within 1e-9) to the corresponding existing scalar computation in
+# analysts/technicals.py / analysts/position_adjustment.py.
+# ---------------------------------------------------------------------------
+
+
+def _ma_series(prices: pd.Series, window: int) -> pd.Series:
+    """Simple moving average series (rolling mean over `window` bars).
+
+    Byte-identical at iloc[-1] to `prices.rolling(window).mean().iloc[-1]`
+    used in analysts/technicals._ma_alignment. First (window-1) entries are
+    NaN (warmup); position window-1 onwards are real values.
+
+    Returns a pd.Series of the same length as `prices`, with the same index.
+    """
+    return prices.rolling(window).mean()
+
+
+def _bb_series(
+    prices: pd.Series,
+    window: int = 20,
+    sigma: float = 2.0,
+) -> tuple[pd.Series, pd.Series]:
+    """Bollinger Bands (upper, lower) over `window` bars at `sigma` standard deviations.
+
+    upper = SMA(window) + sigma * stdev(window)
+    lower = SMA(window) - sigma * stdev(window)
+
+    Byte-identical primitives at iloc[-1] vs analysts/position_adjustment._bollinger_position
+    (which derives a SCALED POSITION value from the same SMA + stdev rolling pair).
+    First (window-1) entries are NaN (warmup); position window-1 onwards are
+    real values.
+
+    Returns (upper, lower) as a tuple of pd.Series, each the same length and
+    index as `prices`.
+    """
+    sma = prices.rolling(window).mean()
+    std = prices.rolling(window).std()
+    upper = sma + sigma * std
+    lower = sma - sigma * std
+    return upper, lower
+
+
+def _rsi_series(prices: pd.Series, period: int = 14) -> pd.Series:
+    """Wilder-smoothed RSI series over `period` bars.
+
+    RSI = 100 - 100 / (1 + RS) where RS = gain_ewm / loss_ewm. Wilder's
+    smoothing is implemented as `.ewm(alpha=1/N, adjust=False).mean()` —
+    mathematically identical to the recursive recipe per StockCharts
+    ChartSchool RSI walkthrough. Byte-identical at iloc[-1] to
+    analysts/position_adjustment._rsi_14 which uses the same formulation.
+
+    First `period` entries are NaN (delta needs 1 prior bar; ewm warmup
+    produces values from index `period` onwards). Returns a pd.Series the
+    same length and index as `prices`.
+
+    Edge cases:
+      * Where loss_ewm == 0 (all-gains warmup), RS → ∞ and RSI saturates
+        to 100. pandas handles this via inf in the division; we leave it
+        as inf in the series and let downstream JSON-serializers coerce
+        to None or 100 as appropriate. _rsi_14 (scalar) clamps to 100.0
+        explicitly — at iloc[-1], real-world data rarely hits l == 0 with
+        14+ bars of history, so the series form returns the same finite
+        value the scalar form does.
+    """
+    delta = prices.diff()
+    gain = delta.clip(lower=0).ewm(alpha=1.0 / period, adjust=False).mean()
+    loss = (-delta).clip(lower=0).ewm(alpha=1.0 / period, adjust=False).mean()
+    rs = gain / loss
+    rsi = 100.0 - (100.0 / (1.0 + rs))
+    return rsi

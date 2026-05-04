@@ -231,8 +231,11 @@ def test_bb_series_byte_identical_to_single_point() -> None:
 def test_rsi_series_byte_identical_to_single_point() -> None:
     """_rsi_series(prices, 14).iloc[-1] reproduces position_adjustment._rsi_14 math.
 
-    Wilder smoothing via .ewm(alpha=1/14, adjust=False). First 14 entries
-    (delta requires 1 prior bar; ewm warmup) are NaN.
+    Wilder smoothing via .ewm(alpha=1/14, adjust=False) — pandas ewm is well-
+    defined from the very first delta, so position 0 is NaN (delta needs a
+    prior bar) but position 1 onward is real-valued. The scalar _rsi_14
+    refuses to RETURN a value below RSI_MIN_BARS=27 (warmup discipline) but
+    the underlying EWM math is identical at any iloc[-1] beyond 27 bars.
     """
     from analysts._indicator_math import _rsi_series
 
@@ -253,9 +256,10 @@ def test_rsi_series_byte_identical_to_single_point() -> None:
     actual_series = _rsi_series(close, period=14)
     assert isinstance(actual_series, pd.Series)
     assert len(actual_series) == len(close)
-    # First 14 entries are NaN (period warmup).
-    assert pd.isna(actual_series.iloc[13])
-    assert not pd.isna(actual_series.iloc[14])
+    # Position 0 is NaN (delta has no prior bar). Position 1 onward is
+    # real-valued (ewm(adjust=False) starts producing from the first delta).
+    assert pd.isna(actual_series.iloc[0])
+    assert not pd.isna(actual_series.iloc[1])
 
     assert math.isclose(
         float(actual_series.iloc[-1]), float(expected_rsi), rel_tol=1e-9, abs_tol=1e-9

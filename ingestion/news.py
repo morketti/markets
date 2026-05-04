@@ -5,6 +5,13 @@ Public surface:
         Fetches headlines from all three sources, dedups across sources, sorts
         by recency desc with None-published items at the end.
 
+    fetch_news(ticker, *, dedup_window_days=7, return_raw=True)
+        -> tuple[list[Headline], list[dict]]
+        Phase 6 / Plan 06-01 extension. Same headlines as the default form,
+        plus a parallel list of `{source, published_at, title, url}` dicts
+        used by Phase 6 storage to persist headlines into per-ticker JSONs
+        for the deep-dive news feed (VIEW-08).
+
 Dedup strategy (per 02-RESEARCH.md):
     Primary key:   source + entry.id (or entry.link if id missing)
     Secondary key: normalized title (lowercase, strip non-alnum, take first 80
@@ -365,19 +372,34 @@ def _dedup(headlines: list[Headline]) -> list[Headline]:
 # ---------------- public entry point ----------------
 
 
-def fetch_news(ticker: str, *, dedup_window_days: int = 7) -> list[Headline]:
+def fetch_news(
+    ticker: str,
+    *,
+    dedup_window_days: int = 7,
+    return_raw: bool = False,
+):
     """Fetch headlines for `ticker` from Yahoo RSS + Google News + FinViz, deduped + sorted.
 
     `dedup_window_days` filters out items older than now - delta (items with
     published_at=None bypass the filter — we keep them but they sort to the end).
 
-    Returns [] if `ticker` doesn't normalize. Per-source failures are absorbed
-    silently (they return [] from their helpers); a single broken source never
-    blocks the others.
+    Default return: `list[Headline]` (existing call-site contract; preserved
+    by Phase 6 / Plan 06-01).
+
+    When `return_raw=True`, returns `tuple[list[Headline], list[dict]]` where
+    the dict list is the raw `{source, published_at, title, url}` records
+    used by Phase 6 storage to persist headlines into per-ticker JSONs
+    (frontend deep-dive news feed, VIEW-08). The two lists are aligned
+    1:1 (same length, same order — both are the post-dedup post-sort
+    final output).
+
+    Returns `[]` (or `([], [])` with `return_raw=True`) if `ticker` doesn't
+    normalize. Per-source failures are absorbed silently; a single broken
+    source never blocks the others.
     """
     norm = normalize_ticker(ticker) if isinstance(ticker, str) else None
     if norm is None:
-        return []
+        return ([], []) if return_raw else []
 
     yahoo = _fetch_yahoo_rss(norm)
     google = _fetch_google_news(norm)
@@ -392,7 +414,25 @@ def fetch_news(ticker: str, *, dedup_window_days: int = 7) -> list[Headline]:
         ]
 
     sorted_items = _sort_by_recency(all_items)
-    return _dedup(sorted_items)
+    final = _dedup(sorted_items)
+    if not return_raw:
+        return final
+
+    # Phase 6 / Plan 06-01: parallel raw-headline list for storage layer.
+    # Use mode='json' so datetime → ISO 8601 string and the dict is JSON-safe
+    # without further conversion in routine/storage._build_ticker_payload.
+    raw: list[dict] = []
+    for h in final:
+        dumped = h.model_dump(mode="json")
+        raw.append(
+            {
+                "source": dumped["source"],
+                "published_at": dumped["published_at"],
+                "title": dumped["title"],
+                "url": dumped["url"],
+            }
+        )
+    return final, raw
 
 
 # Mark the unused import as intentional (re-export shape):

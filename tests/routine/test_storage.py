@@ -231,7 +231,13 @@ def test_atomic_write_json_no_orphan_tmp_on_replace_failure(
 # ---------------------------------------------------------------------------
 
 def test_three_phase_write_order(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Per-ticker JSONs FIRST → _index.json SECOND → _status.json LAST (Pattern #4 lock)."""
+    """Per-ticker JSONs FIRST → _index.json → _status.json (sentinel) → _dates.json (Phase D).
+
+    Pattern #4 lock: A (per-ticker) → B (_index) → C (_status sentinel).
+    Phase 6 / Plan 06-01 adds Phase D: _dates.json AFTER the _status.json
+    sentinel — by which time today's date folder is fully complete and the
+    new index correctly reflects it.
+    """
     from routine import storage
 
     call_order: list[str] = []
@@ -259,9 +265,10 @@ def test_three_phase_write_order(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     )
     # Expected order: 3 per-ticker JSONs (any per-ticker order is fine — Pattern
     # #4 only locks the A→B→C phase boundaries, NOT per-ticker order); then
-    # _index.json; then _status.json LAST.
-    assert call_order[-2:] == ["_index.json", "_status.json"], (
-        f"_index.json + _status.json must be the LAST two writes; got {call_order}"
+    # _index.json; then _status.json (sentinel — Pattern #4 lock); then
+    # _dates.json (Phase D, Plan 06-01).
+    assert call_order[-3:] == ["_index.json", "_status.json", "_dates.json"], (
+        f"Expected _index.json → _status.json → _dates.json as last 3 writes; got {call_order}"
     )
     # The first 3 writes must be the per-ticker JSONs.
     per_ticker = call_order[:3]
@@ -737,6 +744,7 @@ def test_per_ticker_payload_contains_indicators_with_5_series(tmp_path: Path) ->
             )
 
     # ma20 warmup: first 19 entries are None; entry 19 is the first real value.
+    # rolling(N) produces NaN for positions 0..N-2, real values from N-1 onward.
     ma20 = body["indicators"]["ma20"]
     assert all(v is None for v in ma20[:19])
     assert ma20[19] is not None
@@ -746,10 +754,16 @@ def test_per_ticker_payload_contains_indicators_with_5_series(tmp_path: Path) ->
     assert all(v is None for v in ma50[:49])
     assert ma50[49] is not None
 
-    # rsi14 warmup: first 14 None.
+    # rsi14: only position 0 is None (delta has no prior bar). pandas
+    # .ewm(alpha=1/14, adjust=False) is well-defined from the first delta,
+    # so positions 1+ carry real RSI values. The scalar _rsi_14 refuses to
+    # RETURN a value below RSI_MIN_BARS=27 (the analyst-level warmup
+    # discipline), but the series math itself is computed throughout.
+    # The frontend chart can choose to hide the first ~27 entries if it
+    # wants to match analyst warmup, but storage emits them as real values.
     rsi = body["indicators"]["rsi14"]
-    assert all(v is None for v in rsi[:14])
-    assert rsi[14] is not None
+    assert rsi[0] is None
+    assert rsi[1] is not None
 
     # bb_upper / bb_lower warmup: first 19 None.
     for key in ("bb_upper", "bb_lower"):

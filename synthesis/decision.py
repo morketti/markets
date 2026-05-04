@@ -69,6 +69,21 @@ ConvictionBand = Literal["low", "medium", "high"]
 
 Timeframe = Literal["short_term", "long_term"]
 
+# Phase 6 / Plan 06-01 (Wave 0 amendment): per-timeframe thesis status.
+#
+# Drives the frontend Long-Term Thesis Status lens (VIEW-04) — sorts by
+# severity ('broken' first, then 'weakening'). Default 'n/a' so existing
+# Phase 5 v1 snapshots and lite-mode TimeframeBands deserialize without
+# ValidationError. The synthesizer (prompts/synthesizer.md) is instructed
+# to populate this per timeframe.
+ThesisStatus = Literal[
+    "intact",
+    "weakening",
+    "broken",
+    "improving",
+    "n/a",
+]
+
 
 class TimeframeBand(BaseModel):
     """Per-timeframe synthesis content (short_term + long_term).
@@ -87,6 +102,11 @@ class TimeframeBand(BaseModel):
     summary: str = Field(min_length=1, max_length=500)
     drivers: list[str] = Field(default_factory=list, max_length=10)
     confidence: int = Field(ge=0, le=100)
+    # Phase 6 / Plan 06-01 — per-timeframe thesis state for Long-Term Thesis
+    # Status lens. Default 'n/a' makes the field addition non-breaking for
+    # every existing TickerDecision deserialization (v1 snapshots have no
+    # thesis_status field; reading them with the v2 schema must not fail).
+    thesis_status: ThesisStatus = "n/a"
 
     @field_validator("drivers")
     @classmethod
@@ -135,12 +155,14 @@ class TickerDecision(BaseModel):
     alongside the 4 analytical AgentSignals + PositionSignal + 6 persona
     AgentSignals.
 
-    The `schema_version: int = 1` lock is the forward-compat hook for Phase 9
-    + v1.x. Frontend reads schema_version first; if it sees a version > 1, it
-    can choose to render with v1 fields only (graceful degradation) or surface
-    a "schema upgrade required" notice.
+    The `schema_version: int = 2` lock is the forward-compat hook for Phase 9
+    + v1.x. Frontend reads schema_version first; if it sees a version > 2, it
+    can choose to render with v2 fields only (graceful degradation) or surface
+    a "schema upgrade required" notice. Phase 6 / Plan 06-01 bumped the
+    default 1 → 2 alongside the per-ticker JSON shape extension
+    (ohlc_history + indicators + headlines + TimeframeBand.thesis_status).
 
-    Defaults: schema_version=1, open_observation='', data_unavailable=False.
+    Defaults: schema_version=2, open_observation='', data_unavailable=False.
     No defaults on the 5 required fields (recommendation, conviction,
     short_term, long_term, dissent) — synthesizer MUST populate all of them
     explicitly. data_unavailable=True path uses _data_unavailable_decision
@@ -152,7 +174,7 @@ class TickerDecision(BaseModel):
 
     ticker: str
     computed_at: datetime
-    schema_version: int = 1
+    schema_version: int = 2
     recommendation: DecisionRecommendation
     conviction: ConvictionBand
     short_term: TimeframeBand

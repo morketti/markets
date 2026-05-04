@@ -36,6 +36,7 @@ from analysts import (
     technicals,
     valuation,
 )
+from analysts.data.prices import OHLCBar
 from analysts.data.snapshot import Snapshot
 from analysts.position_signal import PositionSignal
 from analysts.schemas import TickerConfig, Watchlist
@@ -50,7 +51,8 @@ logger = logging.getLogger(__name__)
 class TickerResult(BaseModel):
     """One ticker's complete pipeline result. Consumed by routine/storage.py.
 
-    Fields (per 05-CONTEXT.md storage-format lock):
+    Fields (per 05-CONTEXT.md storage-format lock + Phase 6 / Plan 06-01
+    Wave 0 amendment):
       ticker             — canonical ticker (matches snapshot.ticker).
       analytical_signals — 4 AgentSignals (fund/tech/nsen/val) by convention.
                             Empty on per-ticker pipeline failure (errors set).
@@ -62,6 +64,19 @@ class TickerResult(BaseModel):
                             None in lite mode OR per-ticker pipeline failure.
       errors             — Per-ticker pipeline error reprs; default [] when
                             the pipeline ran cleanly.
+      ohlc_history       — Phase 6 / Plan 06-01: list[OHLCBar] (last ~180
+                            trading days) sourced from yfinance via the same
+                            fetch the analytical signals consume; persisted
+                            by storage so the frontend deep-dive chart can
+                            render OHLC + indicator overlays without
+                            re-fetching market data. Default [] for
+                            data-unavailable / lite-mode / cold-start paths.
+      headlines          — Phase 6 / Plan 06-01: list[dict] of raw
+                            `{source, published_at, title, url}` records from
+                            ingestion.news.fetch_news(return_raw=True);
+                            persisted by storage for the frontend news feed
+                            (VIEW-08). Default [] when ingestion fails or
+                            returns empty.
 
     arbitrary_types_allowed=True — AgentSignal + PositionSignal + TickerDecision
     are nested Pydantic models from sibling packages. Pydantic v2 handles them
@@ -77,6 +92,9 @@ class TickerResult(BaseModel):
     persona_signals: list[AgentSignal] = Field(default_factory=list)
     ticker_decision: TickerDecision | None = None
     errors: list[str] = Field(default_factory=list)
+    # Phase 6 / Plan 06-01 — Wave 0 amendment fields.
+    ohlc_history: list[OHLCBar] = Field(default_factory=list)
+    headlines: list[dict] = Field(default_factory=list)
 
 
 def _default_snapshot_loader(ticker: str) -> Snapshot:
@@ -125,6 +143,30 @@ async def _run_one_ticker(
         snapshot, ticker_config, computed_at=computed_at,
     )
 
+    # Phase 6 / Plan 06-01 — Wave 0 amendment: thread ohlc_history + headlines
+    # through TickerResult so storage can persist them in the per-ticker JSON.
+    # Source data: the same Snapshot the analytical signals already consumed —
+    # NO double-fetch (keyless data plane discipline). prices.history is
+    # already a list[OHLCBar]; snapshot.news is list[Headline] which we
+    # serialize to the 4-key raw shape used by the frontend deep-dive feed.
+    ohlc_history: list[OHLCBar] = []
+    if snapshot.prices is not None and not snapshot.prices.data_unavailable:
+        ohlc_history = list(snapshot.prices.history)
+
+    headlines_raw: list[dict] = []
+    for h in snapshot.news:
+        if h.data_unavailable:
+            continue
+        dumped = h.model_dump(mode="json")
+        headlines_raw.append(
+            {
+                "source": dumped["source"],
+                "published_at": dumped["published_at"],
+                "title": dumped["title"],
+                "url": dumped["url"],
+            }
+        )
+
     if lite_mode:
         return TickerResult(
             ticker=ticker,
@@ -133,6 +175,8 @@ async def _run_one_ticker(
             persona_signals=[],
             ticker_decision=None,
             errors=[],
+            ohlc_history=ohlc_history,
+            headlines=headlines_raw,
         )
 
     # 2. Persona fan-out + synthesizer.
@@ -162,6 +206,8 @@ async def _run_one_ticker(
         persona_signals=persona_signals,
         ticker_decision=decision,
         errors=[],
+        ohlc_history=ohlc_history,
+        headlines=headlines_raw,
     )
 
 

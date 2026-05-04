@@ -112,6 +112,12 @@ Derive from agreement count + dissent presence:
   fabricate. Format: "<source>: <reason>" e.g. "PositionSignal:
   state=fair, consensus_score=+0.05".
 - **`confidence`** (0-100): your confidence in this short-term framing.
+- **`thesis_status`** (one of `intact | weakening | broken | improving |
+  n/a`): characterizes whether the long-term thesis is holding. For
+  `short_term`: usually `n/a` unless tactical price action genuinely
+  threatens or confirms the long-term thesis (rare — most tactical
+  moves are noise relative to the multi-year thesis). Default `n/a`
+  when uncertain or when `data_unavailable=True`.
 
 ### `long_term`: `TimeframeBand` (1-year-to-5-year strategic horizon)
 
@@ -122,6 +128,20 @@ current price to `TickerConfig.thesis_price` if user provided one.
 Discuss moat durability + capital allocation arc + secular trajectory.
 End with whether the long-term recommendation aligns with or modifies
 the short-term recommendation.
+
+For `long_term.thesis_status`: REQUIRED to choose one of `intact |
+weakening | broken | improving`; use `n/a` ONLY when
+`data_unavailable=True`. Pick `intact` when fundamentals + valuation
++ long-term-lens personas all support the user's stated thesis_price /
+target_multiples / long_term_lens. Pick `weakening` when 1-2 signals
+contradict but the core thesis still holds. Pick `broken` when the
+fundamental driver of the user's thesis has reversed (e.g. moat
+eroded, multiple compression sustained, growth narrative dead). Pick
+`improving` when previously-weakened signals have started rebuilding
+toward the original thesis. The frontend Long-Term Thesis Status lens
+(VIEW-04) lists tickers where long_term.thesis_status ∈ {weakening,
+broken} sorted by severity — be DECISIVE here so the lens surfaces the
+right tickers.
 
 ### `open_observation` (≤500 chars)
 
@@ -182,13 +202,17 @@ schema fields are:
 
 - `ticker` — the ticker symbol (echoed from input).
 - `computed_at` — ISO 8601 UTC timestamp (echoed from input).
-- `schema_version` — `1` (forward-compat hook for v1.x; do NOT bump).
+- `schema_version` — `2` (Phase 6 / Plan 06-01 bumped 1→2 alongside the
+  per-ticker JSON shape extension; forward-compat hook for v1.x; do NOT
+  bump further).
 - `recommendation` — one of: `add` | `trim` | `hold` | `take_profits` |
   `buy` | `avoid` (6 DecisionRecommendation enum values).
 - `conviction` — one of: `low` | `medium` | `high` (3 ConvictionBand
   enum values).
-- `short_term` — TimeframeBand (summary, drivers, confidence).
-- `long_term` — TimeframeBand (summary, drivers, confidence).
+- `short_term` — TimeframeBand (summary, drivers, confidence,
+  thesis_status).
+- `long_term` — TimeframeBand (summary, drivers, confidence,
+  thesis_status).
 - `open_observation` — ≤500 chars; pin Open Claude Analyst observation.
 - `dissent` — DissentSection (has_dissent, dissenting_persona,
   dissent_summary).
