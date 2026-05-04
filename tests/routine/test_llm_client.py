@@ -387,53 +387,42 @@ async def test_failure_log_directory_creation(
     assert len(fresh_log.read_text(encoding="utf-8").splitlines()) == 2
 
 
-async def test_failure_log_message_truncation(
-    mock_anthropic_client, isolated_failure_log
-) -> None:
-    """A 5000-char ValidationError message is truncated to ≤1000 chars; raw to ≤5000."""
+def test_log_failure_truncates_message_and_raw(isolated_failure_log) -> None:
+    """_log_failure caps message at <=1000 chars and raw at <=5000 chars.
 
-    # We need a ValidationError-like object whose .errors() returns a list with
-    # an 'input' key whose value is >5000 chars, AND whose str() is >5000 chars.
-    # Constructing a real Pydantic v2 ValidationError that meets both conditions
-    # is awkward, so we subclass and stub the two attributes call_with_retry uses.
-    class _LargeValidation(ValidationError):  # type: ignore[misc]
-        def __init__(self) -> None:  # noqa: D401
-            pass
+    Direct unit test on the helper — exercises both truncation paths without
+    fighting Pydantic's ValidationError construction quirks. The contract:
+    a >5000-char message becomes <=1000 chars in the record; a >6000-char raw
+    becomes <=5000 chars in the record. Sort_keys + UTC discipline preserved.
+    """
+    from routine.llm_client import _log_failure
 
-        def __str__(self) -> str:
-            return "X" * 5000
+    long_message = "X" * 5000  # 5x over the message cap
+    long_raw = "Y" * 6000  # 1.2x over the raw cap
 
-        def errors(self, *args, **kwargs):  # type: ignore[override]
-            return [
-                {
-                    "input": "Y" * 6000,
-                    "msg": "x",
-                    "type": "x",
-                    "loc": ("x",),
-                }
-            ]
+    _log_failure("buffett:AAPL", "validation_error", long_message, long_raw)
 
-    err = _LargeValidation()
-    mock_anthropic_client.messages.queue_exception(err)
-    mock_anthropic_client.messages.queue_exception(err)
+    lines = isolated_failure_log.read_text(encoding="utf-8").splitlines()
+    record = json.loads(lines[0])
 
-    await call_with_retry(
-        mock_anthropic_client,
-        model="claude-sonnet-4-6",
-        system="...",
-        user="...",
-        output_format=AgentSignal,
-        default_factory=lambda: _default_factory_signal(),
-        max_tokens=2000,
-        context_label="buffett:AAPL",
-    )
-    records = [
-        json.loads(line)
-        for line in isolated_failure_log.read_text(encoding="utf-8").splitlines()
-    ]
-    assert len(records[0]["message"]) <= 1000
-    assert records[0]["raw"] is not None
-    assert len(records[0]["raw"]) <= 5000
+    assert len(record["message"]) <= 1000
+    assert record["message"] == "X" * 1000  # exact truncation, not lossy reformat
+    assert record["raw"] is not None
+    assert len(record["raw"]) <= 5000
+    assert record["raw"] == "Y" * 5000
+
+
+def test_log_failure_raw_none_passes_through(isolated_failure_log) -> None:
+    """_log_failure writes raw=null when raw argument is None (api_error / unknown_error path)."""
+    from routine.llm_client import _log_failure
+
+    _log_failure("synthesizer:AAPL", "api_error", "rate limit", None)
+
+    lines = isolated_failure_log.read_text(encoding="utf-8").splitlines()
+    record = json.loads(lines[0])
+    assert record["raw"] is None
+    assert record["kind"] == "api_error"
+    assert record["message"] == "rate limit"
 
 
 async def test_failure_log_raw_is_null_when_unavailable(
@@ -495,3 +484,29 @@ def test_module_constants_exposed() -> None:
     assert isinstance(LLM_FAILURE_LOG, Path)
     assert str(LLM_FAILURE_LOG).replace("\\", "/").endswith("memory/llm_failures.jsonl")
     assert DEFAULT_MAX_RETRIES == 2
+
+
+# ---------------------------------------------------------------------------
+# _try_extract_raw defensive paths
+# ---------------------------------------------------------------------------
+def test_try_extract_raw_returns_none_when_errors_empty() -> None:
+    """_try_extract_raw returns None when exc.errors() is empty list."""
+    from routine.llm_client import _try_extract_raw
+
+    class _StubExc:
+        def errors(self):
+            return []
+
+    assert _try_extract_raw(_StubExc()) is None  # type: ignore[arg-type]
+
+
+def test_try_extract_raw_returns_none_on_extraction_exception() -> None:
+    """_try_extract_raw swallows any exception during best-effort extraction."""
+    from routine.llm_client import _try_extract_raw
+
+    class _RaisingExc:
+        def errors(self):
+            raise RuntimeError("errors() blew up")
+
+    # Best-effort: must NOT propagate the inner exception.
+    assert _try_extract_raw(_RaisingExc()) is None  # type: ignore[arg-type]
