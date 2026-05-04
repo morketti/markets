@@ -13,8 +13,7 @@
 | 2 | Ingestion — Keyless Data Plane (7/7 plans, Complete) | Complete    | 2026-05-02 | 5 | Phase 1 |
 | 3 | Analytical Agents — Deterministic Scoring (5/5 plans, Complete) | Complete    | 2026-05-03 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
-| 5 | Claude Routine Wiring — Persona Slate + Synthesizer (6/6 plans, Complete) | Complete    | 2026-05-04 | 6 | Phase 4 |
-| 6 | Frontend MVP — Morning Scan + Deep-Dive (5/5 plans, Complete) | Complete    | 2026-05-04 | 7 | Phase 5 |
+| 5 | Claude Routine Wiring — Persona Slate + Synthesizer (6/6 plans, Complete) | Complete    | 2026-05-04 | 6 | Phase 4 | Complete    | 2026-05-04 | Frontend MVP — Morning Scan + Deep-Dive (5/5 plans, Complete) | Complete    | 2026-05-04 | 7 | Phase 5 |
 | 7 | Decision-Support View + Dissent Surface | User reads buy/trim/hold recommendation with drivers + dissent | VIEW-10 | 4 | Phases 5, 6 |
 | 8 | Mid-Day Refresh + Resilience | On-open refresh layer + lite-mode fallback + memory writes verified | REFRESH-01..04, INFRA-06..07 | 5 | Phase 6 |
 | 9 | Endorsement Capture | Endorsements as first-class signal (capture only — performance math deferred) | ENDORSE-01..03 | 3 | Phase 7 |
