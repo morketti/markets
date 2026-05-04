@@ -37,3 +37,8 @@ frontend/*.tsbuildinfo
 memory/historical_signals.jsonl
 memory/llm_failures.jsonl
 
+# Ingestion intermediate output — raw Snapshot JSONs consumed by routine/run_for_watchlist;
+# the canonical analytical output lands at data/YYYY-MM-DD/ (committed). Keeping snapshots/
+# committed too would double the repo size and leak market data into git history.
+snapshots/
+
