@@ -282,3 +282,70 @@ def test_main_top_level_exception_returns_1(
     assert status["success"] is False
     assert "error" in status
     assert "FileNotFoundError" in status["error"] or "watchlist" in status["error"]
+
+
+# ---------------------------------------------------------------------------
+# Coverage Test 4: Empty watchlist → exit 1 (no run executed).
+# ---------------------------------------------------------------------------
+
+def test_main_empty_watchlist_returns_1(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """load_watchlist returns empty Watchlist → main() returns 1 (nothing to do)."""
+    from routine import entrypoint as ep_mod
+
+    monkeypatch.setattr(ep_mod, "load_watchlist", lambda: Watchlist())
+
+    real_Path = ep_mod.Path
+
+    def _path_factory(arg):
+        if arg == "data":
+            return tmp_path
+        return real_Path(arg)
+
+    monkeypatch.setattr(ep_mod, "Path", _path_factory)
+
+    rc = ep_mod.main()
+    assert rc == 1
+    # No date folder created (we returned before any write).
+    date_dirs = [d for d in tmp_path.iterdir() if d.is_dir()]
+    assert date_dirs == []
+
+
+# ---------------------------------------------------------------------------
+# Coverage Test 5: Failure-status write itself fails → still returns 1.
+# ---------------------------------------------------------------------------
+
+def test_main_failure_status_write_failure_does_not_crash(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """If write_failure_status itself raises, main() STILL returns 1 cleanly.
+
+    The nested try/except in main()'s exception handler ensures the failure-
+    status write can never crash the routine.
+    """
+    from routine import entrypoint as ep_mod
+
+    monkeypatch.setattr(
+        ep_mod, "load_watchlist",
+        lambda: (_ for _ in ()).throw(RuntimeError("first failure")),
+    )
+
+    def _boom_write_failure(**kwargs):
+        raise OSError("disk full during failure-status write")
+
+    monkeypatch.setattr(ep_mod, "write_failure_status", _boom_write_failure)
+
+    real_Path = ep_mod.Path
+
+    def _path_factory(arg):
+        if arg == "data":
+            return tmp_path
+        return real_Path(arg)
+
+    monkeypatch.setattr(ep_mod, "Path", _path_factory)
+
+    rc = ep_mod.main()
+    assert rc == 1  # nested except absorbed the second failure
