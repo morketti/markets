@@ -25,10 +25,16 @@ vi.mock('@/lib/useRefreshData', () => ({
   useRefreshData: vi.fn(),
 }))
 
+vi.mock('@/lib/loadEndorsements', () => ({
+  useEndorsements: vi.fn(),
+}))
+
 import { useTickerData } from '@/lib/loadTickerData'
 import { useRefreshData } from '@/lib/useRefreshData'
+import { useEndorsements } from '@/lib/loadEndorsements'
 const mockedUseTickerData = vi.mocked(useTickerData)
 const mockedUseRefreshData = vi.mocked(useRefreshData)
+const mockedUseEndorsements = vi.mocked(useEndorsements)
 
 function makeDecision(overrides: Partial<TickerDecision> = {}): TickerDecision {
   return {
@@ -112,6 +118,14 @@ describe('DecisionRoute', () => {
       dataUpdatedAt: 0,
       error: null,
     } as unknown as ReturnType<typeof useRefreshData>)
+
+    // Default useEndorsements stub — Phase 9 mount lock. Empty list is the
+    // default no-op state; individual tests can override.
+    mockedUseEndorsements.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useEndorsements>)
   })
 
   it('loading branch → renders decision-loading testid', () => {
@@ -207,5 +221,26 @@ describe('DecisionRoute', () => {
     expect(
       screen.queryByText(/Snapshot price as of .* ET/i),
     ).toBeNull()
+  })
+
+  it('Phase 9: mounts EndorsementsList AFTER DissentPanel (mount-order lock)', () => {
+    mockedUseTickerData.mockReturnValue({
+      data: makeSnapshot(makeDecision()),
+      isLoading: false,
+      error: null,
+    } as unknown as ReturnType<typeof useTickerData>)
+    renderRoute()
+
+    // EndorsementsList present
+    const endorsements = screen.getByTestId('endorsements-list')
+    expect(endorsements).toBeInTheDocument()
+
+    // Mount-order lock: EndorsementsList renders AFTER DissentPanel.
+    // Compare DOM positions via compareDocumentPosition (returns
+    // DOCUMENT_POSITION_FOLLOWING == 4 when arg follows the calling node).
+    const dissent = screen.getByTestId('dissent-panel')
+    const pos = dissent.compareDocumentPosition(endorsements)
+    // 4 = Node.DOCUMENT_POSITION_FOLLOWING
+    expect(pos & 4).toBe(4)
   })
 })
