@@ -88,7 +88,7 @@ Each task was committed atomically per TDD discipline:
 2. **Task 1 GREEN — `feat(05-02): TickerDecision + DissentSection + TimeframeBand Pydantic schemas with data_unavailable invariant + 6/3/2-state Literal enums`** — `287dc72`
    - `synthesis/decision.py` shipped (212 LOC). All 45 tests flipped to GREEN. Coverage on `synthesis/decision.py`: 100% line / 100% branch. Full repo regression: 487 passed.
 
-**Plan metadata commit:** [forthcoming — final commit lands SUMMARY.md + STATE.md + ROADMAP.md + REQUIREMENTS.md updates]
+**Plan metadata commit:** `f055a33` — `docs(05-02): close out plan with SUMMARY + STATE/ROADMAP/REQUIREMENTS update` (also folds in deferred 05-01 metadata closeout — the prior `fe7a818` commit only added 05-01-SUMMARY.md without touching STATE/ROADMAP/REQUIREMENTS)
 
 _Note: This plan ran a single TDD task with a clean RED → GREEN cycle; no REFACTOR commit needed (the GREEN implementation matched the locked sketch verbatim and passed all tests on first run)._
 
