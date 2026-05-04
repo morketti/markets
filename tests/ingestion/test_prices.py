@@ -299,3 +299,52 @@ def test_fetch_prices_explicit_period_still_honored(fixtures_dir: Path) -> None:
         fetch_prices("AAPL", period="6mo")
 
     mock_ticker.history.assert_called_once_with(period="6mo")
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 / Plan 08-01 / Task 3 — explicit resilience tests for REFRESH-04.
+# ---------------------------------------------------------------------------
+
+
+def test_yfinance_throws_yahooquery_rescues(fixtures_dir: Path) -> None:
+    """yfinance.Ticker raises on .history() call → yahooquery rescues; data_unavailable=False.
+
+    Resilience guarantee: a single broken upstream library does NOT degrade
+    the snapshot to data_unavailable when the alternate source is healthy.
+    """
+    mock_yf = MagicMock()
+    mock_yf.history.side_effect = RuntimeError("yfinance scrape broke")
+
+    mock_yq = MagicMock()
+    mock_yq.price = {"AAPL": {"regularMarketPrice": 200.5, "currency": "USD"}}
+
+    with patch("ingestion.prices.yfinance.Ticker", return_value=mock_yf), \
+         patch("ingestion.prices.yahooquery.Ticker", return_value=mock_yq):
+        result = fetch_prices("AAPL")
+
+    assert isinstance(result, PriceSnapshot)
+    assert result.data_unavailable is False
+    assert result.current_price == 200.5
+    assert result.source == "yahooquery"
+
+
+def test_both_yfinance_and_yahooquery_throw(fixtures_dir: Path) -> None:
+    """Both upstream libraries raise → data_unavailable=True; NO exception escapes.
+
+    The "ingestion is forgiving by design" contract: data plane absorbs all
+    upstream weather and surfaces a structured failure shape downstream
+    (api/refresh.py maps this to the full-failure response envelope).
+    """
+    with patch(
+        "ingestion.prices.yfinance.Ticker",
+        side_effect=RuntimeError("yfinance entirely down"),
+    ), patch(
+        "ingestion.prices.yahooquery.Ticker",
+        side_effect=RuntimeError("yahooquery entirely down"),
+    ):
+        result = fetch_prices("AAPL")
+
+    assert isinstance(result, PriceSnapshot)
+    assert result.data_unavailable is True
+    assert result.current_price is None
+    assert result.history == []

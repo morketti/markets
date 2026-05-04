@@ -496,3 +496,42 @@ def test_parse_pubdate_returns_none_for_garbage():
     from ingestion.news import _parse_pubdate
     assert _parse_pubdate("not a date at all") is None
     assert _parse_pubdate("") is None
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 / Plan 08-01 / Task 3 — explicit resilience test for REFRESH-04.
+# ---------------------------------------------------------------------------
+
+
+def test_all_rss_sources_unavailable():
+    """Every RSS source explodes → fetch_news returns []; never raises.
+
+    Resilience guarantee: the news data plane absorbs all upstream weather
+    (RSS feeds down, FinViz scraping broken, network timeouts) and returns
+    an empty list rather than propagating an exception. api/refresh.py
+    maps an empty list to the partial response shape with rss-unavailable.
+    """
+    # feedparser.parse raises for every URL (yahoo + google).
+    def boom_feedparser(*a, **k):
+        raise RuntimeError("feedparser entirely broken")
+
+    # FinViz request raises (covers the requests.Session.get path).
+    def boom_session_get(*a, **k):
+        raise RuntimeError("finviz session.get broken")
+
+    mock_session = type("MockSession", (), {"get": boom_session_get})()
+
+    with patch("ingestion.news.feedparser.parse", side_effect=boom_feedparser), \
+         patch("ingestion.news.get_session", return_value=mock_session):
+        # Default-shape (list[Headline]) — must be empty, not raise.
+        plain_result = fetch_news("AAPL")
+        assert plain_result == []
+        assert isinstance(plain_result, list)
+
+        # return_raw=True → (list[Headline], list[dict]) — both empty.
+        tuple_result = fetch_news("AAPL", return_raw=True)
+        assert isinstance(tuple_result, tuple)
+        assert len(tuple_result) == 2
+        headlines, raw = tuple_result
+        assert headlines == []
+        assert raw == []
