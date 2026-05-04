@@ -144,7 +144,6 @@ def test_blank_source_exits_2(tmp_endorsements_path: Path) -> None:
 
 def test_captured_at_auto_populated(tmp_endorsements_path: Path) -> None:
     """Happy path → record's captured_at is parseable as ISO 8601 UTC datetime within last 60s."""
-    before = datetime.now(timezone.utc)
     rc = main([
         "add_endorsement",
         "--ticker", "AAPL",
@@ -153,15 +152,19 @@ def test_captured_at_auto_populated(tmp_endorsements_path: Path) -> None:
         "--price", "178.42",
         "--path", str(tmp_endorsements_path),
     ])
-    after = datetime.now(timezone.utc)
     assert rc == 0
     rec = json.loads(tmp_endorsements_path.read_text(encoding="utf-8").splitlines()[0])
     captured_at_str = rec["captured_at"]
     captured_at = datetime.fromisoformat(captured_at_str)
     # Must be UTC-aware
     assert captured_at.tzinfo is not None
-    # Must be within the (before, after) bracket
-    assert before <= captured_at <= after
+    # Must be within the last 60s (allow ~60s window for slow CI runners; the
+    # CLI strips microseconds at second precision, so a sub-second clock skew
+    # against datetime.now() is expected — assert wall-clock recency, not
+    # a strict before/after bracket).
+    now = datetime.now(timezone.utc)
+    delta_s = (now - captured_at).total_seconds()
+    assert -1.0 <= delta_s <= 60.0, f"captured_at not within 60s window: delta={delta_s}s"
 
 
 def test_atomic_on_failure(tmp_endorsements_path: Path) -> None:

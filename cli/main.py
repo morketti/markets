@@ -19,6 +19,7 @@ from typing import Callable
 from pydantic import ValidationError
 
 from cli._errors import format_validation_error
+from cli.add_endorsement import add_endorsement_command, build_add_endorsement_parser
 from cli.add_ticker import add_command, build_add_parser
 from cli.list_watchlist import build_list_parser, list_command
 from cli.refresh import build_refresh_parser, refresh_command
@@ -39,6 +40,7 @@ SUBCOMMANDS: dict[
     "list": (build_list_parser, list_command),
     "show": (build_show_parser, show_command),
     "refresh": (build_refresh_parser, refresh_command),
+    "add_endorsement": (build_add_endorsement_parser, add_endorsement_command),
 }
 
 
