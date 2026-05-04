@@ -14,7 +14,7 @@
 | 3 | Analytical Agents — Deterministic Scoring (5/5 plans, Complete) | Complete    | 2026-05-03 | 5 | Phase 2 |
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer (6/6 plans, Complete) | Complete    | 2026-05-04 | 6 | Phase 4 | Complete    | 2026-05-04 | Frontend MVP — Morning Scan + Deep-Dive (5/5 plans, Complete) | Complete    | 2026-05-04 | 7 | Phase 5 |
-| 7 | Decision-Support View + Dissent Surface | User reads buy/trim/hold recommendation with drivers + dissent | VIEW-10 | 4 | Phases 5, 6 |
+| 7 | Decision-Support View + Dissent Surface (1/1 plans, Complete) | Complete    | 2026-05-04 | 4 | Phases 5, 6 |
 | 8 | Mid-Day Refresh + Resilience | On-open refresh layer + lite-mode fallback + memory writes verified | REFRESH-01..04, INFRA-06..07 | 5 | Phase 6 |
 | 9 | Endorsement Capture | Endorsements as first-class signal (capture only — performance math deferred) | ENDORSE-01..03 | 3 | Phase 7 |
 
@@ -223,10 +223,10 @@ Plans:
 
 **Pitfalls addressed:** #12 (self-confirmation bias — dissent always rendered)
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 07-01-decision-support-PLAN.md — RecommendationBanner (6×3 matrix) + ConvictionDots + DriversList (short+long pair) + DissentPanel (always-render Pitfall #12; claude_analyst accent) + DecisionRoute /decision/:symbol/:date? + cross-link symmetry with TickerRoute + Phase 8 hookpoint marker for current-price-delta deferral; ~37 new vitest + 1 new Playwright spec; zero new deps
+- [x] 07-01-decision-support-PLAN.md — RecommendationBanner (6×3 matrix) + ConvictionDots + DriversList (short+long pair) + DissentPanel (always-render Pitfall #12; claude_analyst accent) + DecisionRoute /decision/:symbol/:date? + cross-link symmetry with TickerRoute + Phase 8 hookpoint marker for current-price-delta deferral; 37 new vitest + 1 new Playwright spec; zero new deps
 
 ---
 

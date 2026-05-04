@@ -63,7 +63,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **VIEW-07**: Deep-dive shows persona signals as individual cards (each persona: verdict, confidence, reasoning, evidence)
 - [x] **VIEW-08**: Deep-dive shows news feed grouped by source with timestamps; "since snapshot" delta surfaced
 - [x] **VIEW-09**: Deep-dive shows Open Claude Analyst observation pinned at top
-- [ ] **VIEW-10**: Decision-Support view shows recommendation banner (action + conviction band), drivers list, dissent section, and snapshot vs current-price delta
+- [x] **VIEW-10**: Decision-Support view shows recommendation banner (action + conviction band), drivers list, dissent section, and snapshot vs current-price delta
 - [x] **VIEW-11**: Header shows snapshot date + staleness badge (GREEN < 6h, AMBER 6-24h, RED > 24h or partial)
 - [x] **VIEW-12**: All views are mobile-responsive; morning-scan and deep-dive have phone-optimized layouts (collapsed cards, swipeable tabs)
 - [x] **VIEW-13**: Search/add ticker via typeahead with company name fuzzy match
@@ -192,7 +192,7 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | VIEW-07 | Phase 6 | Complete |
 | VIEW-08 | Phase 6 | Complete |
 | VIEW-09 | Phase 6 | Complete |
-| VIEW-10 | Phase 7 | Pending |
+| VIEW-10 | Phase 7 | Complete |
 | VIEW-11 | Phase 6 | Complete |
 | VIEW-12 | Phase 6 | Complete |
 | VIEW-13 | Phase 6 | Complete |
