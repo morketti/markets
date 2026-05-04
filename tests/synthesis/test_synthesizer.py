@@ -359,9 +359,11 @@ async def test_synthesize_happy_path_returns_llm_decision(
     # System prompt is the synthesizer.md content (contains the locked
     # section anchor "Input Context").
     assert "Input Context" in calls[0]["system"]
-    # User context contains the dissent block (no dissent in this case —
-    # all-bullish base_inputs).
-    assert "no dissent" in calls[0]["user"]
+    # User context arrives via messages=[{"role":"user","content": <user>}]
+    # per routine.llm_client.call_with_retry. The dissent block is included
+    # (no dissent in this case — all-bullish base_inputs).
+    user_msg = calls[0]["messages"][0]["content"]
+    assert "no dissent" in user_msg
 
 
 # ===========================================================================
@@ -497,7 +499,10 @@ async def test_synthesize_dissent_pre_computed_in_user_context(
         persona_signals=dissent_personas, computed_at=frozen_now,
     )
 
-    user_msg = mock_anthropic_client.messages.calls[0]["user"]
+    # User context arrives via messages=[{"role":"user","content": <user>}]
+    # per routine.llm_client.call_with_retry contract.
+    call_kwargs = mock_anthropic_client.messages.calls[0]
+    user_msg = call_kwargs["messages"][0]["content"]
     # Pre-computed dissent IS in the user context — synthesizer prompt
     # never has to compute dissent itself (Pattern #7 lock).
     assert "burry" in user_msg
@@ -545,3 +550,178 @@ def test_load_synthesizer_prompt_raises_file_not_found(monkeypatch) -> None:
         syn_mod.load_synthesizer_prompt()
     # Cleanup so subsequent tests don't inherit the cache miss state.
     syn_mod.load_synthesizer_prompt.cache_clear()
+
+
+# ===========================================================================
+# Coverage tests — exercise the populated-snapshot, dark-PositionSignal,
+# and notes-bearing-config branches in the private formatters. Folded in
+# beyond the planned ≥10 floor to clear the 90/85% coverage gate per
+# Rule 2 (test-side hardening).
+# ===========================================================================
+
+
+def test_build_user_context_with_populated_snapshot(
+    base_inputs, frozen_now: datetime,
+) -> None:
+    """Snapshot with prices + fundamentals populated → summary contains the metrics."""
+    from synthesis.synthesizer import build_synthesizer_user_context
+    from analysts.data.fundamentals import FundamentalsSnapshot
+    from analysts.data.prices import OHLCBar, PriceSnapshot
+    from datetime import date as _date
+
+    cfg, _, analytical, pose, personas = base_inputs
+    populated_snap = Snapshot(
+        ticker="AAPL",
+        fetched_at=frozen_now,
+        data_unavailable=False,
+        prices=PriceSnapshot(
+            ticker="AAPL", fetched_at=frozen_now,
+            source="yfinance", current_price=180.5,
+            history=[
+                OHLCBar(
+                    date=_date(2026, 5, 1),
+                    open=178.0, high=181.0, low=177.5, close=180.0,
+                    volume=1_000_000,
+                ),
+                OHLCBar(
+                    date=_date(2026, 5, 2),
+                    open=180.0, high=182.0, low=179.5, close=180.5,
+                    volume=1_100_000,
+                ),
+            ],
+        ),
+        fundamentals=FundamentalsSnapshot(
+            ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+            pe=28.5, roe=1.45, debt_to_equity=1.95,
+        ),
+    )
+    ctx = build_synthesizer_user_context(
+        ticker="AAPL", snapshot=populated_snap, config=cfg,
+        analytical_signals=analytical, position_signal=pose,
+        persona_signals=personas, dissent_persona_id=None, dissent_summary="",
+    )
+    assert "current_price=180.5" in ctx
+    assert "history bars=2" in ctx
+    assert "P/E=28.5" in ctx
+    assert "ROE=1.45" in ctx
+    assert "D/E=1.95" in ctx
+
+
+def test_build_user_context_with_dark_position_signal(
+    base_inputs, frozen_now: datetime,
+) -> None:
+    """data_unavailable=True PositionSignal → '[data_unavailable]' marker."""
+    from synthesis.synthesizer import build_synthesizer_user_context
+
+    cfg, snap, analytical, _, personas = base_inputs
+    dark_pose = PositionSignal(
+        ticker="AAPL", computed_at=frozen_now, data_unavailable=True,
+    )
+    ctx = build_synthesizer_user_context(
+        ticker="AAPL", snapshot=snap, config=cfg,
+        analytical_signals=analytical, position_signal=dark_pose,
+        persona_signals=personas, dissent_persona_id=None, dissent_summary="",
+    )
+    assert "[data_unavailable]" in ctx
+
+
+def test_summarize_snapshot_data_unavailable_branch(
+    frozen_now: datetime,
+) -> None:
+    """_summarize_snapshot returns 'data_unavailable=True' literal on dark snapshot."""
+    from synthesis.synthesizer import _summarize_snapshot
+
+    dark_snap = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now, data_unavailable=True,
+    )
+    assert _summarize_snapshot(dark_snap) == "data_unavailable=True"
+
+
+def test_summarize_snapshot_partial_data_branches(
+    frozen_now: datetime,
+) -> None:
+    """Exercise each missing-field branch in _summarize_snapshot for branch coverage.
+
+    Snapshot with prices=None + fundamentals=None → '(no fundamentals/prices)'.
+    Snapshot with prices but no current_price + no history → empty parts → fallback.
+    Snapshot with fundamentals where pe/roe/debt_to_equity are None → empty parts.
+    """
+    from synthesis.synthesizer import _summarize_snapshot
+    from analysts.data.fundamentals import FundamentalsSnapshot
+    from analysts.data.prices import PriceSnapshot
+
+    # All-None snapshot — fallback line.
+    snap_empty = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now, data_unavailable=False,
+    )
+    assert _summarize_snapshot(snap_empty) == "(no fundamentals/prices)"
+
+    # Prices object present but no current_price + no history.
+    snap_prices_empty = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now, data_unavailable=False,
+        prices=PriceSnapshot(
+            ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+            current_price=None, history=[],
+        ),
+    )
+    assert _summarize_snapshot(snap_prices_empty) == "(no fundamentals/prices)"
+
+    # Fundamentals present but all metrics None — none added to parts.
+    snap_fund_empty = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now, data_unavailable=False,
+        fundamentals=FundamentalsSnapshot(
+            ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+            pe=None, roe=None, debt_to_equity=None,
+        ),
+    )
+    assert _summarize_snapshot(snap_fund_empty) == "(no fundamentals/prices)"
+
+
+def test_format_config_without_thesis_price_or_notes(frozen_now: datetime) -> None:
+    """_format_config skips thesis_price + notes when they're absent."""
+    from synthesis.synthesizer import _format_config
+    cfg = TickerConfig(
+        ticker="AAPL",
+        short_term_focus=True,
+        long_term_lens="value",
+        # thesis_price=None (default) and notes="" (default).
+    )
+    out = _format_config(cfg)
+    assert "long_term_lens=value" in out
+    assert "short_term_focus=True" in out
+    assert "thesis_price" not in out
+    assert "notes" not in out
+
+
+def test_build_user_context_with_config_notes(frozen_now: datetime) -> None:
+    """TickerConfig.notes populated → notes truncated and rendered."""
+    from synthesis.synthesizer import build_synthesizer_user_context
+    cfg = TickerConfig(
+        ticker="AAPL",
+        short_term_focus=True,
+        long_term_lens="value",
+        thesis_price=200.0,
+        notes="x" * 250,  # exceeds the 200-char render cap
+    )
+    snap = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now, data_unavailable=False,
+    )
+    fund = AgentSignal(
+        ticker="AAPL", analyst_id="fundamentals",
+        computed_at=frozen_now, verdict="bullish", confidence=70,
+    )
+    pose = PositionSignal(
+        ticker="AAPL", computed_at=frozen_now, state="fair",
+    )
+    ctx = build_synthesizer_user_context(
+        ticker="AAPL", snapshot=snap, config=cfg,
+        analytical_signals=[fund, fund, fund, fund],
+        position_signal=pose,
+        persona_signals=[], dissent_persona_id=None, dissent_summary="",
+    )
+    # Notes appear, truncated at 200 chars in the render layer.
+    assert "notes=" in ctx
+    # The 250-char notes string is rendered truncated to 200 chars (the
+    # _format_config truncation slice). The full string would be 250 'x's.
+    assert "x" * 200 in ctx
+    assert "x" * 251 not in ctx
