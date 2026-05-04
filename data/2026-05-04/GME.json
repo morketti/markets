@@ -1,0 +1,20 @@
+{
+  "analytical_signals": [],
+  "errors": [
+    "per-ticker pipeline failure: NotImplementedError('snapshot_loader not configured; pass snapshot_loader= to run_for_watchlist (ticker=GME)')"
+  ],
+  "headlines": [],
+  "indicators": {
+    "bb_lower": [],
+    "bb_upper": [],
+    "ma20": [],
+    "ma50": [],
+    "rsi14": []
+  },
+  "ohlc_history": [],
+  "persona_signals": [],
+  "position_signal": null,
+  "schema_version": 2,
+  "ticker": "GME",
+  "ticker_decision": null
+}

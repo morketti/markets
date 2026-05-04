@@ -1,0 +1,15 @@
+{
+  "completed_tickers": [
+    "AAPL",
+    "BRK-B",
+    "GME",
+    "NVDA",
+    "V"
+  ],
+  "failed_tickers": [],
+  "lite_mode": true,
+  "llm_failure_count": 0,
+  "partial": true,
+  "skipped_tickers": [],
+  "success": true
+}
