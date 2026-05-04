@@ -50,7 +50,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **LLM-05**: When persona LLM response fails Pydantic validation, `default_factory` returns `(neutral, 0, "schema_failure")` and the raw response is logged to `memory/llm_failures.jsonl`
 - [x] **LLM-06**: Synthesizer prompt (`prompts/synthesizer.md`) produces a per-ticker `TickerDecision` with `short_term`, `long_term`, `recommendation`, `open_observation`
 - [x] **LLM-07**: Synthesizer always renders a "Dissent" section identifying the most-bearish persona reasoning when ≥1 persona disagrees by ≥30 confidence points
-- [ ] **LLM-08**: Routine emits `data/YYYY-MM-DD/_status.json` at end of run with `{success: bool, partial: bool, completed_tickers: [], failed_tickers: [], skipped_tickers: [], llm_failure_count: int}`
+- [x] **LLM-08**: Routine emits `data/YYYY-MM-DD/_status.json` at end of run with `{success: bool, partial: bool, completed_tickers: [], failed_tickers: [], skipped_tickers: [], llm_failure_count: int}`
 
 ### Frontend Views (VIEW)
 
@@ -85,10 +85,10 @@ Requirements for initial release. Each maps to a roadmap phase.
 
 ### Infrastructure (INFRA)
 
-- [ ] **INFRA-01**: Scheduled Claude Code routine fires Mon-Fri at 06:00 ET; runs from user's Claude subscription quota (no Anthropic API key)
-- [ ] **INFRA-02**: Routine entrypoint logs estimated token cost up front; if estimate exceeds available quota, runs in lite mode (analyticals only, no persona LLM, no synthesizer LLM)
-- [ ] **INFRA-03**: Daily snapshots committed to `data/YYYY-MM-DD/` with one JSON per ticker (`AAPL.json`, etc.) plus `_index.json` listing tickers + run metadata
-- [ ] **INFRA-04**: Routine commits and pushes via git from within the routine; auth token stored as routine env var (not in repo)
+- [x] **INFRA-01**: Scheduled Claude Code routine fires Mon-Fri at 06:00 ET; runs from user's Claude subscription quota (no Anthropic API key)
+- [x] **INFRA-02**: Routine entrypoint logs estimated token cost up front; if estimate exceeds available quota, runs in lite mode (analyticals only, no persona LLM, no synthesizer LLM)
+- [x] **INFRA-03**: Daily snapshots committed to `data/YYYY-MM-DD/` with one JSON per ticker (`AAPL.json`, etc.) plus `_index.json` listing tickers + run metadata
+- [x] **INFRA-04**: Routine commits and pushes via git from within the routine; auth token stored as routine env var (not in repo)
 - [ ] **INFRA-05**: Frontend deployed to Vercel; builds triggered on `main` branch push; reads from `raw.githubusercontent.com` via public repo URL
 - [ ] **INFRA-06**: Memory layer writes append-only `memory/historical_signals.jsonl` per run with `{date, ticker, persona_id, signal, confidence}` records (used in v1.x for trend surfacing)
 - [ ] **INFRA-07**: Provenance: every code file adapted from reference repos (`virattt/ai-hedge-fund` or `TauricResearch/TradingAgents`) carries a header comment naming the source file and modifications
@@ -182,7 +182,7 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | LLM-05 | Phase 5 | Complete |
 | LLM-06 | Phase 5 | Complete |
 | LLM-07 | Phase 5 | Complete |
-| LLM-08 | Phase 5 | Pending |
+| LLM-08 | Phase 5 | Complete |
 | VIEW-01 | Phase 6 | Pending |
 | VIEW-02 | Phase 6 | Pending |
 | VIEW-03 | Phase 6 | Pending |
@@ -205,10 +205,10 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | ENDORSE-01 | Phase 9 | Pending |
 | ENDORSE-02 | Phase 9 | Pending |
 | ENDORSE-03 | Phase 9 | Pending |
-| INFRA-01 | Phase 5 | Pending |
-| INFRA-02 | Phase 5 | Pending |
-| INFRA-03 | Phase 5 | Pending |
-| INFRA-04 | Phase 5 | Pending |
+| INFRA-01 | Phase 5 | Complete |
+| INFRA-02 | Phase 5 | Complete |
+| INFRA-03 | Phase 5 | Complete |
+| INFRA-04 | Phase 5 | Complete |
 | INFRA-05 | Phase 6 | Pending |
 | INFRA-06 | Phase 8 | Pending |
 | INFRA-07 | Phase 8 | Pending |
@@ -220,4 +220,4 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 
 ---
 *Requirements defined: 2026-04-30*
-*Last updated: 2026-05-03 — Phase 3 / Plan 02 complete: ANLY-01 (fundamentals analyst) marked complete after `analysts/fundamentals.py` shipped with 5-state verdict + per-config + fallback band scoring*
+*Last updated: 2026-05-04 — Phase 5 / Plan 06 complete: LLM-08 + INFRA-01..04 flipped to Complete after `routine/{quota, storage, git_publish, run_for_watchlist, entrypoint}.py` shipped with three-phase atomic write (Pattern #4) + 5-step git fail-loudly (Pattern #11) + lite-mode quota guard (Pattern #6 / INFRA-02). Phase 5 closes complete (6/6 plans, 12/12 requirements LLM-01..08 + INFRA-01..04). Phase 6 (Frontend MVP) unblocked.*
