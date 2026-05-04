@@ -2,14 +2,14 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 06-03
+current_plan: 06-04
 status: in_progress
-last_updated: "2026-05-04T14:12:50Z"
+last_updated: "2026-05-04T14:36:02Z"
 progress:
   total_phases: 9
   completed_phases: 5
   total_plans: 31
-  completed_plans: 28
+  completed_plans: 29
 ---
 
 # State: Markets
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 06-frontend-mvp-morning-scan-deep-dive **In Progress**
-**Status:** executing
+**Status:** Phase complete — ready for verification
 **Current Plan:** 06-03 (Morning Scan — Wave 2)
 **Total Plans in Phase:** 5
 **Next:** Plan 06-03 (Morning Scan three-lens view — VIEW-01, VIEW-02, VIEW-03, VIEW-11). Wave 1 (Plan 06-02 frontend scaffold) just closed: `frontend/` directory scaffolded at repo root with the full locked stack (Vite 6.4 + React 19.2 + TypeScript 5.9 + Tailwind v4.2 CSS-first @theme + react-router 7.14 data-router + TanStack Query 5.100 + zod 4.4 + lightweight-charts 5.2 + clsx + tailwind-merge); Notion-Clean palette tokens (#0E0F11 / #1F2024 / #2A2C30 / #E8E9EB / #8B8E94 / #5B9DFF + state colors) in src/index.css @theme directive; Inter UI + JetBrains Mono numerics typography loaded via Google Fonts; 6 zod schemas (agent_signal/position_signal/ticker_decision/snapshot/status/dates_index) mirror the Phase 3/4/5 + Wave 0 Pydantic shapes 1:1, with Pydantic data_unavailable invariants mirrored as zod refine() refinements AND `schema_version: z.literal(2)` STRICTLY rejecting v1 snapshots per CONTEXT.md UNIFORM RULE; fetchAndParse<T> single GitHub-raw read boundary throws SchemaMismatchError (carries url + zodError) on parse failure and FetchNotFoundError on 404; URL builders snapshotUrl/indexUrl/statusUrl/datesUrl co-located; computeStaleness encodes VIEW-11 6h/24h thresholds with SIX_HOURS_MS + TWENTY_FOUR_HOURS_MS module constants and locked boundary semantics (exactly 6h → AMBER, exactly 24h → AMBER, 24h+1ms → RED); format helpers (formatNumber/formatPercent/formatCompact/formatDate UTC YYYY-MM-DD/formatTicker uppercase+dot→hyphen); react-router v7 data-router with /→/scan/today loader redirect + /scan/:date stub + /ticker/:symbol/:date? stub + Root layout with staleness slot placeholder; shadcn/ui CLI configured (components.json) + ui/.gitkeep dir reserved for Wave 2-3 vendoring; Vercel deploy config (vercel.json) with load-bearing SPA-fallback rewrite (.*) → /index.html; .env.example documents VITE_GH_USER + VITE_GH_REPO; Playwright 3-project config (chromium-desktop + mobile-safari iPhone 14 + mobile-chrome Pixel 7) with webServer pnpm preview; 94 vitest tests passing (64 schema + 16 staleness + 14 fetchSnapshot) + 1 Playwright smoke E2E green proving / → /scan/today redirect + heading visible. 5 deviations auto-fixed (TS6310 composite-noEmit, vitest-vite peer clash via mergeConfig, tsbuildinfo gitignore, vite/client typings, pnpm 10 onlyBuiltDependencies for esbuild postinstall). Wave 2 imports schemas + fetchAndParse + computeStaleness + Tailwind palette without modification.
