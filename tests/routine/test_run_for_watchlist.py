@@ -303,3 +303,78 @@ async def test_run_for_watchlist_uses_supplied_snapshot_loader(
         snapshot_loader=loader,
     )
     assert seen_args == tickers
+
+
+# ---------------------------------------------------------------------------
+# Coverage Test 7: Default snapshot_loader raises NotImplementedError on call.
+# ---------------------------------------------------------------------------
+
+def test_default_snapshot_loader_raises_not_implemented() -> None:
+    """The v1 stub loader raises NotImplementedError; tests inject their own."""
+    from routine.run_for_watchlist import _default_snapshot_loader
+
+    with pytest.raises(NotImplementedError, match="snapshot_loader not configured"):
+        _default_snapshot_loader("AAPL")
+
+
+# ---------------------------------------------------------------------------
+# Coverage Test 8: Default-client branch — client=None constructs AsyncAnthropic.
+# ---------------------------------------------------------------------------
+
+async def test_default_client_branch_uses_async_anthropic(
+    monkeypatch, frozen_now,
+) -> None:
+    """When client=None, run_for_watchlist instantiates AsyncAnthropic() once.
+
+    Empty watchlist → 0 ticker iterations → no LLM calls; the only point is
+    that AsyncAnthropic() default-construction doesn't fail and the function
+    returns []. Verifies the default-client branch is exercised.
+    """
+    from routine import run_for_watchlist as rfw_mod
+    from routine.run_for_watchlist import run_for_watchlist
+
+    constructed: list[bool] = []
+
+    class _FakeAsyncAnthropic:
+        def __init__(self, *args, **kwargs):
+            constructed.append(True)
+            self.messages = None  # never used (empty watchlist)
+
+    monkeypatch.setattr(rfw_mod, "AsyncAnthropic", _FakeAsyncAnthropic)
+
+    watchlist = _build_watchlist([])  # empty
+    results = await run_for_watchlist(
+        watchlist,
+        lite_mode=True,
+        snapshots_root=Path("/tmp"),
+        computed_at=frozen_now,
+        client=None,  # exercises the default-construct branch
+        snapshot_loader=lambda t: _make_dark_snapshot(t),  # arbitrary
+    )
+    assert results == []
+    assert constructed == [True]
+
+
+# ---------------------------------------------------------------------------
+# Coverage Test 9: Default-loader branch — snapshot_loader=None falls through.
+# ---------------------------------------------------------------------------
+
+async def test_default_snapshot_loader_branch(
+    mock_anthropic_client, frozen_now,
+) -> None:
+    """When snapshot_loader=None, the default stub is used; per-ticker exception
+    catches the NotImplementedError and emits TickerResult(errors=[...])."""
+    from routine.run_for_watchlist import run_for_watchlist
+
+    watchlist = _build_watchlist(["AAPL"])
+    results = await run_for_watchlist(
+        watchlist,
+        lite_mode=True,
+        snapshots_root=Path("/tmp"),
+        computed_at=frozen_now,
+        client=mock_anthropic_client,
+        snapshot_loader=None,  # exercises the default-loader branch
+    )
+    assert len(results) == 1
+    r = results[0]
+    assert r.errors and "NotImplementedError" in r.errors[0]
