@@ -223,6 +223,11 @@ Plans:
 
 **Pitfalls addressed:** #12 (self-confirmation bias — dissent always rendered)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 07-01-decision-support-PLAN.md — RecommendationBanner (6×3 matrix) + ConvictionDots + DriversList (short+long pair) + DissentPanel (always-render Pitfall #12; claude_analyst accent) + DecisionRoute /decision/:symbol/:date? + cross-link symmetry with TickerRoute + Phase 8 hookpoint marker for current-price-delta deferral; ~37 new vitest + 1 new Playwright spec; zero new deps
+
 ---
 
 ### Phase 8: Mid-Day Refresh + Resilience

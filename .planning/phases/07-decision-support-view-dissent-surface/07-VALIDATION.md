@@ -1,10 +1,11 @@
 ---
 phase: 7
 slug: decision-support-view-dissent-surface
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: ready
+nyquist_compliant: true
+wave_0_complete: n/a
 created: 2026-05-04
+planner_filled: 2026-05-04
 ---
 
 # Phase 7 — Validation Strategy
@@ -40,23 +41,29 @@ Frontend-only phase. Single wave. Reuses the Phase 6 vitest + Playwright stack.
 
 ## Per-Task Verification Map
 
-> Filled in by planner. Each task references one of these commands.
+> Filled in by planner 2026-05-04. Each task in `07-01-decision-support-PLAN.md` references one of these commands.
 
 ### Plan 07-01 — Decision-Support View (Wave 1)
 
 | Task ID | Wave | Requirement | Test Type | Automated Command | Status |
 |---------|------|-------------|-----------|-------------------|--------|
-| 07-01-1 | 1 | VIEW-10 (RecommendationBanner + ConvictionDots) | unit | `cd frontend && pnpm test:unit src/components/__tests__/RecommendationBanner.test.tsx src/components/__tests__/ConvictionDots.test.tsx --run` | ⬜ pending |
-| 07-01-2 | 1 | VIEW-10 (DriversList + DissentPanel) | unit | `cd frontend && pnpm test:unit src/components/__tests__/DriversList.test.tsx src/components/__tests__/DissentPanel.test.tsx --run` | ⬜ pending |
-| 07-01-3 | 1 | VIEW-10 (DecisionRoute + cross-links + E2E) | unit + e2e | `cd frontend && pnpm test:unit --run && pnpm test:e2e --project=chromium-desktop -g 'decision'` | ⬜ pending |
+| 07-01-1 | 1 | VIEW-10 (RecommendationBanner 6×3 matrix + ConvictionDots 3-state) | unit (vitest + RTL, TDD RED→GREEN — 1 RED commit + 1 GREEN commit) | `cd frontend && pnpm test:unit src/components/__tests__/RecommendationBanner.test.tsx src/components/__tests__/ConvictionDots.test.tsx --run` | ⬜ planned |
+| 07-01-2 | 1 | VIEW-10 (DriversList short+long pair, empty-state UNIFORM RULE; DissentPanel always-render Pitfall #12 + claude_analyst accent Pitfall #2) | unit (vitest + RTL, TDD RED→GREEN — 1 RED commit + 1 GREEN commit) | `cd frontend && pnpm test:unit src/components/__tests__/DriversList.test.tsx src/components/__tests__/DissentPanel.test.tsx --run` | ⬜ planned |
+| 07-01-3 | 1 | VIEW-10 (DecisionRoute composition + App.tsx route + TickerRoute cross-link + Phase 8 hookpoint markers + E2E round-trip /scan→/ticker→/decision→/ticker) | unit + e2e (vitest RTL + Playwright chromium-desktop; TDD RED→GREEN on DecisionRoute) | `cd frontend && pnpm test:unit --run && pnpm test:e2e --project=chromium-desktop -g "decision" && pnpm typecheck` | ⬜ planned |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: ⬜ planned · ⬜ pending (in execution) · ✅ green · ❌ red · ⚠️ flaky*
+
+**Test count totals (planner estimate):**
+- Task 1: 22 vitest tests (3 ConvictionDots + 19 RecommendationBanner)
+- Task 2: 10 vitest tests (4 DriversList + 6 DissentPanel)
+- Task 3: 5 vitest tests (DecisionRoute) + 1 Playwright spec
+- **Phase total: 37 new vitest + 1 new Playwright spec → suite goes 197→234 vitest, +1 spec on chromium-desktop**
 
 ---
 
 ## Wave 0 Requirements
 
-No Wave 0 — Phase 7 builds entirely on Phase 6 infrastructure. All test fixtures, components, schemas, and routing patterns already exist. Zero new deps.
+No Wave 0 — Phase 7 builds entirely on Phase 6 infrastructure. All test fixtures, components, schemas, and routing patterns already exist. Zero new deps. The only "fixture work" is creating `frontend/tests/fixtures/scan/MSFT-no-dissent.json` (verbatim copy of MSFT.json with the dissent block flipped to `has_dissent: false` / `dissenting_persona: null` / `dissent_summary: ""`) — this is a Task 3 sub-step, not a Wave 0 task.
 
 ---
 
@@ -71,11 +78,11 @@ No Wave 0 — Phase 7 builds entirely on Phase 6 infrastructure. All test fixtur
 
 ## Validation Sign-Off
 
-- [ ] All 3 tasks have `<automated>` verify
-- [ ] Sampling continuity: every task has automated verify (3/3)
-- [ ] Wave 0 not needed (existing infrastructure covers all phase requirements)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter (set after planner fills Per-Task Verification Map)
+- [x] All 3 tasks have `<automated>` verify (RED+GREEN per TDD task)
+- [x] Sampling continuity: every task has automated verify (3/3)
+- [x] Wave 0 not needed (existing infrastructure covers all phase requirements)
+- [x] No watch-mode flags (all commands use `--run`)
+- [x] Feedback latency < 60s (Task 1 ~3s · Task 2 ~3s · Task 3 ~70s including E2E — within sampling SLO when split)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** planner-approved 2026-05-04 — plan 07-01 references all 3 task IDs with automated `<automated>` verify commands; Per-Task Verification Map filled in; nyquist_compliant flipped to true.
