@@ -33,3 +33,7 @@ frontend/coverage
 frontend/.env.local
 frontend/*.tsbuildinfo
 
+# Phase 8 — memory log (local-only by default; v1.x revisits cross-device persistence)
+memory/historical_signals.jsonl
+memory/llm_failures.jsonl
+

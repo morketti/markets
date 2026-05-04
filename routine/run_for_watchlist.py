@@ -5,6 +5,13 @@ Per-ticker pipeline:
   2. IF lite_mode: return TickerResult(persona_signals=[], ticker_decision=None).
   3. ELSE: await run_persona_slate (6-call asyncio.gather); await synthesize.
 
+Phase E (Phase 8 / INFRA-06) runs at the loop level after each ticker
+result is appended: when persona_signals is non-empty, one record per
+(ticker, persona) is appended to memory/historical_signals.jsonl via
+routine.memory_log.append_memory_record. Skipped in lite mode (no
+persona signals) AND on per-ticker pipeline failures (errors set,
+persona_signals=[]).
+
 Sync across tickers: subscription quota is single-bucket; 30 tickers * 7 LLM
 calls in parallel would 429 immediately. Per-ticker exception isolation:
 caught at the loop level; appended as TickerResult(errors=[repr(exc)]); other
@@ -41,6 +48,7 @@ from analysts.data.snapshot import Snapshot
 from analysts.position_signal import PositionSignal
 from analysts.schemas import TickerConfig, Watchlist
 from analysts.signals import AgentSignal
+from routine.memory_log import append_memory_record
 from routine.persona_runner import run_persona_slate
 from synthesis.decision import TickerDecision
 from synthesis.synthesizer import synthesize
@@ -219,6 +227,7 @@ async def run_for_watchlist(
     computed_at: datetime,
     client: AsyncAnthropic | None = None,
     snapshot_loader: Callable[[str], Snapshot] | None = None,
+    memory_log_path: Path | None = None,
 ) -> list[TickerResult]:
     """Sync across tickers; async within ticker. Returns one TickerResult per ticker.
 
@@ -247,6 +256,12 @@ async def run_for_watchlist(
     snapshot_loader
         Callable[[ticker], Snapshot]. Defaults to _default_snapshot_loader
         (v1 stub that raises NotImplementedError); tests inject closures.
+    memory_log_path
+        Phase 8 / INFRA-06 — target JSONL path for the per-(ticker, persona)
+        memory log appended in Phase E. Defaults to None which the writer
+        resolves to memory/historical_signals.jsonl. Tests inject a
+        tmp_path. Phase E only fires when persona_signals is non-empty
+        (skips lite_mode AND per-ticker pipeline failures).
 
     Returns
     -------
@@ -278,4 +293,28 @@ async def run_for_watchlist(
                 errors=[f"per-ticker pipeline failure: {exc!r}"],
             )
         results.append(result)
+
+        # Phase E (Phase 8 / INFRA-06) — memory log write per (ticker, persona).
+        # Skip when persona_signals empty (lite_mode quota guard OR per-ticker
+        # pipeline failure both leave the list empty). One record per persona.
+        # Memory log failures are non-fatal — the routine continues even if
+        # the JSONL write breaks (e.g. disk full).
+        if result.persona_signals:
+            date_str = computed_at.date().isoformat()
+            for persona_signal in result.persona_signals:
+                try:
+                    append_memory_record(
+                        date=date_str,
+                        ticker=result.ticker,
+                        persona_id=persona_signal.analyst_id,
+                        verdict=persona_signal.verdict,
+                        confidence=persona_signal.confidence,
+                        evidence_count=len(persona_signal.evidence),
+                        log_path=memory_log_path,
+                    )
+                except Exception as exc:  # noqa: BLE001 — non-fatal
+                    logger.warning(
+                        "memory_log append failed for %s/%s: %r",
+                        result.ticker, persona_signal.analyst_id, exc,
+                    )
     return results
