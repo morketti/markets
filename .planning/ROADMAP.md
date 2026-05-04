@@ -174,6 +174,19 @@ Plans:
 
 ---
 
+### Phase 6: Frontend MVP — Morning Scan + Deep-Dive — Plans
+
+**Plans:** 5 plans (0/5 complete)
+
+Plans:
+- [ ] 06-01-storage-amendment-PLAN.md — Wave 0 Phase 5 amendment: ohlc_history + 5 indicator series + headlines + ThesisStatus + schema_version 1→2 + data/_dates.json index + ROADMAP staleness threshold doc fix
+- [ ] 06-02-frontend-scaffold-PLAN.md — Wave 1: Vite 6 + React 19 + TS + Tailwind v4 + shadcn/ui + 6 zod schemas + fetchSnapshot + staleness (VIEW-11 thresholds) + Vercel deploy config
+- [ ] 06-03-morning-scan-PLAN.md — Wave 2: 3-lens URL-synced tabs + StalenessBadge + Position/Short-Term/Long-Term lens components + ScanRoute + Playwright morning-scan E2E (VIEW-01, VIEW-02, VIEW-03, VIEW-11)
+- [ ] 06-04-deep-dive-PLAN.md — Wave 3: TickerRoute + lightweight-charts wrapper + OpenClaudePin (pinned at TOP per user MEMORY) + 5 PersonaCards + 4 AnalyticalSignalCards + dual TimeframeCards + NewsList grouped-by-source + ticker search typeahead (VIEW-04..09 + VIEW-13)
+- [ ] 06-05-polish-responsive-PLAN.md — Wave 4: ErrorBoundary (schema-mismatch + 404 paths) + DateSelector reading data/_dates.json + mobile-responsive breakpoints + Playwright mobile-safari + mobile-chrome projects + full-flow E2E + visual taste-check (VIEW-12, VIEW-14, VIEW-15)
+
+---
+
 ### Phase 6: Frontend MVP — Morning Scan + Deep-Dive
 
 **Goal:** Static React app reads daily snapshots from GitHub raw and renders the morning-scan three-lens view + per-ticker deep-dive.
