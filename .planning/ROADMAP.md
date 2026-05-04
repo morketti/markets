@@ -15,7 +15,7 @@
 | 4 | Position-Adjustment Radar (3/3 plans, Complete) | Complete    | 2026-05-03 | 5 | Phases 2, 3 |
 | 5 | Claude Routine Wiring — Persona Slate + Synthesizer (6/6 plans, Complete) | Complete    | 2026-05-04 | 6 | Phase 4 | Complete    | 2026-05-04 | Frontend MVP — Morning Scan + Deep-Dive (5/5 plans, Complete) | Complete    | 2026-05-04 | 7 | Phase 5 | Complete    | 2026-05-04 | Decision-Support View + Dissent Surface (1/1 plans, Complete) | Complete    | 2026-05-04 | 4 | Phases 5, 6 |
 | 8 | Mid-Day Refresh + Resilience (2/2 plans, Complete) | Complete    | 2026-05-04 | 5 | Phase 6 |
-| 9 | Endorsement Capture | Endorsements as first-class signal (capture only — performance math deferred) | ENDORSE-01..03 | 3 | Phase 7 |
+| 9 | Endorsement Capture (1/1 plans, Complete) | Complete    | 2026-05-04 | 3 | Phase 7 |
 
 ## Phase Detail
 
@@ -273,10 +273,10 @@ Plans:
 
 **v1.x successors:** ENDORSE-04..07 (corp-action-aware performance, vs S&P alpha, performance number rendering, corp-action notice surface)
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 09-01-endorsement-capture-PLAN.md — analysts/endorsement_schema.py + endorsements/log.py + cli/add_endorsement.py (SUBCOMMANDS extension) + frontend/src/schemas/endorsement.ts + frontend/src/lib/loadEndorsements.ts + frontend/src/components/EndorsementsList.tsx + DecisionRoute mount (after DissentPanel, before open_observation) + Playwright endorsements.spec.ts; closes ENDORSE-01, ENDORSE-02, ENDORSE-03 (v1 complete)
+- [x] 09-01-endorsement-capture-PLAN.md — analysts/endorsement_schema.py + endorsements/log.py + cli/add_endorsement.py (SUBCOMMANDS extension) + frontend/src/schemas/endorsement.ts + frontend/src/lib/loadEndorsements.ts + frontend/src/components/EndorsementsList.tsx + DecisionRoute mount (after DissentPanel, before open_observation) + Playwright endorsements.spec.ts; closes ENDORSE-01, ENDORSE-02, ENDORSE-03 (v1 complete)
 
 ---
 
