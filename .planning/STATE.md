@@ -2,9 +2,9 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: null
-status: phase_complete
-last_updated: "2026-05-04T17:58:34Z"
+current_plan: Not started
+status: planning
+last_updated: "2026-05-04T18:05:53.357Z"
 progress:
   total_phases: 9
   completed_phases: 7
@@ -29,8 +29,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 07-decision-support-view-dissent-surface **COMPLETE (1/1 plans)**
-**Status:** Phase complete
-**Current Plan:** null
+**Status:** Ready to plan
+**Current Plan:** Not started
 **Total Plans in Phase:** 1
 **Next:** Phase 8 (Mid-Day Refresh + Resilience — REFRESH-01..04 + INFRA-06..07) plan-phase via `/gmd:plan-phase 8`. Plan 07-01 just closed: third pillar route /decision/:symbol/:date? mounted with RecommendationBanner (6×3 matrix — action drives color, conviction drives weight) + ConvictionDots (3-dot Pitfall #6 layout-shift guard) + DriversList (UNIFORM RULE empty-state inside cards) + DissentPanel (Pitfall #12 always-render + Pitfall #2 claude_analyst accent treatment). Cross-link symmetry: TickerRoute → '→ Decision view'; DecisionRoute → '← Deep dive'; date preserved on round-trip. Phase 8 hookpoint markers (PHASE-8-HOOK source comment + data-testid='current-price-placeholder') locked in DecisionRoute.tsx as deterministic grep targets for Phase 8's plan-phase. MSFT-no-dissent.json fixture created for has_dissent: false branch coverage. Vitest 197 → 234 (+37); Playwright 60 → 63 (+3 — decision spec ran across all 3 projects). Full unit suite + 3-project E2E + typecheck + build all green; Python pytest 659 still green. Two Rule-3 blocking deviations (App.tsx import ordering reordered to defer extensions into Task 3 GREEN commit; Playwright stale-build foot-gun resolved with pre-build) — neither affected scope or visual locks. VIEW-10 closed; all 15 VIEW requirements complete across Phases 6 + 7. Plan-gate greps clean: PHASE-8-HOOK + current-price-placeholder both present; ZERO inline hex; ZERO z.enum schema redefinition. Six production commits: be734bd / 9c972a0 (Task 1 RED+GREEN — RecommendationBanner + ConvictionDots), 6460ad6 / d65f424 (Task 2 — DriversList + DissentPanel), 913eddd / c1a1c8e (Task 3 — DecisionRoute + cross-links + E2E + extensions).
 
