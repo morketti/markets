@@ -1,19 +1,4467 @@
 {
-  "analytical_signals": [],
-  "errors": [
-    "per-ticker pipeline failure: NotImplementedError('snapshot_loader not configured; pass snapshot_loader= to run_for_watchlist (ticker=NVDA)')"
+  "analytical_signals": [
+    {
+      "analyst_id": "fundamentals",
+      "computed_at": "2026-05-04T22:02:08.793698Z",
+      "confidence": 20,
+      "data_unavailable": false,
+      "evidence": [
+        "P/E 40.5 (above 30 bearish band)",
+        "P/S 22.3 (above 8 bearish band)",
+        "ROE 101.5% (above 15% bullish band)",
+        "debt/equity 7.25 (above 1.5 bearish band)",
+        "profit margin 55.6% (above 15% bullish band)"
+      ],
+      "ticker": "NVDA",
+      "verdict": "neutral"
+    },
+    {
+      "analyst_id": "technicals",
+      "computed_at": "2026-05-04T22:02:08.793698Z",
+      "confidence": 40,
+      "data_unavailable": false,
+      "evidence": [
+        "MA20 (198.3) > MA50 (187.3) > MA200 (184.0) \u2014 bullish stack",
+        "1m momentum +11.9% (above +5%)",
+        "3m momentum +6.9% (neutral band)",
+        "6m momentum -2.2% (neutral band)",
+        "ADX 24 \u2014 ambiguous regime"
+      ],
+      "ticker": "NVDA",
+      "verdict": "bullish"
+    },
+    {
+      "analyst_id": "news_sentiment",
+      "computed_at": "2026-05-04T22:02:08.793698Z",
+      "confidence": 14,
+      "data_unavailable": false,
+      "evidence": [
+        "167 headlines (recency-weighted), avg VADER compound +0.06 \u2014 bullish",
+        "16 headlines lacked timestamps and were excluded"
+      ],
+      "ticker": "NVDA",
+      "verdict": "bullish"
+    },
+    {
+      "analyst_id": "valuation",
+      "computed_at": "2026-05-04T22:02:08.793698Z",
+      "confidence": 12,
+      "data_unavailable": false,
+      "evidence": [
+        "analyst consensus 269 (n=57), current 198 \u2014 -26.3% gap"
+      ],
+      "ticker": "NVDA",
+      "verdict": "bullish"
+    }
   ],
-  "headlines": [],
+  "errors": [],
+  "headlines": [
+    {
+      "published_at": "2026-05-04T21:50:00Z",
+      "source": "yahoo-rss",
+      "title": "Is Eli Lilly Stock Heading for $1,000?",
+      "url": "https://www.fool.com/investing/2026/05/04/is-eli-lilly-stock-heading-for-1000/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:42:08Z",
+      "source": "yahoo-rss",
+      "title": "3 Absurdly Cheap Growth Stocks to Buy in May 2026",
+      "url": "https://www.fool.com/investing/2026/05/04/3-absurdly-cheap-growth-stocks-to-buy-in-may-2026/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:42:07Z",
+      "source": "yahoo-rss",
+      "title": "Dow Jones Futures: Iran Attacks Spark Stock Market Losses; Palantir Falls On Earnings",
+      "url": "https://finance.yahoo.com/m/3d2a97f4-a6fb-34ca-8055-7af58ef956c6/dow-jones-futures%3A-iran.html?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:39:55Z",
+      "source": "yahoo-rss",
+      "title": "Brookwood Cuts FLXR Position by $3 Million -- What Income Investors Should Know",
+      "url": "https://www.fool.com/coverage/filings/2026/05/04/brookwood-cuts-flxr-position-by-usd3-million-what-income-investors-should-know/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:35:00Z",
+      "source": "yahoo-rss",
+      "title": "2 Dividend Stocks I'd Buy Without Hesitation During a Market Crash",
+      "url": "https://www.fool.com/investing/2026/05/04/2-dividend-stocks-id-buy-without-hesitation-during/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:31:49Z",
+      "source": "yahoo-rss",
+      "title": "Why Napco Security Technologies Stock Plummeted Today",
+      "url": "https://www.fool.com/investing/2026/05/04/why-napco-security-technologies-stock-plummeted-to/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:20:21Z",
+      "source": "yahoo-rss",
+      "title": "'Nobody's doing AI better than Palantir': Earnings takeaways",
+      "url": "https://finance.yahoo.com/video/nobodys-doing-ai-better-than-palantir-earnings-takeaways-212021317.html?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:20:00Z",
+      "source": "yahoo-rss",
+      "title": "Prediction: This Silver ETF Will Take Off After May 15",
+      "url": "https://www.fool.com/investing/2026/05/04/prediction-this-silver-etf-will-take-off-after-may/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T21:12:47Z",
+      "source": "google-news",
+      "title": "NVDA vs. MU: Which \u201cStrong Buy\u201d AI Stock Has the Higher Upside Potential, According to Analysts? - TipRanks",
+      "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxORU1QOE8yZ0R3cXRPdWFBeXJzM2xiSE5sendXMGlnbDk2VUNUV1pnTDNUX0xob1kyYmZMWEhLSUtVMGZxY093WVc3dFV5ZjF4N2NXMi1GMVVfbU9rR1RsSXFuQ01FemdxcXZBMUE1aXh4SjdlelE2dGtHMnFaLVFfWEM0cU0yM0d0TVFNZFZ6OGtJdTlveGhnTUZBQzhObnJtRHd6YkloM0dOdnYwRVZkQkFVbDRxVFczUFFVNA?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T21:07:40Z",
+      "source": "yahoo-rss",
+      "title": "Bernstein Analyst: AI Agents Drive Chip Demand \u2018Off the Charts,\u2019 Supply Can\u2019t Keep Up",
+      "url": "https://247wallst.com/investing/2026/05/04/bernstein-analyst-ai-agents-drive-chip-demand-off-the-charts-supply-cant-keep-up/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:59:00Z",
+      "source": "yahoo-rss",
+      "title": "Nvidia Just Stunned the Quantum Computing Market. What Does This Mean for IonQ, D-Wave, and Rigetti?",
+      "url": "https://www.fool.com/investing/2026/05/04/nvidia-stun-quantum-computing-ionq-d-wave-rigetti/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:50:08Z",
+      "source": "yahoo-rss",
+      "title": "Eli Lilly Captures 60% of the GLP-1 Market as Mounjaro Revenue Soars 125%",
+      "url": "https://247wallst.com/investing/2026/05/04/eli-lilly-captures-60-of-the-glp-1-market-as-mounjaro-revenue-soars-125/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:50:00Z",
+      "source": "yahoo-rss",
+      "title": "AbbVie's Latest Results Reveal a Trend Investors Shouldn't Overlook",
+      "url": "https://www.fool.com/investing/2026/05/04/abbvies-latest-results-reveal-a-trend-investors-sh/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:25:00Z",
+      "source": "yahoo-rss",
+      "title": "My Top 2 Generative AI Stocks for Long-Term Investors for May 2026",
+      "url": "https://www.fool.com/investing/2026/05/04/my-top-x-generative-ai-stocks-for-long-term-invest/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:20:00Z",
+      "source": "yahoo-rss",
+      "title": "S&P 500 to Hit 8,000 This Year? Here's Why JPMorgan Thinks It's Possible",
+      "url": "https://www.fool.com/investing/2026/05/04/sp-500-to-hit-8000-this-year-heres-why-jpmorgan-th/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:05:00Z",
+      "source": "yahoo-rss",
+      "title": "Here's Exactly Why Wall Street Thinks Viking Therapeutics Stock Could Soar 207% Over the Next 12 Months",
+      "url": "https://www.fool.com/investing/2026/05/04/heres-exactly-why-wall-street-thinks-viking-therap/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T20:00:35Z",
+      "source": "yahoo-rss",
+      "title": "Broadcom, Google And Caterpillar Lead AI Charge On Must-See List",
+      "url": "https://finance.yahoo.com/m/d8f38cc8-23ce-3e37-8320-19e404aff06f/broadcom%2C-google-and.html?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T19:50:00Z",
+      "source": "yahoo-rss",
+      "title": "The \"Magnificent Seven\" Have a Combined Market Cap of Just Under $23 Trillion. Is Now the Time to Diversify Outside of Tech?",
+      "url": "https://www.fool.com/investing/2026/05/04/the-magnificent-seven-have-a-combined-market-cap-o/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T19:50:00Z",
+      "source": "yahoo-rss",
+      "title": "Meta's Revenue Growth Is Impressive, but This Remains a Big Problem",
+      "url": "https://www.fool.com/investing/2026/05/04/metas-revenue-growth-is-impressive-but-this-remain/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T19:41:53Z",
+      "source": "yahoo-rss",
+      "title": "Magna Stock Craters 10% as Strong Q1 Fails to Lift Full-Year Outlook",
+      "url": "https://247wallst.com/investing/2026/05/04/magna-stock-craters-10-as-strong-q1-fails-to-lift-full-year-outlook/?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T19:41:41Z",
+      "source": "google-news",
+      "title": "The Real SpaceX Play: 5 Chip Stocks Powering the IPO Before It Launches - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOcXliR0NmdS1BWk5DM01hdTFhenFCMUdrUGg5Z0ZjYkFnX2ViWEg2d2VuQlU2WHBWR1ppOElaS0x5Y3g4ZVpYM3RZS2dQWkpMbDg0aVY0QU1RdjBFUVBacXI3VnlpbGU0OURjYUl5Sm1SQnNNSURXcHk2V2d6dTJ4eW03OVJ4b1NFdzQzcWt4dGJhQ0hFeEZoWGg5eVJWdllyX2xTbmgzdGdGQW9o?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T19:41:00Z",
+      "source": "yahoo-rss",
+      "title": "Nvidia Stock Is Stuck Below $200. What Pushes It Higher.",
+      "url": "https://finance.yahoo.com/m/fa25c5c2-e4fc-3aad-8193-b2437b2d6819/nvidia-stock-is-stuck-below.html?.tsrc=rss"
+    },
+    {
+      "published_at": "2026-05-04T19:15:22Z",
+      "source": "google-news",
+      "title": "DBS Bank Raises PT on NVIDIA (NVDA) Stock - Insider Monkey",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNX2ZadFZTVm5Hb0YxbHpaSFBxYWZDeXdRcmRTUHJTcHpzM0lnYnMwc25ydnMwNVVSQnNXVDdBQW56djd3QTlqdGhQMlJDeG8zVjJPeVdadlJ6SkREX3JIaGJvbjhkdnNTVm9pcGFrcW90UWUxdmZfdGVXbWZHSnpkbkU0M1k1VkRyR0RR0gGTAUFVX3lxTFA5S0dmQmxSYzFoVE1YVlNWMEdUeVNURUV1c0JVdGhYdk9RSVd2YzJLWkpLd0RWZUE1bnd5bk84dFhDOW9YN3VZOXZBUURZNldfSXlPcGNYS3c0ajQ4c2wyR1RqaXJHS3ZvOFF5YzF2SmNxQnBxTDNwb0FZcDFmTm83Tnp0VFFtaG9hN2pyemRlMHFhZw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T18:48:17Z",
+      "source": "google-news",
+      "title": "SanDisk Stock Crushes Nvidia With 45x Returns, Becomes S&P 500's Best - Benzinga",
+      "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQU3ozUG04MnA1MGxJNDV1WHM4OERwNWgyNWNPcl90SDBkZHhxT1NOMjM0NEV5SlN0bnZPaUpVRTdBLUVhSTEyYTV6RHBER0drUGVGWXFPVFp2OUhoR2p1UE8xdklLSExMSjVzZ0tfY1ZIZ0QxZU1hQUhMZzNKZ1NRQm1ZamkzTHlmZ2xoRWVlZHBYaG1hUHpFNnVCSHk0RWNLdllIUkFFS1lhZWkwSFhoaXRpOGw0SnY0Y0JJczQ4RjVsUHg0SkE?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T18:14:32Z",
+      "source": "google-news",
+      "title": "50% of Nvidia Employees Are Now Worth Over $25 Million: How Nvidia Created Thousands of Millionaires - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxONWM2R0c2MWs4V2ZtUm1Saml4RzhmOUVTMEdhNW5KZzZFdl96SWtOSTR6bS1LeFY2R2xlWFYxeWJXcHZkUUFKZDNKcm8xSmMwdWt4cTc3Q2xnU3Q5Njg0V1BlVGlEV2VGbTZ3MEVMYzRvOEw4VkVMVmc4Q0JxSE1sbHB5RlJRYkZ2bExpV0pKTW1aaF9HSGZzNnVB?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T17:57:24Z",
+      "source": "google-news",
+      "title": "NVIDIA (NVDA) Stock: Why Cramer Says AI Spending Still Flows to Jensen\u2019s Chips - Blockonomi",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNbDRZVXdNQ2dsNF9qMi1fZFM3aGdCSFRNVkpaU3l4VkVTaWtvTnB6SFZNR3ptandlU1c2SlZndXJFQ2hsZnJOT0ZIc2phUEVFdEdiODJMaWJZVW5CbWNnTWc1QjdmSDdNblNZd3p6MDJLd2UyclJSOWZoUkZNVTdvM0NwOEFsRjFmR21FOVBmajVzaVloRUdHcm1ISVlDZDA?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T17:27:58Z",
+      "source": "google-news",
+      "title": "Nvidia has split its stock 480-for-1 since 2000. Here's when to expect the next stock split. - MSN",
+      "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxOZXFHazktVkdLZ3dwbG4wUzV3dzd0OGhJZXdyamNMR0NrMWJZSzJnWEJycUtoT01pNjRXZEpvTGNkbGxBT1hBQ3NuWExtYzBheEdUQ1daRFFaT2duQjM0RDFQOHc4RHFnR1VmVzExRm1iOWF0M2VIQnJ0MmgyaWlLNTFRR2lZWGRfTXlxd1RINUotb2RIRUZaMVRvS2laTk1QLWhZWHczeUZiY1daZHlkTFZBaFVWR1VzZjk0MGNrb0hLaTA1dDRWcTZnTTN0aHpvS205aDl6Ynlsd01h?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T17:19:16Z",
+      "source": "google-news",
+      "title": "NVIDIA (NVDA) Stock: Cramer Still Bullish as History Points to More Upside - CoinCentral",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPd09QNWxic2QyVm9HMm9qcDVOUWJZclVHRXhkV01LQi14NGNhM1cxZ3FoMExDRkpPdkdVeXA0YjVqMUxuYV8yOVBnN29laTRLbUxRTVpVVExsOF9Fd3AtaWZwekdnQmRGQkJJQi1rTXl1Rmx5TEFva2tqeC14dG5FM3FQVTIzWlN1bTc2TElsYTRnWC16ZXdlUFJ3MkM?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T16:54:00Z",
+      "source": "google-news",
+      "title": "History Says Nvidia's 2026 Run Is Just Getting Started - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPaGNicVl5cG9sanJueXZSUUQyUUc4UktRNEhoRGcxdWtHenhCLXlRZlZPbXl3amNYNUp3eFhZangwTjJlTGo3dVpyRVBYRXpBcFdEQmVidGpnQlBaVnpDMmpNbWZoTHRPdk9CcUd1OFB6SURiaElEbFRYMHJ2RGZUcHYyZURTQTFKelVxUlJUWVZIRlg0YkZMdw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T16:20:58Z",
+      "source": "google-news",
+      "title": "Jim Cramer Just Won\u2019t Give Up on NVIDIA (NVDA) - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQWi0zZmpVWmRPRjZxWkJ2RHNLNG1FbDB5ZXhHZnZIYVpVSFZ5OUZVMUlvLUlZY3U4MGVnMkRZczdWR1c5RHNTMHZydXl3ZXR3SlNGSktQYzhWaUlfMWtEUHB1ZTBzYWtiSDNEeEs2U3BpcmRqdUNMY2VFZ3l5eW1MYl9kRnBNSjFLWFIyZW5uQQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T16:07:18Z",
+      "source": "google-news",
+      "title": "Nvidia stock price forecast: $190 support in focus as NVDA trades down - Traders Union",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOckFEQ2VNWlNSOWJLT1dLYklvUHJCendGZ0lzYlpDcHhxU3JrNXBiYURGYk10VGtPNjJQbTd4OUFtM2I1V1JBUF9DakxzemVOM3h2ZDFjQncxY2dNak9ZQWgtNExTTDhqLXJRUGtscWxpV3hPMFdDU3dGT0xaQjNvVlJPbkxuakpCYWprQUtJMzlwZVh0Qk5LTw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T15:08:05Z",
+      "source": "google-news",
+      "title": "Nvidia CEO Jensen Huang says company now has zero market share in China - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPd1hYYk5qWHVvMDBwUkpSTjU4NlE5ZGUwMDVEbEhOZmV3bHRpT1A3N05FRE1pdUFlTVFzVWdneHZTYk5JTXVVdjZGOUUyY3BqWThxbUFNZk1iVFJua2hGbVdUQllmRm9CSVdwR0xoRGU2LVBkamtPTEh2ci1YRDhYZy1DZTNhN2Z5VWJNUUw2UXp2TTNqSUpQZ3pRdHMyeUlFMWhlWG1ZdktxV3h3a2tsamYxZDRZS2tSUjNHSXducFdKUHJIYnkwS05nR2VvMnpVaGJham53?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T15:02:17Z",
+      "source": "google-news",
+      "title": "Nvidia\u2019s Stock Plunged 90% Twice Before Becoming Most Valuable Company - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPbGwwajlDLV81UXdySGt0MDZUcXNaSlZTMnVHdFdmV3M4U2UzU0d2SmJWZHdVcFR5aEhjREtvTVBxcXRNUjZ2S2s1YXE3akIzaWRsZUNseWNTOXpmbzhLLWtrdnZVUEE4emtZR0Q4V3JSZFFrRURxbEk2dG5HSmpTLVByQ1cyYjZ4cGMzcHBQam5rczE5QTl5eXBR?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T14:46:51Z",
+      "source": "google-news",
+      "title": "Everyone Is Chasing Nvidia Stock \u2014 BlackRock Is Watching Paint - PPG Indus (NYSE:PPG) - Benzinga",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNUTkxU3hicjVFdUxBU2J4WXQ4ekRTR0xJc0NMRmZXN3hVbXZFR3c5WkNQQ1g4cG05SUQ4QTRhdHRnVUtEeVgzNExwUUR1MExHTkNXNWtaTmZxaTBFUE53VmNEWTVyRURvQ2g0WF9CUldjV2tYdVpjOHo4RjduTjZRYnpoWG5adXdiTExDMllIclFtLW1fQ0Z6TW5jQTlpZUhXQ1M3ZTlJREc5bVZUVmRYcnVyWQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T14:35:00Z",
+      "source": "google-news",
+      "title": "Elon Musk Nvidia Stock Comments Just Quietly Made Jensen Huang\u2019s Year - primaryignition.com",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQRElIa2NWaUdmNnIzaXpNMU8xeGNNYUFNRUlhSEZzd3MtQnBMY3hBTDlJVDJ4N3k5bjBvb3MwRW1fbWNWRlYzQk55YUJURkhFY0s0OGR4RjdEbnR1dHdpdXNVMlFOd2xFdGRFQU4xXzNacGFyMURJUzFBZzJnb2g0WkZ6a093dV9Db1JKY1FHenlKb09LU0dSR1FYS2k3RE8zOGtpSlNZZk1Jc2Jj?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T14:27:28Z",
+      "source": "google-news",
+      "title": "While NVDA Dominates Headlines, Here\u2019s Where the Real AI Economics Are Hiding - 24/7 Wall St.",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOVEE1U2RZQURROE9LeHNtVDFxZWZ0SS05VkhKMkE1TDdyRXczdF9hSndVcnF2WEtrMEZOSmFiS0xFX2UtZm4wWTR3Qi1UaXB3bVRLQnhIcm5nMUFQQllkWEh3ajVsclZOOFFFZFU0R0NCNndKdjZJMVdaTmE5cFJGWFZXRmxaZlg3a1l2LUVXTXhzYnN2NTJHRVVVYkV4a1UwWW5zV0htbHh4X1B2T0JWR0kzR3VrWlk0U3A4?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T14:09:09Z",
+      "source": "google-news",
+      "title": "Nvidia stock holds steady amid major asset managers control over 65% of shares - Traders Union",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNeWwzam9HTXlYOXJfZUpWd0dZLUM4MnVZT1ZScXpReHhIZjMtTUJOcFFRYS1XX3R2TnF0anJZM00zbDRiWUVGU1RSWVZNQkZWODlCTGxQcWo1Ty11bmNONHVRTmZ4ZFBQZVpEaDZXZzJwRzlTdmJBeG1wbVVUcTdZdGRvV3VVSE9LVFhDUEZCRzdWVkF1S01V?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T14:05:47Z",
+      "source": "google-news",
+      "title": "Nvidia Stock: Breaking Down Its Key Risk and Why It\u2019s Still a Compelling Buy in 2026 - TradingKey",
+      "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNSTNsZEZFa3BBcTdqNE5QQUhJb01tQ2hKTVRHVW9nNzdnVFhQeEsxU29sMmJ3enVTd1E1dWtyaUdoWG5JX1k2MUJUVW1DeExPeXBNcWprQ2NpT2NTOGFidEN2MEtfVEg2ZjlFWHpxdWlVdFgwYjZKbVdtTVZFQTZXZlU2TUdfTWlWU19RZVNOSzhyM1NVRlRXSmhURk0wYmJUTy1EaURzdHZiOGRMbnduYW8tSUdQXzVK?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T13:28:59Z",
+      "source": "google-news",
+      "title": "Why Nvidia stock is about to begin a 3-month hot run - Finbold",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9PX0N2NjVIb0pVNEJHWEpIbVdZRS15RzNDQld3Q05iYVF0RWp5eThsS0pDVUQ1YXdqV2tFbkV0cFhrR2xyVE1DZjlfelk5clNIaEo4QVgwckhxeHdWVV9vbnFVcXc4bmxURHJTNjVQYzczN3V4R3B6ZEVLTVVjdw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:41:00Z",
+      "source": "google-news",
+      "title": "Institutions Keep Buying NVIDIA - FXEmpire",
+      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNUVhFMGxpalUta2g3bmltczFEWFFROTNNUTdGVlhqVXpjS2F5bkpmclVqZVRxbm15b3VSU0RBVURaWjV6dUloMDlaZWtnRVJTZU5JZVluXzBtNkozMjZySC1oaHBpejBjdjVyRTdGMEhBWU9kbWowRGNlVHd2V0FDNVFaNWtLMy12MkE?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:39:24Z",
+      "source": "google-news",
+      "title": "Nvidia (NVDA) Stock Hovers Below $200 as Key Earnings Approach - Blockonomi",
+      "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOSFVhb0NfQ2RfMVlBTlVxazdJOExZcllSXy05THR6dk01cS03VG9sYU5aNnZkdndLTXNMTXc3UEI2d2t5NUhMMF8yNEdxR2VRUVZRM1Y0ZnBOcUJvc3ZGa2N1SGw2VUx0M2g5RE5wOUwybmNFTHZCY2oyLXJwUjlJaEZRZTdiTVBYdUtZ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:31:46Z",
+      "source": "google-news",
+      "title": "Jensen Huang Sends Stark Warning on Nvidia Stock - TradingView",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPS0tzWVQyc0l1YnNHbkhNckcycWRocU5Xa013Wk5rcl8xZ3ZhNkhRa0xQRTJ3d2tzVEhna1VtbElHYXVIeFBvR003ZEpkYWh3R2RiYTNWUHNNd0RUbWVHV1BuSUNFVE94N0p2UlMyNTljWEJCemx2YWc0bEN5V1NuczMyQWtaWVdOSGl3RVFHYk1jaTBKV2IyZElXdnRXOWRQSFRIU0ppM0ExdWg4?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:26:53Z",
+      "source": "google-news",
+      "title": "Nvidia (NVDA) Stock Is Stuck. These Three Earnings Could Unlock It - CoinCentral",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQR3JuVVhhY0pvUjBxWGRoaFFhSHc3MmpJQ0U3YXE1NUFpLWdYZkQ3bTNzMnFnNnY0bkxRcFNfZDR3MHprRDd6MUdGWFk4VkkwcFBhdHhqak5CUzMzZXdYWWlWR1dGVEV0LXFFRzBvWEotWWw4RmtnX3VOZ3NLTjZmUUlNR28tR3p5bkVFamxiQmdYQQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:19:21Z",
+      "source": "google-news",
+      "title": "Here are Monday's biggest analyst calls: Nvidia, Apple, Palantir, AMD, McDonald's, Broadcom, Airbnb & more - CNBC",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPNDRrLWdJNnhUdzFtVGxUa0RwYXpYLTBGb3l3RUhYM2FLYVd4Z3N3MVZWNXpPbHRMSEs5NXcxdmNjcUE1dElHc04xZk1KVmR5azJzM3hOX2tpRkFvY2JBVEdkVDl6bzUtbUdibGlIWmlBUmhrWHc2M25uam5ENDNSemFLR2tEamM?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:07:02Z",
+      "source": "google-news",
+      "title": "Top 5 AI Stocks for May 2026: Nvidia (NVDA), AMD, Broadcom Lead Investor Watchlist - MEXC",
+      "url": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1ibVY5bDZQNWY4RmxVaE5sdmNFZ2t4UERmbFgxdGl3SnFmaW5UU0JKVUFENC04bjY3Y3QwcV96RjJiVHNTYVgzQg?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T12:00:14Z",
+      "source": "google-news",
+      "title": "NVIDIA Corporation $NVDA Shares Acquired by WorthPointe LLC - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQeURsRWxoQjVKZ1NidXAxdnlrbDFULUUzTExfdmlmOXZadGx6RG5rMnBhR29JaDEzVDZLYkNLR25PTWJUb01CZkdPY0JUQU5mdnZEWUhnWlkyVnd0QklDWEE2OVpPRjY4WmJWenRRd244WnZxa09iX1FqbXF3U2I5NVR3aUJ4TmpaeDZ5NEJZTWNBQ3RuSzdHNnJqV1pTSHktNU1uX2RDSFZoQnJyRTZRUFZONzJaMmk4ZkQ4?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T10:33:29Z",
+      "source": "google-news",
+      "title": "If you bought 100 Nvidia shares at start of 2025, here\u2019s your dividend return today - Finbold",
+      "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNaFAtNDBXcFhHcXAzSklHSVFDVFNXUkdPei1ERC1YaGh0aWNpamp4aUFGcExRYmxVLWRMTjR5M2NXYnFRYW1CUEdDV3lXY0Z4dHVTVW1FSDBkeFliand4YUxsaGM2bGs4VUJCYndWQnYzZWlLMWJrZ25wcDRPVmgtSE1fWVlYOWF3WUJPQTBBblJFZlBPLU82MVJQaXJaMVBudkxsRQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T10:12:57Z",
+      "source": "google-news",
+      "title": "NVDA Stock Surges in Global Focus as UK Investors Prepare for Major Tech Shifts - vocal.media",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQY2VoQ2J0YnRMOVNWRUU1OUFVVEwtLWh1bFFIT1EyUXVsMzZQblFkbzRVWDgxUWhjT3AzcVJvYzFRd2JTZzVsYnd4a29Ibm85WUQtMEJScEMxdXNDSG1zeXNyMXpsUEZ3WTdIWlJKakpLNThtUW9RX1BJb3ZuVFh5TVNSZFMwWWhSb2tEWDhyaVdjdW5IcHdzU2txcFlaVU1RVmMxRnRUeUpiQQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T09:12:46Z",
+      "source": "google-news",
+      "title": "PFG Investments LLC Acquires 3,721 Shares of NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQVmQwaTJCbDVRRWNOdHBKUUt3NzI5WnhOWVJhZE1mX2VqY245cGtfOG5IeXM0ZnZFbmJBNV9Xa2tZWmlyMVd4bmhaQ2ZGMGlmWFBhd1dsNlpfT3ZtOVhKQko5cnRCbVpOa3pqV093WUtLMjVuUjhTbzlfYTNUaDJmMlhWV0NGenFSZGgzYV90a0dQUHcyMVVUTzNKRHZ5UzlRZHFOcHZnVW9WNlJxU1JYVHpUT0xCVjBsZFJJTmxtZ2Y0eTQ2d0RV?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T09:06:00Z",
+      "source": "google-news",
+      "title": "Nvidia, Palantir, and Broadcom Are Sending Shockwaves Through Wall Street With This $4.6 Billion Warning - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNSEFJVUdsZ0JiaXowdk91ald4SkdRa2FnRVpaZkludGQzcFNLYVVsX3ljNER0N3NsSlpRUkMxMWpUT21Uc2VpbWlXYWY5ZDlyeVRiRC1Zam93VG9rVEVYdDBKOEV6emJ1TFhGcFZ3WkxXc25wM0pSNm02eTBhdndPb3M2d1hiUkxINWU0QzBwQ1RsbU9fRENpUA?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T08:14:17Z",
+      "source": "google-news",
+      "title": "NVDA Stock Gains In Premarket: CEO Jensen Huang Says China Chip Export Ban \u2018Largely Backfired\u2019 - Stocktwits",
+      "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxOV1NCWEphdmM5QlE1Ui1IR3BlRzJGSnVvNmdIX2pGR1RWVHBZbFhETFdrV3RVOFBuSTJSN3RKRzRCVkNEN3ZzN0NVQWVLeEx0YnpEcFcyX0NjVkgtMDlXUnNBUDcyTXZPc25EUGNFcTRPVXJLLUtkdnlBaVhhaXVPclpRRWZZWHlpcUJiWkplSXl5ZF9zdzk4MTkyVjQxTUNoU2g3aXh3dVkyQ2lrV0duYjNrenk2RElXWTJPNUotdWNteWVCcTBoeHJ3VDA1QUp3YXFkTU40dGVRVnVwRHIxSHE2R280QkxqcTQw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T07:46:03Z",
+      "source": "google-news",
+      "title": "NVIDIA Corporation $NVDA Shares Sold by Border to Coast Pensions Partnership Ltd - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxPcUxzWlRVdF8wcVhUYnhUQ2J2SmpQSnF6YThXOEhOcGlmNERzcXMyZ09POWdaeGpkUTN4eXgwUkMxQ0JGQmNWXzlUanZTVzdHdEx6ekhiUGNOOENrWm90eGFNdEp6d0x1QWVIZzhGMnRXRGNWTk9mYk9VS3RjbWtRTFQwZkhlQmtYUFlOMC1PYTd5MjdNeF9YbmxXWGUwTzlwTkp6TVhnYXk5dEtRdnFlcDF0TTREM2NIZ0RaUldDcUIzRlA3cUY0NHJEYklNVFZIZHZ1T21xVQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T07:45:59Z",
+      "source": "google-news",
+      "title": "Generali Investments Towarzystwo Funduszy Inwestycyjnych Has $10.22 Million Stock Position in NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxOYmduakE0SnYwcjlKdHJMd1VFNnZZdEJrVDAzYU16QjFWQl9aWXFCczZzcGd6RGpRSVdJZFlzVmJfUUNZS3N2UjgxOW82RS1YTmpuNTRZSzBYTjRjSHNTQjlyN0VqZ2pYa1pyd0VDSks2aXFBUEotUTlaMUI0b0kxZklZNGZSZXlldkZXbDJ6cHJuTUQyWVNBMmRwdXpwLWhEMTZWMXlRbHoxTEhsWU11TWp3R0UzRXlzUlFQZkNRSVhkclM5UWJFSEZvTVU1bS1jWmlETzM0TzBQLWVsWFEwVDdFaFM2SHNlODlrZzVJQVlDRjVERldkaEZBQk44VG8td1c0cUpzNA?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T07:45:58Z",
+      "source": "google-news",
+      "title": "12,191 Shares in NVIDIA Corporation $NVDA Acquired by Diversified Management Inc. - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxQd1pXNlVGakFidnFNRlZ5MW5malpOTl9pOTZqNXJfSnZ0WnJHM0ZRWlFVQ09vLUdtdmlDRXdRYm95ZDVJczVwOC13M0Z1NU03SkJPNkROcjJMWmEzcGlXQ2NQcWloQzNIOEZEbWJuMHQyTFZxM0JVa1plU1YwSmpJNl9iT2lHU0JBMEZhSkRYTFpyaUZDU21TRHV2NGYzM2JHN1BrNnZiUHN3Vzd4WTlsQ2dZNnl1SXVDU0MwVWVOMG1HWkVuZ1VjakI3SjdldEdGSk1UMVZ3?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T07:45:57Z",
+      "source": "google-news",
+      "title": "Cottage Street Advisors LLC Lowers Stock Holdings in NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOdFlHbFRkTncwQzlEZEhCZUVwVm1UemtGLW1yR3lEUnVwdjhoVU9vQUNqVHl0c1dCMk84djcwQ2RFd2o0TXhtRndCQV9WRk1RVXA5MEJRMUNydXp0Y0kwT0pESHZMbzRFOHVCNVdFVUlTSU9GN1pJR3ZGWTJ1TGNCbmZqa3RIX1BYck96RV9rVWJUbFdnYk5Sbjk0amNKUXF0dV9VR0t5RTY5WW1Wdll3TVdjVHd0d04yWlZxZmpmVkZ2TllxY0ZDdHNzZHM3MGtBTEtN?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T07:36:00Z",
+      "source": "google-news",
+      "title": "How Nvidia stock could hit $284 in 2026 - Fool UK",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5yMWF5QWJ1ZGVYR0JzbGMwQUkwdlMyVjFLLXdxNFhUUWFOcnR4NFlTMk90bDVYSHcyc0FuOG5BVmRhdDFuY0hiMV9kQlVUNVpnNkNwS1d2MDJtNzgwUUwxOWlfclFjVlFnUFljN3QxdzNtNlA2aUJvS0FDQnRudw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T06:06:06Z",
+      "source": "google-news",
+      "title": "What Is Nvidia? How the GPU Architect Became the Engine of AI in 2026 - TradingKey",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPMWVIZEVuekpJR0NYRGZOX0k4cDRBTTlNZ3VSSlJmQVBKWlo1V0dnbWpiYlpndnBibVR2Q0RKZ0sxQTJmckhXY2YzZVZzUDdsZXpTYnBIcEdOc1h2ZW93emRXLUhYVGlYblRWR1NILU45eFpCUG1XZ2VidVNrV1otZ2UtUmhNRWlEeVRUZ01qaEZlYzVmMUtqUWRra3NsUVdMSWthWE11dXk1aDNfalQw?oc=5"
+    },
+    {
+      "published_at": "2026-05-04T02:31:35Z",
+      "source": "google-news",
+      "title": "\u2018See You in 2028,\u2019 Says Investor About Nvidia Stock - TipRanks",
+      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQd2J0UlZuMDlRazlzTXNScVROc2Vud3p2LUFOaWVmc1VVV0ZyRTI3Q05xRjNjODBON3NSSDNmMmxJbXdmVUVFWHpKdE9KTFVPblB2dlhBeGFIRmdGM0lfQ0l6MWw2VjRjdS1ENWtxUWt1S1l5b29UdkRodDE5MlRxZl9yZl8?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T23:00:00Z",
+      "source": "finviz",
+      "title": "MediaTek hires former TSMC executive to boost AI chip packaging",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/mediatek-hires-former-tsmc-executive-030028783.html"
+    },
+    {
+      "published_at": "2026-05-03T21:11:00Z",
+      "source": "google-news",
+      "title": "Prediction: This Will Be the Top-Performing Artificial Intelligence (AI) Semiconductor Stock Over the Next Year. (Hint: It's Not Nvidia, Broadcom, or Micron.) - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNeDhNZ2w4SGdPTUNkWVFVNHNqMlFabFl0VEdqZzFDVVdKa0JfWVlEdG0wQ242WDRqaEdJbE1ld2s2bWRfVl8zb3pnYnRoaUJHTy1obkZOVjhxdnozODA3TVlBNDhEaXFfSzdQWllLbHJtRXFMSVlERlZIbUpKN0J2SlRmNFhtaDNCWWNqSUF4M0xVZFhzcFl2cg?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T20:01:22Z",
+      "source": "google-news",
+      "title": "Nvidia\u2019s Physical AI Push Is Pulling Asia\u2019s Tech Stocks Into a New Race - TechStock\u00b2",
+      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxOWWQtMmJGZkYzRFlXVVREbW5QcDluWnJiVDBlTjl0T2Q1UnQ1VWVaSGdyRXdVRmoyVFdmMnF6S0JsWElWaVZ1T0RpbVNmQWQ1dFY1T21UUGVscGp5ZWpfZV9sb1RhakxRbFc2Ul9UZUE5U3hDVEZ3TzVSeEtzVFh2QjdiNHZZS1BYNFlJRW9KX281N3pR?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T18:13:42Z",
+      "source": "google-news",
+      "title": "Is NVIDIA Corporation (NVDA) A Good Stock To Buy Now? - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNU3VOblBOY3ltcUd2aGdaNWJnVXhXOFJNYk9QcFdLT1Zkc2ZCaFhPU1l0QXVfWWhOeUVIYzJ4WUREYVI0NVlPY01hNWs1VEpOcUg3QS1FQWFaMGM3N1BKV2tFckgxZVljYTdKbk9ETDVBN3Z1amV0NWQ2Sk91RW5UR09XY3RzejVUbkdvZ2RjcHJoTkphU1pJMGFtQ21sODdr?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T17:27:00Z",
+      "source": "google-news",
+      "title": "Jensen Huang Just Announced Something Big. Here's What It Means for Nvidia Stock. - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQOEpBakVKNkN0MUo0NjhkZXJ5LUZMX3g3YjBnXzgyczJmNFJpelk0N09aaEs0SktuRDFHV3JHNUN5ZGRRY3hHdVdCRTNiVHVCV1BHbUxfOVU3dG02N0c2QnJjR1NwQS1GREpsa211WXpkb0RWODRsai1mYjdHckRCU0YwSEstVkQ0OHFGSURRRzlPclFkV2g4dw?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T15:30:00Z",
+      "source": "finviz",
+      "title": "AI Capex Boom Drives Hottest ETF Trade Into Semiconductors, Not Crypto",
+      "url": "https://finance.yahoo.com/m/d4d84ebd-b5e4-3f28-a59a-affc4ead4ad5/ai-capex-boom-drives-hottest.html"
+    },
+    {
+      "published_at": "2026-05-03T14:20:53Z",
+      "source": "google-news",
+      "title": "Nvidia\u2019s (NVDA) Asia Supply Chain Boom Lifts Tech Stocks as AI Spending Rises - TipRanks",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQeVZvSE1tV1Q4NFdRZUJzc3NucWk0VVhnNlV2RWNKRHlSaTdfak9Ca05QN2RYQ1UxbUNRdGhpLVpyeS1sR3dNdGhuMmJIN3I3MHBPT3RBekw3a2V1cmFEUUtQOVZIWXFOdUIyWkN6WDZLZUZNaVBJbGZneHhoamdtM3MyRHJMRWNZOWgxbXc2Q1piTjZzcF9NeGp3S1hhczJLNndiZ01zVQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T13:35:35Z",
+      "source": "google-news",
+      "title": "Is It Time To Reassess Nvidia (NVDA) After Its Recent Share Price Swings? - simplywall.st",
+      "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxNMlhyYkFjbmNseURsaF9JMlRVbUh6SDJPYzBXazdwOXBsRWV6dEo5Z3AzcFZLTGlQNlZZQWEyd2ljVGFYekxob3ZnendUQjNtc0h0VzJqbWpsTFBSXzNWbUk3dWprdlZ3RzRXWFJjMDlxNFVyYi12U1hQRlFUTnBKUE4zLUtsRVF6VExPdFd5VW95NDFJb2R2Y0RHNUkzM29VWXg0blhmVDFvMmxoYnVjMndYV1hqd0lnc3BfX0VWUEM2NkxudG5uM3Jkc9IB0AFBVV95cUxPdFQ1SExNYjBKaEpaYURuUzBIbDBzWVg5OS1GQUwxdWNWeUs2UkFQeGlnYjdvYVREYy1yYnZWYWgtVW51WDZQNUVsTDRjc3kxODlrN2ZnNzM0NThuQU5IcUJtR08tTWp0VjZHN3Y0VFFyV1B5Ty0xXzRYV3VMODd6Njl1Q1BNdjFHa3k0eFJQWU83cFRzdU1kUThObHI4M250UmUzWjFZUlFXS1VCSzdybklXOTRvZjFfd1JMV2FGdzhNbGd6Nm43SHU2RTJiYm9S?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T11:30:00Z",
+      "source": "google-news",
+      "title": "3 AI Stocks Crushing Nvidia This Year - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPVkF2ckh3SkdhQkRrSDlVTkZXUXNTTlllb2ltdXVDcWhIcDJyRW1nVHNibjJiT3c5S1c4eVR1UlBXajVyZkhlMUY4TVBSTFJIbXctQlJwdXFfOEhqb0Z2eXdqSUhBWVg1M0Q1VHB4N0F3NlNtS0UwSW16Si12VXZoRnFyajlCZW8?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T10:24:44Z",
+      "source": "google-news",
+      "title": "Trading expert sets date when Nvidia (NVDA) stock will crash to $110 - Finbold",
+      "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOOGJnanJvdUxUU3YtMnN6b3pDeTY0WHFvc1h4WEQwMkF2SlMyTnplVEVfckFoX3A1VzE0dEZHYmlXeGh2eWNTR19EcjV5YndaekxoVm5HYktyVVhDMFM5UkE4cEIwZXNIaXQ0MEs4ZFNlbDV3MkpFZDNSSWV5eW1QdHZfeElpYWF4RjFUWEFNSQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T09:00:00Z",
+      "source": "finviz",
+      "title": "Big Tech Earnings Show Split Between AI Trade Winners and Losers",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/big-tech-earnings-show-split-130007908.html"
+    },
+    {
+      "published_at": "2026-05-03T08:16:11Z",
+      "source": "google-news",
+      "title": "CKW Financial Group Sells 2,702 Shares of NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNMWIwV1A5T2pTN0t0eEZNNG9IRkpYYnJrdGJGREhSMUpjXzdLVk56aC1BT1VjZ2dyWVBsNndnYWF1bmFNQmF6OVFveGhPNFRhemZFM3VqQkZDQWk3dnQ2R29kZ3lMNmV6SXotVmRtUmVXUmhwejdPOEpXdFJZUUY2RnFoajRvVWlfbnM5akdxdnI0SnZOMmhLMllFZHRxa1loaF9sV0RYNUpXUElLMkhaNDRxejBDMWNZVGdkZC1CN3NLMlE?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T08:16:09Z",
+      "source": "google-news",
+      "title": "Generali Powszechne Towarzystwo Emerytalne Buys Shares of 105,000 NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxPZFFFV3ZUNnlWR24yWi1FZklzR0pvREJGU3VheEgwZUpjTkQ0aHEzbld1VlJwR1BUX3RBUzE4T19TTThiS3VHa2JZRWl0enNOLWhOY1FoMWFTSE5zMDQyY3dNdGowS2xSU2lwc0trWDFhMEY0b2M5SlZyTDlQb2Rkb3VzdTN6c3ZNSjRqZ2o4TVpUVGxOZUhIXzFoa2dnSDBVOTRJbFhvZXZzdWNsYjRwOUlRbWFPVDFhTHdyQTJIdkpUSXB4T2EtSmVRZ0gxRVNpTzZTajdtVmtTTHJTdl9ILUtqMA?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T08:02:41Z",
+      "source": "google-news",
+      "title": "NVIDIA Corporation $NVDA Shares Purchased by Foster Victor Wealth Advisors LLC - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQZmQ5VXBNRHJiRXE3MV9OYVZCTnAzWWJFSnQ2SDJqRGlnMDNvUXlWYkwyVlg1NldQZmp3U1poOE1uQ1VzR203UFRxUTN5MXBrM041ZlFTMnFHaWhqb0J5cXczQkZVOTFjRGIzTlp5R1loM1dON3pHVFZkYmhSWU9pMkV1eEFGWGZ5YkpiNGV2djEydFpvQ0o0T3plRzJDTFpUYlVyREtRaDB5akNaVHcybVlnaU14bHFZWWZxX2ZKWXFQODFzejlOa2hOcjBwT1UxcVc5ZQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T08:02:29Z",
+      "source": "google-news",
+      "title": "2,720 Shares in NVIDIA Corporation $NVDA Acquired by DeLarme Wealth Management Inc. - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi2AFBVV95cUxORXJ5akFSLVhXZVk4Tk15a2xjSWtLUG9nd21wRjEwVHVnV0M2NTEzNXJsOXdtOFg3ZUYtUnkxTWdDTTJrdnNyZVJXQ1NZcVhwSlh1bU9KcEdVY3hVVnVzbERpRFRmTVpNaG5RVkQ2NHZtVkNvWlg3RHlRWG1DWi1ZLXVxWkpyV2RBZnhFMWFQMUVqbUJpX0VfbG9CWHUxNWdqN0FnS0hyTTdmR2pSX0xRM3BxSjdEN3haWDRyWHNtcmhCdU00cnpRcW4tWkNfOWhyckg1aVkxNko?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T07:48:13Z",
+      "source": "google-news",
+      "title": "BLB&B Advisors LLC Has $92.91 Million Stock Holdings in NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOaF8yXzJZaXA2bURTVkJPeVRZX05BcGt2ZndzeFZDNHBpTjNHeWptZzh1R2xVRzBHNEV5QUJGLWptV1U4emRvNUpJbDl4LXdJc2QtN01SV01TN2d2Z1g0M0lXQTZZZkRqZmwyRVRNakYzN3UyX2hRVHpjOUJuLUxlQW5ZWUZSVWMwY2U0X1ZlTUpJQlZsMGFjTTgwa0NCTjd2NlgtczNRWUdyYXNEdnZ5eU9jaUVrd0hRTFdRNHVKMnM4anhQTmtvNF9FWlhCQk4yMVhz?oc=5"
+    },
+    {
+      "published_at": "2026-05-03T05:30:00Z",
+      "source": "finviz",
+      "title": "5 big analyst AI moves: JPM downgrades Meta; Micron gets a fresh Street-high PT",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/5-big-analyst-ai-moves-093002179.html"
+    },
+    {
+      "published_at": "2026-05-02T23:04:00Z",
+      "source": "finviz",
+      "title": "Nvidias pivot to physical AI ignites rally across Asian supply chain",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/nvidia-pivot-physical-ai-ignites-030451238.html"
+    },
+    {
+      "published_at": "2026-05-02T22:39:37Z",
+      "source": "google-news",
+      "title": "NVIDIA (NVDA): Among the Best American Stocks to Buy in the Technology Sector - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOeEhHNGtDaTRWUGVzakFoWm5jaVIwb0M3X2RnQko0Y3dqNFJVampnbHJJZkpBU1MxUTZlZlVXbU9QV2VKc3VSbVYxRENwZ2dKVklYQlRiVXktNDh1V1k2UDR1MElWeUJvRUJ1YVczVGRLUG94cGs4ZHBTdE5QazJfZ1REb0E1WGhRaVlxMWtPdlh4YlRWbjVvVHlDazBLTXRyaVE?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T22:29:00Z",
+      "source": "finviz",
+      "title": "Taiwan supplier JPC takes No. 2 spot in Nvidia Vera Rubin power cable certification",
+      "url": "https://www.digitimes.com/news/a20260429PD200/jpc-production-investment-cables-development.html"
+    },
+    {
+      "published_at": "2026-05-02T21:30:00Z",
+      "source": "google-news",
+      "title": "Major Hyperscalers Just Reported Earnings. Nvidia Was The Winner - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxON1NkM2UwUWRzSDFLem52d0ZROU1Bb2pnS2htaTNkV2Ntb1plZTVSXzZWVHRFRjMtTWs5UjY2ejdad2NqOFVBb05HMHVLVHZnTUpJVGJId0NRVnNoM09uYUVZSkhWdDVSUV9MUlU0YVgwdHBsZ1k4YmFoMjBtc3BwN3RWVnVOVkpobEpRMVNoMlk4SGZzUUtfcA?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T17:20:00Z",
+      "source": "google-news",
+      "title": "Elon Musk Just Announced Fanastic News to Nvidia Stock Investors - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPcUcxWS1MOVE5Q2NqRFdIdllDX3kwMDZGd2t3RkNjeW84WUg2U20ybFBuMS1tbWs5MGl6bDk2TDlwaEc5d1Q5bXVHN1RDckNNV2d3cl9GdzBHYW9Tc241RkM2dTcyMkNTMlpyZFdoZDNfR3Y1SjFsSm1LSkRJTWNPSHVVSlpnelI0VnhlNXoyOHlCYnQ1UURZbDF6OGJTUk0?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T15:00:00Z",
+      "source": "finviz",
+      "title": "The Dead Phone Company Nvidia Just Bet $1 Billion On",
+      "url": "https://finance.yahoo.com/m/0cce233c-6dcf-336b-ada0-b974341b78bd/the-%E2%80%9Cdead%E2%80%9D-phone-company.html"
+    },
+    {
+      "published_at": "2026-05-02T14:23:27Z",
+      "source": "google-news",
+      "title": "NVIDIA Stock Pulls Back Before May 20 Earnings. Here\u2019s What the $1 Trillion Demand Story Still Needs to Prove - TIKR.com",
+      "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPQWN6Y1AweTFBa1hkM0VQTzdIVDBpM2JEajEydjJUSTdDYnYzTzlXQUhNT21oVkRObVNVeDJISXU3UnJpby1mYlFGN0lnTzdzOEFXWG43T0g4bThOTGtOel90UU5hYjg5LUhhc20xR2szZVpkYlFvLW5oa0xTekRJUTZYdlQ3M2htX04wbkVCb2YxRGJiMWhmZWtGalZOQlVxWU9aaWNKTl9mSFpIS1RiS0U3cU5ITEVIZm1fS1NKX2ZDbmxydzdPME1fNDU?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T13:45:10Z",
+      "source": "google-news",
+      "title": "Nvidia\u2019s Next Leg Is Hidden (NASDAQ:NVDA) - Seeking Alpha",
+      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFByMlBZZ0p5NzhUZTdUVjJUNEctbUVtRTR5dmh2V1VKajdVSHloLU9obHJ4clBaX2MzNXhRUzk3XzRqUEZJeUhhcFV6VG5VZHNMLXdPZllFejFvejZhc3dYbjltZnExTUZqcHJHTWFkQWxwUTYxMWc?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T11:45:00Z",
+      "source": "finviz",
+      "title": "The Quest to Use AI to Help Find New Drugs",
+      "url": "https://www.wsj.com/health/pharma/the-quest-to-use-ai-to-help-find-new-drugs-a754fdc3?mod=wsj_FV"
+    },
+    {
+      "published_at": "2026-05-02T09:36:45Z",
+      "source": "google-news",
+      "title": "MOKAN Wealth Management Inc. Purchases 3,902 Shares of NVIDIA Corporation $NVDA - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPUDhybVJ5ZTl4VVV3S2V2UFd3ZlFWeHh3N1RiMUdTS3Q1TEVyV2V4VVVGS2F4RHdZMGVLeVAtRng0WVBxbElmX3Q3V1VUVVVqRF95RjFZb2dTdlVQYU5IZGFaS2RReHJzdWV1dkRWMmUxbDhKc0hOZnluaWFqbVBJZ0pqLW1QMFZFSlZmS043UlBtWnkxanB1ZFVRY3ZXMV9kTUczZ0JDSnhOMmFiTkg1cHRNR3NKalFCZVpYdmx2SkpxNGpQUW52d3FuZjY2czkxMklj?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T09:12:00Z",
+      "source": "google-news",
+      "title": "Nvidia Stock vs. Intel Stock: A Wall Street Analyst Says Buy One and Sell the Other - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNSzZVUFRjQ1BrUzkwcjQ2djduVlotU0RlN3F2cndGLWRubFJ4WXZVb05fSXN5MjNPQTB6czJvV0liNE90a3g5NzViOE95NXhsSlh6dWUwOWR3RERYdjJmcnJMdjJtOWpWUmowTkFiTTVoRVM3a3JjT2dOeU1tdTVjaXpHSkZBRGVLZVgyMWszU21Pdw?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T07:57:21Z",
+      "source": "google-news",
+      "title": "NVIDIA Corporation $NVDA Stock Holdings Cut by Cove Private Wealth LLC - MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNY1B0X2pHbHIxc1VQejR1bmQ2TUpxM0JWNDRvVWRndy1aNGFadnZVNVhQTHBGV2FFam9TdmNweklvc3dmUndKVkd1R1BabXJ2eHlPX1lXcTBDeWFKRlpKQXlFYWhuaGwyUXpXSEZCZWF3LU9wVXE2TXF1eHF1bVNQbk9CZ1JIWjE0dTVnWXFwWjlwM1IzcFJKdEtNa19POEZOU0NSUlJsUWhsSkpHUkgyTHJwdGM3ZDVWUTRDdGtCLWZiVzl1LU96TEF3?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T06:09:00Z",
+      "source": "google-news",
+      "title": "Jim Cramer Goes Against The Sentiment For NVIDIA (NVDA) - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOQlFhUWJ3aTRyVHB4SVJMRElCY013eTlhZFBnTUpoenZ1UmxCZExTdHRXMm8zUC1EUnVFdlFkenFRb2t5dE1vNkt3bno5SERfVUFveWJWZHhrTnMzcWI2V1JQUUh5VmViSV9zVWVBbTQzS1J3NnhrVVktclVaTTZIMTh5X2lna2NsR2dEZjRYNEpXQU9RWmh2Rmo2ZTFVM1U?oc=5"
+    },
+    {
+      "published_at": "2026-05-02T01:30:00Z",
+      "source": "google-news",
+      "title": "Nvidia Jumped Back Above $5 Trillion. When Will It Hit $6 Trillion? - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPb2ZrMWFMN19rTW9OYTB4VUk1U1pxU2sydGwzN1VIMElJUWxRUWJHUU16ZU9IYXhLQjZ3YlVybElhbGg5RHV6RzZfejY4VHQyYnVtUHdLTHRHbU45UWFWRW5hZmZSa3lFWjdYcmctdHY1Ykt2VDhYREt1WjdqaGl6MkNDeExDa2syMTNmNGZGVGh2cVk?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T20:49:30Z",
+      "source": "google-news",
+      "title": "Nasdaq, S&P 500 Futures Subdued Despite Tech Strength: Why GME, EBAY, NVDA, SOUN, PN Are In Focus - Stocktwits",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOSGtRRnBxVHJQWm9CQzlfclZTV0RlcGxoemdXUTU5UVpjSGlDTHU1RjRBZU5BeWZDQUdxZjJvZHdLTmNTY3NGalZmdWRwTHkybktoNWtEeTBTaUZKQXFPT2VhQngteENfX1RfYW02VnVtX01zQ1JJN21oUVdUVDRQeExFcU9Wc1ZVRnBpTDBFblM5Z2JBRS1iVmxYOFVYdnBMSWw5YUE0R0pGUmVPdko1dUFZbnE2TWk2aFVfZEpWd1V4U1pOV1h3?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T19:17:00Z",
+      "source": "google-news",
+      "title": "Nvidia Is Worth $5 Trillion Once Again. Here's Why It Could Become the First $10 Trillion Stock Within the Next 3 Years. - The Motley Fool",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPVHd4cVY1S0U2RmhJeUNwaUxLcGxfTkZtOC1BVFJTdkZXUmw4YVF6Qm11X3RaMERsWGhSRGdnNzV0a3hHM2M2N2hJNWRPTjVIU1UwWmlQRFd5Z0dCVzQ2ZUNva3NJeDF5SE5FcUZ4TTNjY1UzUG1semg3Y3o1cVUtWFZtekJGZk85LUktam5tNTdTT2tNWWM2QQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T17:53:00Z",
+      "source": "finviz",
+      "title": "AI Is Now the Bull Case for the Broader Market-Enough to Even Revive Old Tech",
+      "url": "https://www.barrons.com/articles/ai-tech-rally-micron-semiconductor-chips-broader-stock-market-0e82e528?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T17:33:00Z",
+      "source": "finviz",
+      "title": "U.S. Dips Into Oil Reserves as Iran War Enters Its Third Month",
+      "url": "https://www.barrons.com/articles/u-s-dips-into-oil-reserves-as-iran-war-enters-its-third-month-9ed3ee80?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T16:24:00Z",
+      "source": "finviz",
+      "title": "Nvidia, Google, Microsoft Win Major Pentagon AI Contracts",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/nvidia-google-microsoft-win-major-202408743.html"
+    },
+    {
+      "published_at": "2026-05-01T16:05:00Z",
+      "source": "google-news",
+      "title": "Nvidia (NVDA) Stock Quotes, Company News And Chart Analysis - Investor's Business Daily",
+      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNX2ZhLWp6SHRtd2ZSclFXaEZlbHM2Tkd5c0tVWUp4dWRDVzU4eWkyMTU0a3Q1bWtCLWxkQzFqbVkza0R1bXBhZV9JaHEtOTBDRW40M3VpY3czQldHRzhwbVQxQXJmR1gxV0lpNEJSX09PdlZTdTczLXpZOFZ6LTBPYXgyamdHa0gyNTQ1ZTlhVVQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T15:17:00Z",
+      "source": "finviz",
+      "title": "Intel's Historic Month: Why a 114% Gain Is Making Investors Nervous (and How to Cope).",
+      "url": "https://www.barrons.com/articles/intel-stock-price-buy-sell-nervous-731bf8b4?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T14:47:39Z",
+      "source": "google-news",
+      "title": "Forget Nvidia: This AI Semiconductor Stock in Billionaire Philippe Laffont Portfolio Is Winning in 2026 - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOTnJiM3d1eU91UkRHNzZFeVlIekREeWFOckd5Q1dCRHVqN0NzN1FaX1A5alRNejNLXzFqUENGT1lxcmxTbkRIVHVfbURycnRWTXJOVFlGV2RVUndlc1lORmZEMHFiQ3pMV3RlWFVJaEFSdU5MMnd1ZmZSZVl5cVBQZlhlRzM1S2UzVFRmM3NZbzNENUZIUjdUblpRYk9UNm9RU2RR?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T14:37:15Z",
+      "source": "google-news",
+      "title": "Bank of America Maintains Buy Rating on Nvidia Corp. (NVDA) - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPbDN4cUFmZFRrV1Z4S2I1S01pYUluendmbUlnZGw0ZVNaakdfMkdEbEJaUXByc1d6TXo0QTZZT3FEa3Fwdl9McTlUQTNxR0xfVXNuZFA3dlhTUk1CV2FpWkE0eC0zQjdJV19Ud0lpUWRxazNHVzZtZjQzNklOOGxMWjJOUEZJTFgtdnZndURGcmh6aTRGZmpaTllsLWhpODQ?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T14:10:54Z",
+      "source": "google-news",
+      "title": "Nvidia (NVDA) Stock Forecast \u2014 What Financial Analysts Are Predicting Right Now - TipRanks",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQcmEzTHBGZEs4UF9IYy1hOWwxN25oX1BSSy1BdjVhZDc0VC1QOXU3SGJ2ZHJVZjZJM21vZU1SNTVmaWdGb3lsdHdsYWpNM1loNGd5b3I4SzQ4ZEFyRmRnTGo0cm9abm0zN0pCSEJNOFFQdkpIa1ZNYzZmMHhESTdGc0NTMkkyNnhxbnljUEhoTGpzd0owN3dVdDk3SjczMVE5b3JyWUt3Z2k?oc=5"
+    },
+    {
+      "published_at": "2026-05-01T14:04:00Z",
+      "source": "finviz",
+      "title": "The First $6 Trillion Company May Not Be Nvidia",
+      "url": "https://www.barrons.com/articles/alphabet-stock-nvidia-market-cap-6-trillion-ai-cloud-eabe1c41?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T12:56:00Z",
+      "source": "finviz",
+      "title": "Meta Acquires Robotics AI Company to Help Build Humanoid Technology",
+      "url": "https://finance.yahoo.com/news/meta-acquires-robotics-ai-company-165643541.html"
+    },
+    {
+      "published_at": "2026-05-01T12:34:00Z",
+      "source": "finviz",
+      "title": "Intel Is Trading at 'Par.' Where It Goes Next.",
+      "url": "https://www.barrons.com/articles/intel-is-trading-at-par-where-it-goes-next-731bf8b4?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T12:15:00Z",
+      "source": "finviz",
+      "title": "This AI Stock Is Up 78% This Year. Why It Still Looks Like a Buy.",
+      "url": "https://www.barrons.com/articles/monolithic-power-ai-stock-price-buy-2a51ecc3?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T12:12:00Z",
+      "source": "finviz",
+      "title": "Nvidia, Google Join Pentagon AI Deals for Classified Work",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/nvidia-google-join-pentagon-ai-161208772.html"
+    },
+    {
+      "published_at": "2026-05-01T12:10:00Z",
+      "source": "finviz",
+      "title": "Nebius Makes $643 Million AI Inference Push With Eigen Deal",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/nebius-makes-643-million-ai-161020268.html"
+    },
+    {
+      "published_at": "2026-05-01T12:00:00Z",
+      "source": "finviz",
+      "title": "Manning & Napier Group, LLC Significantly Reduces Stake in Albemarle Corp",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/manning-napier-group-llc-significantly-160024423.html"
+    },
+    {
+      "published_at": "2026-05-01T11:59:00Z",
+      "source": "finviz",
+      "title": "Pentagon expands AI partnerships with major tech firms",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/pentagon-expands-ai-partnerships-major-155951596.html"
+    },
+    {
+      "published_at": "2026-05-01T11:59:00Z",
+      "source": "finviz",
+      "title": "Palantir, Nvidia Partner CoreWeave Headline Earnings Calendar; Lithium Play In Spotlight",
+      "url": "https://www.investors.com/research/earnings-preview/palantir-pltr-stock-earnings?mod=IBD_FV"
+    },
+    {
+      "published_at": "2026-05-01T10:30:00Z",
+      "source": "finviz",
+      "title": "BC-Most Active Stocks",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/bc-most-active-stocks-143017426.html"
+    },
+    {
+      "published_at": "2026-05-01T10:21:00Z",
+      "source": "finviz",
+      "title": "Is Amazon Stock A Buy At 34x Earnings?",
+      "url": "https://finance.yahoo.com/m/698b0c6f-c93b-3657-ba0c-3b587c1ad599/is-amazon-stock-a-buy-at-34x.html"
+    },
+    {
+      "published_at": "2026-05-01T09:46:00Z",
+      "source": "finviz",
+      "title": "AI Data Center Growth Is Now a Power Infrastructure Problem",
+      "url": "https://finance.yahoo.com/m/80e0fe66-2e8c-3239-b841-16804ab05223/ai-data-center-growth-is-now.html"
+    },
+    {
+      "published_at": "2026-05-01T09:40:00Z",
+      "source": "finviz",
+      "title": "Wall Street Is Bullish on Oracle, But Investors Arent Buying It",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/wall-street-bullish-oracle-investors-134013796.html"
+    },
+    {
+      "published_at": "2026-05-01T09:32:00Z",
+      "source": "finviz",
+      "title": "Google, SpaceX and OpenAI are being tapped to make the U.S. an 'AI-first fighting force'",
+      "url": "https://www.marketwatch.com/story/google-spacex-and-openai-are-being-tapped-to-make-the-u-s-an-ai-first-fighting-force-3c1245ac?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-05-01T09:11:00Z",
+      "source": "finviz",
+      "title": "Defense Department Notches AI Deals With Nvidia, Amazon, and 5 Others. Who Was Left Out?",
+      "url": "https://www.barrons.com/articles/nvidia-amazon-google-ai-defense-department-696af442?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T08:47:00Z",
+      "source": "finviz",
+      "title": "Pentagon sealed classified AI deals with Google, OpenAI, Microsoft, Amazon, and SpaceX",
+      "url": "https://qz.com/pentagon-classified-ai-deals-google-openai-microsoft-amazon-spacex-050126"
+    },
+    {
+      "published_at": "2026-05-01T08:05:00Z",
+      "source": "finviz",
+      "title": "This Nvidia Rival Gains Momentum Ahead Of Earnings Report",
+      "url": "https://www.investors.com/stock-lists/ibd-big-cap-20/arista-networks-anet-stock-earnings-nvidia-data-centers?mod=IBD_FV"
+    },
+    {
+      "published_at": "2026-05-01T08:00:00Z",
+      "source": "finviz",
+      "title": "Pentagon signs AI deals with Nvidia, Microsoft, AWS and Reflection",
+      "url": "https://finance.yahoo.com/m/718048bf-6273-3663-8aac-b8a103798c43/pentagon-signs-ai-deals-with.html"
+    },
+    {
+      "published_at": "2026-05-01T07:49:00Z",
+      "source": "finviz",
+      "title": "Apple rises on earnings beat and other premarket movers",
+      "url": "https://www.marketwatch.com/livecoverage/s-p-500-nasdaq-record-closes-dow-jones-earnings-results-oil-climbs-little-sign-iran-war-ending/card/apple-rises-on-earnings-beat-and-other-premarket-movers-piy1ljrUUDL6A2kUNAhh?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-05-01T06:50:00Z",
+      "source": "finviz",
+      "title": "Markets Enjoyed an Historic April. Why the S&P 500 Could Fall Short in May.",
+      "url": "https://www.barrons.com/articles/things-to-know-today-ca07d135?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T05:45:00Z",
+      "source": "finviz",
+      "title": "AI Agents Are Becoming Day Traders, But Gains Are Elusive",
+      "url": "https://finance.yahoo.com/markets/options/articles/ai-agents-becoming-day-traders-094518580.html"
+    },
+    {
+      "published_at": "2026-05-01T05:24:00Z",
+      "source": "finviz",
+      "title": "Nvidia Stock Faces a Battle to Reclaim Key $200 Level After Sharp Drop",
+      "url": "https://www.barrons.com/articles/nvidia-stock-today-200-chips-17fdb8ac?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-05-01T04:10:00Z",
+      "source": "finviz",
+      "title": "Swedish legal tech firm Legora lands $50m boost from new backers",
+      "url": "https://finance.yahoo.com/m/8e2c4b3a-f9f5-36e5-925a-29a98fa11740/swedish-legal-tech-firm.html"
+    },
+    {
+      "published_at": "2026-05-01T04:01:00Z",
+      "source": "finviz",
+      "title": "Stock Market Today: S&P 500 set for more gains after record finish; Dow futures up while Nasdaq turns lower; oil climbs as Iran war grinds on",
+      "url": "https://www.marketwatch.com/livecoverage/s-p-500-nasdaq-record-closes-dow-jones-earnings-results-oil-climbs-little-sign-iran-war-ending?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-05-01T01:09:50Z",
+      "source": "google-news",
+      "title": "Why Nvidia (NVDA) Stock Is Sinking Today \u2013 April 30, 2026 - TipRanks",
+      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOV3dvQXFUZDhFLWhQR090T1RmV2JIOTI1bGlXTmJvWXZRLTZ1bjlkSmRQcDRDVnRkd3lQVlFjVHdqbnpsYkZsMmM2MXI2ZzVUY0V2TXJyeTNMRUVFRlA2akF6a2NpM2NPY1FocTcxUy1DRkw4NXh4b1VBZUFuc3FQaGNmSmQ2aDhWUFE?oc=5"
+    },
+    {
+      "published_at": "2026-04-30T22:29:36Z",
+      "source": "google-news",
+      "title": "Nvidia stock slips as investors weigh rising competition from Google and Amazon - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPZzA3Q0RKbElHbUZndXllM0lzejJfNG1FVFg4R2hZNjVnTWlScGNwanRERUdpS1pWVEoxdExPMnpLemI3UVVINFBpeld2QUZBeFFGV1R0MXFJb3A0OERUU2gta1FUNEU5MklHeEl5SzhWWWpoOS1kY1ZQalJkWTBYdlJqNmYybEMyTjAxTzRVRm9yREtFODNlQzd3ZzFTTEs2TVRMS25PZ09ldHIxak5aaEpGQXpmV0lpNlR1QVBwQURsRGlWUjdMcUswVjQyQ2ZYUnc?oc=5"
+    },
+    {
+      "published_at": "2026-04-30T16:55:00Z",
+      "source": "finviz",
+      "title": "Stocks clock their best month since 2020 as Wall Street shakes off Iran oil shock",
+      "url": "https://www.marketwatch.com/story/stocks-clock-their-best-month-since-2020-as-wall-street-shakes-off-iran-oil-shock-848a7214?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-04-30T16:35:00Z",
+      "source": "finviz",
+      "title": "Meta Sells $25 Billion of Debt as Investor Worry, Fatigue Builds",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/meta-looks-raise-much-25-140755006.html"
+    },
+    {
+      "published_at": "2026-04-30T16:34:00Z",
+      "source": "finviz",
+      "title": "Nvidia used to benefit from AI spending increases. So why did the stock just slide?",
+      "url": "https://www.marketwatch.com/story/nvidia-used-to-benefit-from-ai-spending-increases-so-why-did-the-stock-just-slide-c5c2cd36?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-04-30T16:21:00Z",
+      "source": "finviz",
+      "title": "Sandisk stock drops on Q3 earnings beat, still up 3,300% in a year",
+      "url": "https://finance.yahoo.com/video/sandisk-stock-drops-on-q3-earnings-beat-still-up-3300-in-a-year-202120262.html"
+    },
+    {
+      "published_at": "2026-04-30T16:15:00Z",
+      "source": "finviz",
+      "title": "Nasdaq leads US stocks in monthly gains following April rally",
+      "url": "https://finance.yahoo.com/video/nasdaq-leads-us-stocks-in-monthly-gains-following-april-rally-201531873.html"
+    },
+    {
+      "published_at": "2026-04-30T16:14:00Z",
+      "source": "finviz",
+      "title": "Legal AI startup Legora hits $5.6 valuation and its battle with Harvey just got hotter",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/legal-ai-startup-legora-hits-201447464.html"
+    },
+    {
+      "published_at": "2026-04-30T15:04:00Z",
+      "source": "finviz",
+      "title": "Samsung Profit Jumps as AI Chip Demand Soars",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/samsung-profit-jumps-ai-chip-190453520.html"
+    },
+    {
+      "published_at": "2026-04-30T14:29:00Z",
+      "source": "finviz",
+      "title": "From Intel to Nvidia, Tech CEOs Are Embracing Quantum. Why It Matters.",
+      "url": "https://www.barrons.com/articles/intel-nvidia-tech-ceo-quantum-stocks-8147f64a?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-30T14:17:00Z",
+      "source": "finviz",
+      "title": "How Nvidia beat Apple to become the defining stock of the AI boom",
+      "url": "https://finance.yahoo.com/markets/article/how-nvidia-beat-apple-to-become-the-defining-stock-of-the-ai-boom-181731661.html"
+    },
+    {
+      "published_at": "2026-04-30T14:12:00Z",
+      "source": "finviz",
+      "title": "Is Qualcomm Ready for Primetime? What the Technicals Say.",
+      "url": "https://www.barrons.com/articles/qualcomm-stock-qcom-technical-analysis-5c799062?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-30T14:09:00Z",
+      "source": "finviz",
+      "title": "Nvidia stock falls, Hertz & Uber partner on robotaxis",
+      "url": "https://finance.yahoo.com/video/nvidia-stock-falls-hertz--uber-partner-on-robotaxis-180911731.html"
+    },
+    {
+      "published_at": "2026-04-30T13:35:00Z",
+      "source": "finviz",
+      "title": "Blue Owl's SpaceX Bet Just Bailed Out Its Earnings Call",
+      "url": "https://finance.yahoo.com/m/67018a36-fa6b-32e2-a44b-bc6bf7ece285/blue-owl%27s-spacex-bet-just.html"
+    },
+    {
+      "published_at": "2026-04-30T12:55:00Z",
+      "source": "finviz",
+      "title": "S&P 500 is showing that it doesn't need tech to hit records",
+      "url": "https://www.marketwatch.com/livecoverage/s-p-500-dow-jones-nasdaq-oil-prices-donald-trump-military-action-iran/card/s-p-500-is-showing-that-it-doesn-t-need-tech-to-hit-records-HGscWUgWs137eE1y5Crr?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-04-30T11:18:00Z",
+      "source": "finviz",
+      "title": "Nvidia stock plunges as investors weigh rising competition from Google and Amazon",
+      "url": "https://finance.yahoo.com/markets/article/nvidia-stock-plunges-as-investors-weigh-rising-competition-from-google-and-amazon-151839063.html"
+    },
+    {
+      "published_at": "2026-04-30T11:05:00Z",
+      "source": "finviz",
+      "title": "Why The Google Stock Rally Could Be Premature",
+      "url": "https://finance.yahoo.com/m/ef751ecf-d788-3242-9d14-310a3983b72f/why-the-google-stock-rally.html"
+    },
+    {
+      "published_at": "2026-04-30T10:28:00Z",
+      "source": "finviz",
+      "title": "Apple Earnings Could Push Market Cap Above $4 Trillion",
+      "url": "https://www.barrons.com/livecoverage/apple-earnings-stock-price-iphones-ai-china-memory/card/apple-earnings-could-push-market-cap-above-4-trillion-AmorDiRvEuI0BSQkZZ4s?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-30T10:17:00Z",
+      "source": "finviz",
+      "title": "Nvidia Stock Investors Just Got Major News From China",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/nvidia-stock-investors-just-got-141720598.html"
+    },
+    {
+      "published_at": "2026-04-30T10:08:00Z",
+      "source": "finviz",
+      "title": "Meta Slides 7% After Lifting AI Spending Outlook To $145 Billion",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/meta-slides-7-lifting-ai-140810844.html"
+    },
+    {
+      "published_at": "2026-04-30T09:39:00Z",
+      "source": "finviz",
+      "title": "Up 3x, Has AMD Cracked The Nvidia Code?",
+      "url": "https://finance.yahoo.com/m/57d03398-18a4-39ed-8e17-da1a62e6212f/up-3x%2C-has-amd-cracked-the.html"
+    },
+    {
+      "published_at": "2026-04-30T09:11:00Z",
+      "source": "finviz",
+      "title": "What Big Tech Earnings Mean for Nvidia and Other AI Chip Stocks",
+      "url": "https://www.barrons.com/articles/nvidia-stock-price-chips-meta-microsoft-9a9a6263?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-30T08:38:00Z",
+      "source": "finviz",
+      "title": "The AI Hunger Games Claim Next Victims as Meta and Microsoft Slump After Earnings",
+      "url": "https://www.barrons.com/articles/meta-stock-price-ai-earnings-capex-microsoft-f682817b?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-30T08:33:00Z",
+      "source": "finviz",
+      "title": "Nvidia B300 Servers Hit $1M in China Amid Export Curbs",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/nvidia-b300-servers-hit-1m-123359514.html"
+    },
+    {
+      "published_at": "2026-04-30T08:16:00Z",
+      "source": "finviz",
+      "title": "Nvidia expands into legal tech with new investment",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/nvidia-expands-legal-tech-investment-121601273.html"
+    },
+    {
+      "published_at": "2026-04-30T07:25:00Z",
+      "source": "finviz",
+      "title": "Samsung chip profit jumps almost 50-fold; supply shortage to worsen",
+      "url": "https://finance.yahoo.com/video/samsung-chip-profit-jumps-almost-112503210.html"
+    },
+    {
+      "published_at": "2026-04-30T07:00:00Z",
+      "source": "google-news",
+      "title": "Is Nvidia Stock a Buy? Why Semiconductor Strength May Signal a Market Top - IO Fund",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNZ2ZYMmU2M2dObGhfaDZFMmlBZmJ3aDVWbHJtQUtBaW9oWVByVVlTRnZWVi1XeHVoVUlZT240TnM4WEJrRnM4Rmk4SGhlN1o4ZGN1eFp5NFZJYVJpcXRrdnZTdU1aNmdvT1dGTWI1cGRPZkhDWGxwcXdEaTRBc0xBWnRvMDlNOVE?oc=5"
+    },
+    {
+      "published_at": "2026-04-30T07:00:00Z",
+      "source": "finviz",
+      "title": "Nvidia has powered one-third of the Magnificent 7's bull market gains: Chart of the Day",
+      "url": "https://finance.yahoo.com/markets/article/nvidia-has-powered-one-third-of-the-magnificent-7s-bull-market-gains-chart-of-the-day-110000790.html"
+    },
+    {
+      "published_at": "2026-04-30T06:22:00Z",
+      "source": "finviz",
+      "title": "Taiwan's Delta Electronics warns costs rising as AI data centre demand surges",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/taiwans-delta-electronics-warns-costs-102216489.html"
+    },
+    {
+      "published_at": "2026-04-30T06:13:00Z",
+      "source": "finviz",
+      "title": "Nvidia, AMD, and Broadcom Stocks Rise. What Big Tech Earnings Mean for AI Chips.",
+      "url": "https://www.barrons.com/articles/nvidia-stock-price-amd-broadcom-ai-spending-9a9a6263?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-30T02:45:00Z",
+      "source": "finviz",
+      "title": "Exclusive-Prices of Nvidia's B300 server at $1 million in China on US curbs, sources say",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/exclusive-prices-nvidias-b300-server-064521420.html"
+    },
+    {
+      "published_at": "2026-04-29T20:21:00Z",
+      "source": "finviz",
+      "title": "Samsung Electronics sees robust AI demand after Q1 profit surges eightfold to set record",
+      "url": "https://finance.yahoo.com/m/fb80a463-c46c-3aef-8060-b8c68531cb83/samsung-electronics-sees.html"
+    },
+    {
+      "published_at": "2026-04-29T20:11:00Z",
+      "source": "finviz",
+      "title": "Samsung chip profit jumps almost 50-fold; supply shortage to worsen in 2027",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/samsung-elec-q1-profit-surges-001154038.html"
+    },
+    {
+      "published_at": "2026-04-29T19:42:00Z",
+      "source": "finviz",
+      "title": "Highlights from Meta's earnings call",
+      "url": "https://finance.yahoo.com/video/highlights-from-metas-earnings-call-234218673.html"
+    },
+    {
+      "published_at": "2026-04-29T17:49:00Z",
+      "source": "finviz",
+      "title": "Google to sell TPU chips to 'select' customers in latest shot at Nvidia",
+      "url": "https://finance.yahoo.com/markets/stocks/article/google-to-sell-tpu-chips-to-select-customers-in-latest-shot-at-nvidia-214900221.html"
+    },
+    {
+      "published_at": "2026-04-29T17:03:00Z",
+      "source": "finviz",
+      "title": "Meta earnings under the microscope",
+      "url": "https://finance.yahoo.com/video/meta-earnings-under-the-microscope-210348535.html"
+    },
+    {
+      "published_at": "2026-04-29T15:45:00Z",
+      "source": "finviz",
+      "title": "Why Google could see the best revenue trends out of all the hyperscalers",
+      "url": "https://www.marketwatch.com/livecoverage/alphabet-earnings-google-stock-results-cloud-ai/card/why-google-could-see-the-best-revenue-trends-out-of-all-the-hyperscalers-xaovZjmJ2hn23uKktapu?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-04-29T13:30:00Z",
+      "source": "finviz",
+      "title": "Amazon chose an unusual earnings date",
+      "url": "https://www.marketwatch.com/livecoverage/amazon-earnings-stock-results-aws-guidance-ai/card/amazon-chose-an-unusual-earnings-date-kBrhmeVYDjMMJ6sOcVww?mod=mw_FV"
+    },
+    {
+      "published_at": "2026-04-29T13:16:00Z",
+      "source": "finviz",
+      "title": "80 Seconds of Big Tech Earnings Will Decide Stock Markets Fate",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/80-seconds-big-tech-earnings-090007149.html"
+    },
+    {
+      "published_at": "2026-04-29T12:57:00Z",
+      "source": "finviz",
+      "title": "Intel Is Up Another 10%. Its Struggling Foundry Business Is Lifting Shares.",
+      "url": "https://www.barrons.com/articles/intel-stock-price-alphabet-foundry-95153531?mod=bar_FV"
+    },
+    {
+      "published_at": "2026-04-29T11:40:00Z",
+      "source": "finviz",
+      "title": "Bloom Energy Shares Jump After Earnings Beat and Major Oracle Data Center Deal",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/bloom-energy-shares-jump-earnings-154039265.html"
+    },
+    {
+      "published_at": "2026-04-29T09:48:00Z",
+      "source": "finviz",
+      "title": "Applied Materials At 42x: Boom Or Bubble?",
+      "url": "https://finance.yahoo.com/m/f10ccb36-f9b8-326b-b62c-fb60ff04bd2d/applied-materials-at-42x%3A.html"
+    },
+    {
+      "published_at": "2026-04-29T08:12:55Z",
+      "source": "google-news",
+      "title": "Nvidia (NVDA) Stock Trades Down, Here Is Why - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQOTJmRTk2UlBJdVNOc1lfaTNud3lxN1BwTExsRDBOcUE3Q2MwR0J4MmFROTJnRF9pX2dlWjhVNWN5WURQVlF0aEhYSnFISjFsR20xSDBQNFZ0c09FeWhNYnhhenFySHdzZ1h3VjBibE5SWWJGZWRqRFdJZjhiSVZ0QVpZYUZLeEFrLS1KOThxQ0FjZEVsV2VNMk13?oc=5"
+    },
+    {
+      "published_at": "2026-04-28T13:40:23Z",
+      "source": "google-news",
+      "title": "NVIDIA Stock Outlook: Is Wall Street Bullish or Bearish? - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOOS1OVTZqenRyUTc3WjRkbmVhT2hGTWF0eEhGS3R0R1pYeWlyU1ZPc09SMnN6RVoxLWJwemQzVnY3M1ZtZ0tYX0NDU2c4X2ZkTnBBcDdKeFl0WFJGeS0xaUNwT1lsbEtJUEZ3VmdCVzFBUWp6ZXdxbFEwTzBrWGlKS1B2MU05X1o2dDhBN19adTZURkhwNXY5SUU1aGpJQQ?oc=5"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Dow Jones Futures: Iran Attacks Spark Stock Market Losses; Palantir Rallies On Earnings",
+      "url": "https://www.investors.com/market-trend/stock-market-today/dow-jones-sp500-nasdaq-iran-attacks-palantir-earnings-pltr-stock?mod=IBD_FV"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Bond Yields Are Rising. Why That Could End the Stock Market's Rally.",
+      "url": "https://www.barrons.com/articles/treasury-bond-yields-stock-rally-4303125c?mod=bar_FV"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Nvidia's Big Move. Breakout or Bear Trap?",
+      "url": "https://www.barrons.com/articles/nvidias-big-move-breakout-or-bear-trap-bda95fee?mod=bar_FV"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Cerebras Seeks $3.5 Billion IPO As AI Chip Race Intensifies",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/cerebras-seeks-3-5-billion-183110392.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Super Micro Q3 Earnings Preview: What To Expect From Upcoming Report",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/super-micro-q3-earnings-preview-175626963.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Marvell Stock: A 16% Yield Trade With A 46% Margin of Safety",
+      "url": "https://finance.yahoo.com/m/46d54666-8521-310a-bce2-aea9491ddc2a/marvell-stock%3A-a-16%25-yield.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Big Tech pulled into growing AI capacity concerns",
+      "url": "https://finance.yahoo.com/sectors/technology/articles/big-tech-pulled-growing-ai-165832927.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Cerebras Systems seeks up to $26.6B valuation in US IPO",
+      "url": "https://finance.yahoo.com/m/8c62d9a2-b7d6-308f-88af-02b51899b0e2/cerebras-systems-seeks-up-to.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Qualcomm Stock To $340?",
+      "url": "https://finance.yahoo.com/m/75181525-cc99-3f2a-bf16-30eaa379c2c7/qualcomm-stock-to-%24340%3F.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Intel Is Finally Grabbing A Slice Of The AI Bonanza",
+      "url": "https://finance.yahoo.com/m/eb383811-ad03-3acf-b761-0bcbd4b3deb3/intel-is-finally-grabbing-a.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "AI chipmaker Cerebras is kicking off its IPO roadshow with a $115 $125 share price target",
+      "url": "https://qz.com/cerebras-ipo-roadshow-share-price-050426"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Anthropic in talks to secure UK-based Fractile AI chips and diversify supply",
+      "url": "https://finance.yahoo.com/m/bf5837ce-cb12-30ba-bf5d-77b28523ba5e/anthropic-in-talks-to-secure.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "AI Chipmakers in Korea, Taiwan Drive Asian Stocks to Record",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/ai-chipmakers-korea-taiwan-drive-063820107.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Nvidia Stock Is Pushing Toward $200. What Could Get It There.",
+      "url": "https://www.barrons.com/articles/nvidia-stock-price-ai-chips-35da78b6?mod=bar_FV"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "AI chipmaker Cerebras targets $115-$125 share price in US IPO, source says",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/ai-chipmaker-cerebras-targets-115-081455561.html"
+    },
+    {
+      "published_at": null,
+      "source": "finviz",
+      "title": "Cerebras eyes US$40 billion IPO in high-stakes AI chip challenge to Nvidia",
+      "url": "https://www.digitimes.com/news/a20260504VL209/cerebras-ipo-nvidia-ai-chip-infrastructure.html"
+    }
+  ],
   "indicators": {
-    "bb_lower": [],
-    "bb_upper": [],
-    "ma20": [],
-    "ma50": [],
-    "rsi14": []
+    "bb_lower": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      111.81447379720994,
+      114.00075460329936,
+      116.76752314351384,
+      119.26568509038806,
+      122.14817872030166,
+      126.16866826165052,
+      128.5871061765907,
+      129.4627637329325,
+      129.31471007700898,
+      129.60947309906885,
+      129.71927487682072,
+      129.95906533476727,
+      130.3779836376154,
+      131.58901031830052,
+      132.7440304401641,
+      134.33051486356774,
+      133.90342839096974,
+      134.07443483382136,
+      133.34818015024376,
+      133.88946490172515,
+      134.90258475101803,
+      135.03998270778428,
+      135.0703371907837,
+      135.83922812676744,
+      136.37345498457785,
+      136.696461429045,
+      136.97431150967125,
+      137.67724669259857,
+      138.38661764290418,
+      139.23554537672987,
+      139.93891265978775,
+      141.02622182644797,
+      142.37587220412775,
+      144.68617821768422,
+      147.7014448797243,
+      150.0219796826714,
+      150.91719010687427,
+      151.97766830180763,
+      152.45445673511838,
+      153.28327159560232,
+      155.142586468744,
+      156.59886341027482,
+      158.09664369147836,
+      159.76885278041712,
+      161.55347661042347,
+      162.83057020683458,
+      163.97361213041063,
+      165.0012628689705,
+      166.7252470616374,
+      167.02286634651372,
+      167.51261343661074,
+      167.83136274770348,
+      168.39370422347673,
+      169.19275023307327,
+      171.18297157917638,
+      172.1916211054928,
+      172.43202924952064,
+      173.14412362644288,
+      173.38372725317473,
+      173.8479761142449,
+      173.88293222277645,
+      174.04943940067292,
+      174.17257468709306,
+      172.42292740562715,
+      171.02530822087408,
+      170.0090829158872,
+      167.97704748547952,
+      166.68107438589436,
+      166.03184233236044,
+      166.20886429292315,
+      166.29971217679704,
+      166.46710688722928,
+      166.54231942074773,
+      166.69432194979856,
+      166.14567638683482,
+      166.1722652931988,
+      166.22789501456165,
+      165.80158840913,
+      165.84594217498963,
+      166.05702143879122,
+      166.2930478977256,
+      166.40495680278553,
+      166.22896492921296,
+      165.93898641544064,
+      165.92641552243163,
+      165.82385394714936,
+      167.1821020684345,
+      168.7677071594559,
+      170.0658623974982,
+      170.03439406428836,
+      169.7735890981412,
+      170.1637359580675,
+      170.5311972564644,
+      171.26467768261148,
+      173.22379370621468,
+      174.022500190809,
+      174.90463004186094,
+      174.8414978312258,
+      175.24151242608045,
+      175.84965297898356,
+      176.5752112341408,
+      177.49185090263703,
+      177.48994881409084,
+      175.41923965603124,
+      172.74685968596822,
+      171.73570080742618,
+      171.12629896616056,
+      170.360759646274,
+      170.72014308203342,
+      170.89560204501277,
+      170.67497982757027,
+      171.17479727383304,
+      171.35741093310418,
+      172.68332435264338,
+      174.195526263921,
+      174.92917589699044,
+      175.78378796336875,
+      176.3946590659218,
+      176.43455167012155,
+      177.54275325136538,
+      177.22694027627514,
+      175.8674080789183,
+      174.8023267341144,
+      172.96485571004308,
+      172.56428937140737,
+      171.45526745094776,
+      171.19239293236845,
+      172.48418167580485,
+      172.52900154528035,
+      172.790562306832,
+      172.57041601540828,
+      172.55333619880224,
+      174.0760973481648,
+      174.71745946325362,
+      175.67306512093512,
+      174.62557500483297,
+      174.61955766852455,
+      174.50514294384408,
+      172.6043695024464,
+      172.10840968518346,
+      172.1149309062898,
+      172.1591493256533,
+      171.50599685690239,
+      171.37195200606163,
+      170.93520467409752,
+      171.2665120363321,
+      171.39791927970552,
+      171.49449989224593,
+      171.69782324031314,
+      171.70073468699078,
+      171.80991680429634,
+      171.74547753115527,
+      171.74725943000453,
+      171.788436678198,
+      172.04896376354583,
+      173.32897561605657,
+      174.32509161895092,
+      175.29510666091954,
+      178.68570645435665,
+      180.11930580572485,
+      180.57657714832078,
+      180.72230555713426,
+      180.76857608984335,
+      180.76974458995497,
+      180.94250854966316,
+      180.6270306163921,
+      180.22977826241777,
+      180.12586353474177,
+      180.02515319998687,
+      179.1205348781209,
+      176.69082614796278,
+      174.10820886857763,
+      174.1225792745535,
+      174.11146488984426,
+      174.17188830242608,
+      174.16486716470718,
+      174.38225651229413,
+      174.13178255112962,
+      174.07655895069797,
+      175.0428074251779,
+      175.29360843550728,
+      175.42141773895457,
+      175.36844109098183,
+      175.3172302408953,
+      175.02007624425735,
+      174.83903115064118,
+      173.6692035676165,
+      173.39143273204107,
+      172.86728524261693,
+      173.17077228184013,
+      174.76335446152706,
+      176.39970947089554,
+      176.13960053626005,
+      176.04762277930752,
+      176.0093980657867,
+      175.83779545764497,
+      175.27962614466307,
+      175.31843701606908,
+      175.07179144538068,
+      174.6213845253804,
+      173.96093956594257,
+      172.3134655874587,
+      171.79227376218188,
+      171.69465014821782,
+      173.41005114022005,
+      171.8991236249298,
+      169.73454074807935,
+      167.08831886115007,
+      166.68245915826532,
+      166.490100825558,
+      166.48011027138122,
+      166.47193875704326,
+      166.49398712177327,
+      166.68074521670331,
+      166.90809025351538,
+      166.25365433383124,
+      165.54836491616786,
+      163.8019341584172,
+      162.1009547830745,
+      161.02503350054758,
+      159.9678511697717,
+      159.98567107672727,
+      160.270738087651,
+      160.67910683685824,
+      161.17248742855034,
+      162.3271917495407,
+      163.8255843249114,
+      167.32051971253222,
+      169.71779952977562,
+      172.53225077866534,
+      175.29326509541693,
+      178.36690941392413
+    ],
+    "bb_upper": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      146.60663292276075,
+      147.15970529660297,
+      147.2302673838299,
+      147.0245660692799,
+      146.57649626749134,
+      145.15339518439438,
+      144.83046279313587,
+      145.24549279782923,
+      146.36032654408476,
+      146.78037980620456,
+      147.60036318470273,
+      148.2163710665999,
+      148.90819952888853,
+      148.9028872647073,
+      148.88260072438666,
+      148.9577511276432,
+      151.26646754408887,
+      153.11705991715522,
+      155.69997201040076,
+      157.44524579163425,
+      158.02481545650153,
+      159.4911314889931,
+      161.2034726236694,
+      162.2602500226466,
+      163.55470511063697,
+      165.25735174234174,
+      166.99416688388342,
+      168.49986512380767,
+      169.69717752311146,
+      171.72077328782092,
+      173.68496276745836,
+      175.4851749631028,
+      176.82807982223943,
+      177.27031744881967,
+      176.54067242984598,
+      176.50775817133248,
+      177.55522505425853,
+      178.34244125629783,
+      179.76533696605347,
+      180.68823108994454,
+      181.42548451514273,
+      182.03086528845563,
+      181.97084593254507,
+      182.47427466098915,
+      182.515346631764,
+      182.89197770576305,
+      183.4156578891206,
+      184.16571100798262,
+      184.2404267664876,
+      185.18860063346673,
+      185.72068276700256,
+      186.30378282114415,
+      186.54530639664046,
+      186.80908082161423,
+      185.67971457805018,
+      185.13298826950722,
+      185.0165577866122,
+      184.7533891909399,
+      184.81973496606358,
+      184.98138027003245,
+      185.1793846717548,
+      185.24283965206146,
+      185.16569588175457,
+      185.9934956290408,
+      186.6272430486572,
+      186.86759860266747,
+      187.52486444079003,
+      187.3820771643986,
+      186.90149659586223,
+      186.14157210844402,
+      185.6097986264256,
+      185.02347691404023,
+      184.67931143862728,
+      183.8154162093811,
+      183.8301109666808,
+      183.88850283424262,
+      184.00284076424694,
+      184.99208834868247,
+      184.81076253692444,
+      184.1207602384549,
+      183.49480152854395,
+      183.18593064838632,
+      184.12982260740813,
+      186.0005903057508,
+      187.67594043459962,
+      189.50227978087798,
+      190.2047448553936,
+      190.34289922482142,
+      190.47355105465024,
+      191.6838890167663,
+      193.48452400000332,
+      193.6283187904677,
+      194.31774225769578,
+      194.0992032377987,
+      193.09398278304315,
+      192.85221446983553,
+      192.6250147335297,
+      192.59115750324685,
+      192.46411348944687,
+      192.18693759718832,
+      191.9083291100975,
+      191.79859862128873,
+      192.76439383727637,
+      196.27994552463284,
+      200.93210759918804,
+      203.34311236396056,
+      205.43935197378084,
+      208.3386574679838,
+      209.34412388574003,
+      209.77859992031927,
+      209.55027194244929,
+      209.54940011386228,
+      210.43966853466924,
+      210.42661217079413,
+      210.3112577936962,
+      210.08255200828302,
+      209.92286334278361,
+      209.707948661129,
+      209.68805422587457,
+      209.20378300351743,
+      209.36761233602957,
+      209.989227968445,
+      210.1604082512372,
+      209.67713342569908,
+      207.39999285515512,
+      205.92029865012648,
+      203.92642115454564,
+      200.0929118300545,
+      198.1383019215165,
+      196.69489148955472,
+      196.3491152345917,
+      196.10725645256497,
+      193.17767920212816,
+      191.5994426973909,
+      189.35798346304927,
+      189.2225786816905,
+      187.84172925774496,
+      187.06923144580435,
+      187.929071659663,
+      187.1881372508517,
+      187.21762066841725,
+      187.65537093801856,
+      188.97550338723826,
+      190.189479878704,
+      191.654175208715,
+      192.44579265116792,
+      193.07734469734524,
+      193.48574760531267,
+      194.20937433048766,
+      194.68043596730607,
+      195.05422809316462,
+      195.47464728573928,
+      195.47986459343298,
+      195.54668142482936,
+      195.6871339537393,
+      195.4860634464434,
+      195.174909906928,
+      195.1378446940609,
+      193.27616030589724,
+      192.2355403856814,
+      192.0112570191597,
+      191.98052189647902,
+      191.78025813867225,
+      191.56510190662706,
+      191.19134917738762,
+      191.83681063116651,
+      192.7310356413908,
+      193.29792491740665,
+      193.074653013392,
+      193.2013126560588,
+      194.3260912714708,
+      195.18580205671535,
+      195.20842963657933,
+      195.73751582304638,
+      196.0370716585114,
+      196.46807045736313,
+      196.6306615785262,
+      196.4571578785579,
+      196.38638965770048,
+      196.41108661779083,
+      196.61825985062552,
+      196.98842570586964,
+      197.42938300569784,
+      198.11855924885077,
+      199.11967442712935,
+      198.63775412767916,
+      198.27566642750068,
+      197.68848364979485,
+      197.65666037505886,
+      197.62315929774974,
+      196.94552767958623,
+      195.90314087090135,
+      195.8872640877634,
+      195.45227193504797,
+      195.24051801087344,
+      194.72214869518706,
+      194.61232942174317,
+      194.61550768607935,
+      194.5591533788381,
+      194.25257787696336,
+      193.98003943796368,
+      193.91653929535383,
+      192.84776682619702,
+      191.18143322580562,
+      187.7790907054831,
+      187.9260198076874,
+      189.12456111959645,
+      190.04077049431868,
+      189.88260431829718,
+      189.34695361780138,
+      188.762936298443,
+      188.75406984891376,
+      188.27801147441812,
+      187.82325258603106,
+      187.38390803750022,
+      188.58734450650078,
+      190.19863368002356,
+      193.2740637663875,
+      196.66904338587082,
+      199.53996588910087,
+      202.90914773159548,
+      205.82732788567506,
+      207.96626142406774,
+      210.2878929800363,
+      211.89051305973092,
+      214.43880861667026,
+      217.8494156750886,
+      219.1544802874678,
+      220.24220108057597,
+      219.80975056410807,
+      219.15473600321587,
+      218.16509131849773
+    ],
+    "ma20": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      129.21055335998534,
+      130.58022994995116,
+      131.99889526367187,
+      133.14512557983397,
+      134.3623374938965,
+      135.66103172302246,
+      136.7087844848633,
+      137.35412826538087,
+      137.83751831054687,
+      138.1949264526367,
+      138.65981903076172,
+      139.08771820068358,
+      139.64309158325196,
+      140.2459487915039,
+      140.81331558227538,
+      141.64413299560547,
+      142.5849479675293,
+      143.5957473754883,
+      144.52407608032226,
+      145.6673553466797,
+      146.46370010375978,
+      147.26555709838868,
+      148.13690490722655,
+      149.04973907470702,
+      149.9640800476074,
+      150.97690658569337,
+      151.98423919677734,
+      153.08855590820312,
+      154.04189758300782,
+      155.4781593322754,
+      156.81193771362305,
+      158.25569839477538,
+      159.6019760131836,
+      160.97824783325194,
+      162.12105865478514,
+      163.26486892700194,
+      164.2362075805664,
+      165.16005477905273,
+      166.10989685058593,
+      166.98575134277343,
+      168.28403549194337,
+      169.31486434936522,
+      170.03374481201172,
+      171.12156372070314,
+      172.03441162109374,
+      172.86127395629882,
+      173.69463500976562,
+      174.58348693847657,
+      175.4828369140625,
+      176.10573348999023,
+      176.61664810180665,
+      177.06757278442382,
+      177.4695053100586,
+      178.00091552734375,
+      178.43134307861328,
+      178.6623046875,
+      178.72429351806642,
+      178.9487564086914,
+      179.10173110961915,
+      179.41467819213867,
+      179.53115844726562,
+      179.6461395263672,
+      179.66913528442382,
+      179.20821151733398,
+      178.82627563476564,
+      178.43834075927734,
+      177.75095596313477,
+      177.03157577514648,
+      176.46666946411133,
+      176.1752182006836,
+      175.95475540161132,
+      175.74529190063475,
+      175.6108154296875,
+      175.25486907958984,
+      174.9878936767578,
+      175.0303840637207,
+      175.1153678894043,
+      175.39683837890624,
+      175.32835235595704,
+      175.08889083862306,
+      174.89392471313477,
+      174.79544372558593,
+      175.17939376831055,
+      175.96978836059571,
+      176.80117797851562,
+      177.66306686401367,
+      178.69342346191405,
+      179.55530319213867,
+      180.26970672607422,
+      180.85914154052733,
+      181.62905654907226,
+      181.8960273742676,
+      182.4244697570801,
+      182.68194046020508,
+      183.1588882446289,
+      183.43735733032227,
+      183.76482238769532,
+      183.71632766723633,
+      183.85281295776366,
+      184.01829528808594,
+      184.24177017211915,
+      184.64522476196288,
+      185.1271713256836,
+      185.84959259033204,
+      186.83948364257813,
+      187.53940658569337,
+      188.2828254699707,
+      189.3497085571289,
+      190.03213348388672,
+      190.33710098266602,
+      190.11262588500978,
+      190.36209869384766,
+      190.8985397338867,
+      191.55496826171876,
+      192.2533920288086,
+      192.50586395263673,
+      192.85332565307618,
+      193.0513038635254,
+      193.06130294799806,
+      193.3732681274414,
+      193.29727630615236,
+      192.92831802368164,
+      192.4813674926758,
+      191.32099456787108,
+      189.98214111328124,
+      188.68778305053712,
+      187.55940704345704,
+      186.28854675292968,
+      185.33365173339843,
+      184.74272689819335,
+      184.459765625,
+      184.3302963256836,
+      183.62688827514648,
+      183.15845108032227,
+      182.5155242919922,
+      181.92407684326173,
+      181.23064346313475,
+      180.7871871948242,
+      180.2667205810547,
+      179.64827346801758,
+      179.66627578735353,
+      179.90726013183593,
+      180.24075012207032,
+      180.7807159423828,
+      181.29468994140626,
+      181.85615234375,
+      182.23763198852538,
+      182.4901237487793,
+      182.9535987854004,
+      183.19058532714843,
+      183.43207244873048,
+      183.61006240844728,
+      183.61356201171876,
+      183.66755905151368,
+      183.86804885864257,
+      184.40751953125,
+      184.75000076293946,
+      185.21647567749022,
+      185.98093338012694,
+      186.17742309570312,
+      186.29391708374024,
+      186.35141372680664,
+      186.2744171142578,
+      186.16742324829102,
+      186.0669288635254,
+      186.2319206237793,
+      186.48040695190429,
+      186.7118942260742,
+      186.54990310668944,
+      186.16092376708986,
+      185.5084587097168,
+      184.6470054626465,
+      184.6655044555664,
+      184.92449035644532,
+      185.10447998046874,
+      185.31646881103515,
+      185.50645904541017,
+      185.29447021484376,
+      185.23147430419922,
+      185.72694702148436,
+      185.9559341430664,
+      186.2049217224121,
+      186.39891204833984,
+      186.71789474487304,
+      187.06987533569335,
+      186.73839263916017,
+      185.9724349975586,
+      185.53995819091796,
+      185.2619728088379,
+      185.39696578979493,
+      185.85444107055665,
+      186.15142517089845,
+      186.01343231201173,
+      185.74994735717775,
+      185.62495803833008,
+      185.27997207641602,
+      184.94597778320312,
+      184.96697235107422,
+      184.8154724121094,
+      184.43698120117188,
+      183.97048950195312,
+      183.11500244140626,
+      182.32002029418945,
+      181.43804168701172,
+      180.59457092285157,
+      179.9125717163086,
+      179.4295509338379,
+      178.56454467773438,
+      178.28253173828125,
+      177.91852722167968,
+      177.62152328491212,
+      177.6130043029785,
+      177.3859992980957,
+      177.2519989013672,
+      177.1459991455078,
+      177.420499420166,
+      177.8734992980957,
+      178.53799896240236,
+      179.38499908447267,
+      180.28249969482422,
+      181.4384994506836,
+      182.90649948120117,
+      184.11849975585938,
+      185.48349990844727,
+      186.53150024414063,
+      188.38300018310548,
+      190.8375,
+      193.2375,
+      194.9800003051758,
+      196.1710006713867,
+      197.2240005493164,
+      198.26600036621093
+    ],
+    "ma50": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      142.9216749572754,
+      144.10523620605468,
+      145.28259826660155,
+      146.36898040771484,
+      147.36217834472657,
+      148.44476028442384,
+      149.4595623779297,
+      150.33099822998048,
+      151.15924865722656,
+      151.97290100097655,
+      152.8503433227539,
+      153.69639099121093,
+      154.48324676513673,
+      155.44726959228515,
+      156.35590301513673,
+      157.318525390625,
+      158.2239633178711,
+      159.18179107666015,
+      160.0392416381836,
+      160.99986938476562,
+      161.88411285400392,
+      162.70017333984376,
+      163.47084228515624,
+      164.31129638671874,
+      164.98978057861328,
+      165.64526947021486,
+      166.26576599121094,
+      166.96884948730468,
+      167.66493377685546,
+      168.46080169677734,
+      169.19887908935547,
+      169.91975952148437,
+      170.49366424560546,
+      171.03217468261718,
+      171.56108703613282,
+      172.03620849609376,
+      172.2903665161133,
+      172.55612243652342,
+      172.81627899169922,
+      173.20301452636718,
+      173.68053497314452,
+      174.0920672607422,
+      174.4604064941406,
+      174.7933483886719,
+      174.99930603027343,
+      175.26666046142577,
+      175.51821746826172,
+      175.89216247558593,
+      176.17951568603516,
+      176.3050942993164,
+      176.43167388916015,
+      176.53565765380858,
+      176.72463134765624,
+      177.02879089355469,
+      177.433134765625,
+      177.79548767089844,
+      178.07325286865233,
+      178.3142218017578,
+      178.48020294189453,
+      178.75237060546874,
+      179.0185433959961,
+      179.12453247070312,
+      179.41669647216796,
+      179.41749908447267,
+      179.4490966796875,
+      179.49709381103514,
+      179.5462924194336,
+      179.54529876708983,
+      179.52750610351563,
+      179.4701190185547,
+      179.48172271728515,
+      179.56671844482423,
+      179.78769775390626,
+      180.16826171875,
+      180.79639099121093,
+      181.3463284301758,
+      181.89666564941408,
+      182.47460266113282,
+      182.85236389160156,
+      183.12133972167967,
+      183.25113037109375,
+      183.41091613769532,
+      183.90845825195314,
+      184.35620178222655,
+      184.8199432373047,
+      185.12410308837892,
+      185.58724029541017,
+      185.9531900024414,
+      186.1653594970703,
+      186.3493389892578,
+      186.41873107910158,
+      186.43992889404296,
+      186.53591857910158,
+      186.5947119140625,
+      186.79408996582032,
+      186.80928802490234,
+      186.87428131103516,
+      186.8312860107422,
+      186.85448364257812,
+      186.98287414550782,
+      187.07746673583983,
+      187.22485717773438,
+      187.2874560546875,
+      187.23166687011718,
+      187.10568176269533,
+      186.8285070800781,
+      186.60212829589844,
+      186.44594360351562,
+      186.1641650390625,
+      185.8649917602539,
+      185.63361877441406,
+      185.6444219970703,
+      185.66243072509766,
+      185.8342221069336,
+      186.04841064453126,
+      186.17680603027344,
+      186.26340515136718,
+      186.3408044433594,
+      186.4947979736328,
+      186.65179016113282,
+      186.75358764648436,
+      186.81079223632813,
+      186.68201232910155,
+      186.35885345458985,
+      185.9171078491211,
+      185.57575225830078,
+      185.18899841308593,
+      184.79265045166017,
+      184.5436849975586,
+      184.20112060546876,
+      184.10613525390625,
+      184.04014801025392,
+      183.8127816772461,
+      183.6792041015625,
+      183.57382537841798,
+      183.66722869873047,
+      183.71423767089843,
+      183.80504058837892,
+      183.89023803710938,
+      183.76685241699218,
+      183.63806060791015,
+      183.49826721191405,
+      183.5556671142578,
+      183.80025177001954,
+      183.96604339599608,
+      184.2272265625,
+      184.3678192138672,
+      184.39501983642577,
+      184.5028140258789,
+      184.59480865478517,
+      184.7046026611328,
+      184.78999816894532,
+      184.92159118652344,
+      185.1029815673828,
+      185.39556579589845,
+      185.59295501708985,
+      185.61095428466797,
+      185.7061489868164,
+      185.88833892822265,
+      186.06632934570314,
+      186.1133267211914,
+      185.99593322753907,
+      185.86473999023437,
+      185.7879443359375,
+      185.69815063476562,
+      185.5967544555664,
+      185.4511575317383,
+      185.38575927734374,
+      185.2475634765625,
+      185.09336700439454,
+      184.91996948242186,
+      184.5919741821289,
+      184.40417449951173,
+      184.21117462158202,
+      184.08617462158202,
+      183.79497589111327,
+      183.48277435302734,
+      183.04537658691407,
+      182.80897827148436,
+      182.76277099609376,
+      182.64436920166017,
+      182.50056945800782,
+      182.30937286376954,
+      182.22177459716798,
+      182.1297787475586,
+      182.07218597412108,
+      182.00839447021485,
+      182.116201171875,
+      182.38160186767578,
+      182.74199737548827,
+      183.2919857788086,
+      183.8957717895508,
+      184.1853726196289,
+      184.43477844238282,
+      184.65698272705077,
+      185.0215884399414,
+      185.6151907348633,
+      186.22258850097657,
+      186.708388671875,
+      186.9403924560547,
+      187.15159576416016,
+      187.32500091552734
+    ],
+    "rsi14": [
+      null,
+      0.0,
+      49.16232079612298,
+      51.42719141791831,
+      46.27114908640307,
+      72.47827141531039,
+      82.50660360714537,
+      86.60883920988425,
+      84.59491879397585,
+      85.01434424301604,
+      85.14424796754972,
+      79.92138889290297,
+      69.90883293056149,
+      71.44676930102113,
+      66.01417462479823,
+      72.23053225050045,
+      69.97161044118053,
+      75.26077916355936,
+      64.0065509322535,
+      66.95562528053361,
+      71.28048368386516,
+      71.99992026982966,
+      67.01537326247625,
+      69.08161123693708,
+      70.14119800526633,
+      71.66932821045191,
+      68.49022446293614,
+      71.15951976797675,
+      63.11907684846689,
+      66.75099670765448,
+      65.29974456039162,
+      67.13564949625678,
+      62.84411634814263,
+      63.339574394778104,
+      68.59617450524104,
+      75.18200159794547,
+      75.78767765756308,
+      78.00995183588526,
+      78.1993992695892,
+      66.19811090540146,
+      70.32832976779052,
+      72.25976329769442,
+      69.68862544218344,
+      71.43967961331495,
+      74.07854826797512,
+      75.12697491368466,
+      75.83444400147074,
+      73.50065328183724,
+      78.94386815136338,
+      79.40427894124221,
+      80.52023390383414,
+      78.85476226340674,
+      75.90306732044938,
+      64.86073315453103,
+      69.04192839414881,
+      71.88563461165124,
+      71.31364853369065,
+      74.29625554744477,
+      71.25230353680597,
+      74.64462569665685,
+      71.27218945786365,
+      62.28852253132042,
+      68.71492141176017,
+      65.39000567976913,
+      66.5519670520295,
+      67.90255334731518,
+      69.78115929699665,
+      68.35250275027964,
+      69.50801809222689,
+      65.81442345856783,
+      66.34196570870145,
+      62.546802783410904,
+      64.70720483417989,
+      51.61470351472609,
+      51.1944132705241,
+      50.42063802528936,
+      55.59996603076286,
+      58.4278334361226,
+      61.28739421955561,
+      60.896144304865665,
+      57.56695085687056,
+      46.178497940979526,
+      41.196667060482646,
+      40.972677465012616,
+      43.13706249544947,
+      36.67563590409406,
+      39.39361563369442,
+      44.28481905401575,
+      54.815830087095655,
+      54.56225377724992,
+      55.52244377656303,
+      55.38669964066125,
+      49.99026991304848,
+      42.806832875747375,
+      52.36292641073023,
+      52.974409750722664,
+      61.552744764565126,
+      53.68142235416497,
+      51.675600640053524,
+      52.61592332441631,
+      53.29555547288853,
+      58.03993852544717,
+      63.23738349995149,
+      63.90916777759184,
+      65.6014626561408,
+      63.14708595869262,
+      59.23804007415882,
+      58.30371198680759,
+      63.36856344073684,
+      67.03458690176629,
+      51.839596501830684,
+      57.525217737966976,
+      47.76820753311875,
+      47.55864101892822,
+      49.9020489308874,
+      51.56201995375995,
+      50.81612580840638,
+      48.87329233031147,
+      47.705399664748796,
+      50.43065060014443,
+      55.83604137565855,
+      61.589970673185334,
+      69.41713558207802,
+      73.13171992092254,
+      67.07353620636864,
+      66.50171965340871,
+      69.56813682497847,
+      58.76116658952558,
+      54.86140464543407,
+      47.853906458674594,
+      47.924233575062004,
+      57.52938626086555,
+      51.95299732854725,
+      52.49186990559217,
+      46.41305012482783,
+      49.421525268272966,
+      46.39605855441657,
+      42.30259637606646,
+      47.239148177298034,
+      42.75044611263895,
+      41.47994594594143,
+      45.1411346652146,
+      41.53446539150872,
+      44.019224558627684,
+      41.48255830028304,
+      44.56407147859889,
+      46.17393952135066,
+      44.48460264193106,
+      48.600195077797636,
+      47.629527825130495,
+      51.03852106266545,
+      50.38608921893812,
+      49.00202933339919,
+      45.76003520329514,
+      39.869388696152534,
+      41.60888719334714,
+      43.58778100325195,
+      37.157905949328004,
+      41.54110895353868,
+      49.638856444321995,
+      52.43559213342393,
+      57.617662491037365,
+      56.892099982755916,
+      58.68499462832039,
+      55.68426415708342,
+      54.79602516812867,
+      53.39324804389406,
+      56.12641397315058,
+      55.046497693504605,
+      53.70504501109441,
+      56.150478813556376,
+      49.96430801394603,
+      49.703498069149326,
+      49.8288549163177,
+      51.251670893809184,
+      46.859569476958,
+      53.1864174354449,
+      51.79367696931998,
+      40.44422117071429,
+      48.294582071046364,
+      50.33571952906803,
+      53.978481839479095,
+      52.229144712829466,
+      54.91712016744545,
+      58.589347489269834,
+      59.754349074082015,
+      57.33303175203556,
+      48.81258656408418,
+      42.34274040613188,
+      36.29663366515907,
+      34.31465592760874,
+      51.14265982447978,
+      55.35749178837397,
+      53.739990027047696,
+      55.16036735228268,
+      51.64333628072317,
+      47.3277567882703,
+      49.69542292175775,
+      52.874429958364615,
+      52.77897352326374,
+      54.88437162140534,
+      56.7553047648998,
+      58.15944415691028,
+      61.00212188956294,
+      47.358977904832415,
+      40.3463036195751,
+      46.236361303903514,
+      44.08312792786417,
+      47.33320377890428,
+      47.66191092784818,
+      42.41624131839034,
+      47.82710166955779,
+      50.04588930918781,
+      51.37988760603278,
+      48.223943960220645,
+      45.231915288885155,
+      48.751017131697786,
+      47.32853129109499,
+      45.628021680079726,
+      43.59919435616724,
+      37.82999996187272,
+      41.9782261039381,
+      41.53159166199565,
+      46.3898792688179,
+      38.94018974768455,
+      35.84098383561198,
+      34.00003256651901,
+      45.77988828802513,
+      47.2625241642739,
+      49.083990274744245,
+      49.37105618961265,
+      49.93043999403988,
+      54.603842955847725,
+      56.609283883902634,
+      61.35166879894819,
+      61.99609766185334,
+      68.06751063511281,
+      69.77215301838093,
+      68.89941721973429,
+      71.36924391701407,
+      71.64596623312715,
+      67.60890084974051,
+      69.81060319829979,
+      64.64503144591271,
+      71.49829517772584,
+      76.28291835891852,
+      70.98935963920091,
+      65.41837472621698,
+      54.123133634727154,
+      52.983235786939595,
+      53.011781322898145
+    ]
   },
-  "ohlc_history": [],
+  "ohlc_history": [
+    {
+      "close": 113.7931900024414,
+      "date": "2025-05-05",
+      "high": 114.64298826396649,
+      "low": 112.63346720059009,
+      "open": 112.88340831442672,
+      "volume": 133163200
+    },
+    {
+      "close": 113.51325988769531,
+      "date": "2025-05-06",
+      "high": 114.7129742117387,
+      "low": 110.7938992837595,
+      "open": 111.4537475013017,
+      "volume": 158525600
+    },
+    {
+      "close": 117.03242492675781,
+      "date": "2025-05-07",
+      "high": 117.65228163619798,
+      "low": 112.25355204144066,
+      "open": 113.02337494499027,
+      "volume": 206758800
+    },
+    {
+      "close": 117.34236145019531,
+      "date": "2025-05-08",
+      "high": 118.65205049698933,
+      "low": 115.82271514729747,
+      "open": 118.22215145930612,
+      "volume": 198428100
+    },
+    {
+      "close": 116.62252044677734,
+      "date": "2025-05-09",
+      "high": 118.20215005190205,
+      "low": 115.18285724943865,
+      "open": 117.32235248570746,
+      "volume": 132972200
+    },
+    {
+      "close": 122.97103118896484,
+      "date": "2025-05-12",
+      "high": 122.97103118896484,
+      "low": 120.25167057965504,
+      "open": 121.94127499373305,
+      "volume": 225023300
+    },
+    {
+      "close": 129.89938354492188,
+      "date": "2025-05-13",
+      "high": 131.18908818741485,
+      "low": 124.44067836400953,
+      "open": 124.95056035306071,
+      "volume": 330430100
+    },
+    {
+      "close": 135.30810546875,
+      "date": "2025-05-14",
+      "high": 135.40808800730593,
+      "low": 131.6489642323906,
+      "open": 133.16861033831793,
+      "volume": 281180800
+    },
+    {
+      "close": 134.79823303222656,
+      "date": "2025-05-15",
+      "high": 136.2678878895653,
+      "low": 132.6287461607251,
+      "open": 134.258351724734,
+      "volume": 226632600
+    },
+    {
+      "close": 135.36810302734375,
+      "date": "2025-05-16",
+      "high": 136.31789147723805,
+      "low": 133.42857277146337,
+      "open": 136.18791721457987,
+      "volume": 226542500
+    },
+    {
+      "close": 135.53805541992188,
+      "date": "2025-05-19",
+      "high": 135.83797251007488,
+      "low": 132.35879696756518,
+      "open": 132.35879696756518,
+      "volume": 193154600
+    },
+    {
+      "close": 134.3483428955078,
+      "date": "2025-05-20",
+      "high": 134.54829272140586,
+      "low": 132.58874781513978,
+      "open": 134.2583525069389,
+      "volume": 161514200
+    },
+    {
+      "close": 131.76895141601562,
+      "date": "2025-05-21",
+      "high": 137.36762292180558,
+      "low": 130.55922977564506,
+      "open": 133.02864907239967,
+      "volume": 270608700
+    },
+    {
+      "close": 132.7987060546875,
+      "date": "2025-05-22",
+      "high": 134.21836966107523,
+      "low": 131.51900885300861,
+      "open": 132.19884131725317,
+      "volume": 187344000
+    },
+    {
+      "close": 131.25906372070312,
+      "date": "2025-05-23",
+      "high": 132.64873565144939,
+      "low": 129.12957588399638,
+      "open": 129.96937433382988,
+      "volume": 198821300
+    },
+    {
+      "close": 135.4680633544922,
+      "date": "2025-05-27",
+      "high": 135.6280293045703,
+      "low": 133.27857708527512,
+      "open": 134.1183754403962,
+      "volume": 192953600
+    },
+    {
+      "close": 134.7782440185547,
+      "date": "2025-05-28",
+      "high": 137.2176717346689,
+      "low": 134.75824445795843,
+      "open": 135.9979578766118,
+      "volume": 304021100
+    },
+    {
+      "close": 139.15721130371094,
+      "date": "2025-05-29",
+      "high": 143.45620133736625,
+      "low": 137.87751407348716,
+      "open": 142.21648797143945,
+      "volume": 369241900
+    },
+    {
+      "close": 135.09817504882812,
+      "date": "2025-05-30",
+      "high": 139.58710766728817,
+      "low": 132.88868890141003,
+      "open": 138.6873257641086,
+      "volume": 333170900
+    },
+    {
+      "close": 137.34764099121094,
+      "date": "2025-06-02",
+      "high": 138.08745689917103,
+      "low": 135.36809645457458,
+      "open": 135.45808684638126,
+      "volume": 197663100
+    },
+    {
+      "close": 141.1867218017578,
+      "date": "2025-06-03",
+      "high": 141.9665367692297,
+      "low": 137.91748812723765,
+      "open": 138.74729436292043,
+      "volume": 225578800
+    },
+    {
+      "close": 141.88656616210938,
+      "date": "2025-06-04",
+      "high": 142.3564566649135,
+      "low": 139.5071219355859,
+      "open": 142.15650682982962,
+      "volume": 167120800
+    },
+    {
+      "close": 139.95703125,
+      "date": "2025-06-05",
+      "high": 143.96608121416313,
+      "low": 138.79730082341692,
+      "open": 142.13651043477643,
+      "volume": 231397900
+    },
+    {
+      "close": 141.6865997314453,
+      "date": "2025-06-06",
+      "high": 143.23623746842864,
+      "low": 141.47664251332282,
+      "open": 142.47640682683559,
+      "volume": 153986200
+    },
+    {
+      "close": 142.59640502929688,
+      "date": "2025-06-09",
+      "high": 144.96584183837217,
+      "low": 141.9065651342004,
+      "open": 143.15627066728982,
+      "volume": 185114500
+    },
+    {
+      "close": 143.92608642578125,
+      "date": "2025-06-10",
+      "high": 144.25599524562207,
+      "low": 141.4966510569608,
+      "open": 142.65638139553192,
+      "volume": 155881900
+    },
+    {
+      "close": 142.80625915527344,
+      "date": "2025-06-11",
+      "high": 144.96590375929992,
+      "low": 141.84641202362192,
+      "open": 144.5859620448177,
+      "volume": 167694000
+    },
+    {
+      "close": 144.9759063720703,
+      "date": "2025-06-12",
+      "high": 144.9759063720703,
+      "low": 141.82643588786814,
+      "open": 141.94641106631286,
+      "volume": 162365000
+    },
+    {
+      "close": 141.94639587402344,
+      "date": "2025-06-13",
+      "high": 143.556128789635,
+      "low": 140.8265869783813,
+      "open": 142.4563055840922,
+      "volume": 180820600
+    },
+    {
+      "close": 144.66595458984375,
+      "date": "2025-06-16",
+      "high": 146.1556971839991,
+      "low": 143.1761967394354,
+      "open": 143.32618096280035,
+      "volume": 183133700
+    },
+    {
+      "close": 144.09603881835938,
+      "date": "2025-06-17",
+      "high": 145.1958620737219,
+      "low": 143.75609899624828,
+      "open": 144.46598768948277,
+      "volume": 139108000
+    },
+    {
+      "close": 145.455810546875,
+      "date": "2025-06-18",
+      "high": 145.62578045463974,
+      "low": 143.0962022725339,
+      "open": 143.9860537050978,
+      "volume": 161494100
+    },
+    {
+      "close": 143.8260955810547,
+      "date": "2025-06-20",
+      "high": 146.17569581398777,
+      "low": 142.6262828381709,
+      "open": 145.42582047781178,
+      "volume": 242956200
+    },
+    {
+      "close": 144.1460418701172,
+      "date": "2025-06-23",
+      "high": 144.7559411184857,
+      "low": 142.00639807778802,
+      "open": 142.47632119978937,
+      "volume": 154308900
+    },
+    {
+      "close": 147.8754119873047,
+      "date": "2025-06-24",
+      "high": 147.9354148301798,
+      "low": 145.4758169849003,
+      "open": 145.53580457152245,
+      "volume": 187566100
+    },
+    {
+      "close": 154.28436279296875,
+      "date": "2025-06-25",
+      "high": 154.4243389252029,
+      "low": 149.23519867353343,
+      "open": 149.24520677628502,
+      "volume": 269146500
+    },
+    {
+      "close": 154.99423217773438,
+      "date": "2025-06-26",
+      "high": 156.69394650127538,
+      "low": 153.97439748110884,
+      "open": 155.95406403411533,
+      "volume": 198145700
+    },
+    {
+      "close": 157.72378540039062,
+      "date": "2025-06-27",
+      "high": 158.68363258213975,
+      "low": 155.23419369167684,
+      "open": 156.01406285223712,
+      "volume": 263234500
+    },
+    {
+      "close": 157.96376037597656,
+      "date": "2025-06-30",
+      "high": 158.6336472456001,
+      "low": 155.93409881773164,
+      "open": 158.37368067249696,
+      "volume": 194580300
+    },
+    {
+      "close": 153.2745361328125,
+      "date": "2025-07-01",
+      "high": 157.17388214393176,
+      "low": 151.46483925954294,
+      "open": 156.26402965591922,
+      "volume": 213143600
+    },
+    {
+      "close": 157.22386169433594,
+      "date": "2025-07-02",
+      "high": 157.57380961936815,
+      "low": 152.94457434216997,
+      "open": 152.9545671877056,
+      "volume": 171224100
+    },
+    {
+      "close": 159.3135223388672,
+      "date": "2025-07-03",
+      "high": 160.95324924613055,
+      "low": 157.74379112425564,
+      "open": 158.34368228178877,
+      "volume": 143716100
+    },
+    {
+      "close": 158.21371459960938,
+      "date": "2025-07-07",
+      "high": 159.28352889047815,
+      "low": 157.31385497697042,
+      "open": 158.17371270193448,
+      "volume": 140139000
+    },
+    {
+      "close": 159.97341918945312,
+      "date": "2025-07-08",
+      "high": 160.19338386133896,
+      "low": 158.36368604860908,
+      "open": 159.3035323273478,
+      "volume": 138133000
+    },
+    {
+      "close": 162.85293579101562,
+      "date": "2025-07-09",
+      "high": 164.39267314506114,
+      "low": 161.13322041798892,
+      "open": 161.1932080055649,
+      "volume": 183656400
+    },
+    {
+      "close": 164.07273864746094,
+      "date": "2025-07-10",
+      "high": 164.4726660794993,
+      "low": 161.5831469026993,
+      "open": 164.29270331195812,
+      "volume": 167704100
+    },
+    {
+      "close": 164.89259338378906,
+      "date": "2025-07-11",
+      "high": 167.862101078866,
+      "low": 163.44283738179527,
+      "open": 163.6927958392512,
+      "volume": 193633300
+    },
+    {
+      "close": 164.04273986816406,
+      "date": "2025-07-14",
+      "high": 165.4625020418882,
+      "low": 161.99307751467913,
+      "open": 165.3425116109199,
+      "volume": 136975800
+    },
+    {
+      "close": 170.671630859375,
+      "date": "2025-07-15",
+      "high": 172.37134531045626,
+      "low": 169.17188012202328,
+      "open": 171.1615549258278,
+      "volume": 230627400
+    },
+    {
+      "close": 171.34152221679688,
+      "date": "2025-07-16",
+      "high": 171.72146396229547,
+      "low": 168.87193138356372,
+      "open": 171.03157616389174,
+      "volume": 158831500
+    },
+    {
+      "close": 172.97125244140625,
+      "date": "2025-07-17",
+      "high": 174.13106334471073,
+      "low": 170.80161486292053,
+      "open": 171.99141956059896,
+      "volume": 160841100
+    },
+    {
+      "close": 172.38136291503906,
+      "date": "2025-07-18",
+      "high": 174.22105359276725,
+      "low": 171.23154479926822,
+      "open": 173.61115431570738,
+      "volume": 146456400
+    },
+    {
+      "close": 171.35153198242188,
+      "date": "2025-07-21",
+      "high": 173.35119970444802,
+      "low": 170.97159023323564,
+      "open": 172.72129949000853,
+      "volume": 123126100
+    },
+    {
+      "close": 167.00225830078125,
+      "date": "2025-07-22",
+      "high": 171.36153479867312,
+      "low": 164.55266825003173,
+      "open": 171.31154005146294,
+      "volume": 193114300
+    },
+    {
+      "close": 170.75161743164062,
+      "date": "2025-07-23",
+      "high": 171.23153339032083,
+      "low": 167.94208685699226,
+      "open": 169.5018251648929,
+      "volume": 154082200
+    },
+    {
+      "close": 173.7111358642578,
+      "date": "2025-07-24",
+      "high": 173.80111724784433,
+      "low": 171.27153886755505,
+      "open": 172.41134882841166,
+      "volume": 128984600
+    },
+    {
+      "close": 173.47117614746094,
+      "date": "2025-07-25",
+      "high": 174.69097468726906,
+      "low": 172.9312725713388,
+      "open": 173.58115848322245,
+      "volume": 122316800
+    },
+    {
+      "close": 176.7206268310547,
+      "date": "2025-07-28",
+      "high": 176.97058528484683,
+      "low": 173.94109004538618,
+      "open": 173.99108478739527,
+      "volume": 140023500
+    },
+    {
+      "close": 175.48085021972656,
+      "date": "2025-07-29",
+      "high": 179.350217961682,
+      "low": 174.99094135061006,
+      "open": 177.93045559033015,
+      "volume": 154077500
+    },
+    {
+      "close": 179.24021911621094,
+      "date": "2025-07-30",
+      "high": 179.86011122312902,
+      "low": 176.01074478620916,
+      "open": 176.48066791766442,
+      "volume": 174312200
+    },
+    {
+      "close": 177.84043884277344,
+      "date": "2025-07-31",
+      "high": 183.26954448460754,
+      "low": 175.9007587673991,
+      "open": 182.86960179799485,
+      "volume": 221685400
+    },
+    {
+      "close": 173.69113159179688,
+      "date": "2025-08-01",
+      "high": 176.51065501732398,
+      "low": 170.86160006411595,
+      "open": 174.06106522140865,
+      "volume": 204529000
+    },
+    {
+      "close": 179.9700927734375,
+      "date": "2025-08-04",
+      "high": 180.17005649193501,
+      "low": 174.49100755408614,
+      "open": 175.1309006070304,
+      "volume": 148174600
+    },
+    {
+      "close": 178.23037719726562,
+      "date": "2025-08-05",
+      "high": 180.23004490386853,
+      "low": 175.87076869322405,
+      "open": 179.59015184800575,
+      "volume": 156407600
+    },
+    {
+      "close": 179.3901824951172,
+      "date": "2025-08-06",
+      "high": 179.87009845787975,
+      "low": 176.22071111043454,
+      "open": 176.30069964693718,
+      "volume": 137192300
+    },
+    {
+      "close": 180.73995971679688,
+      "date": "2025-08-07",
+      "high": 183.84944343505214,
+      "low": 178.77028591662776,
+      "open": 181.53982980547644,
+      "volume": 151878400
+    },
+    {
+      "close": 182.6696319580078,
+      "date": "2025-08-08",
+      "high": 183.26953833968557,
+      "low": 180.3700111699138,
+      "open": 181.51982919208731,
+      "volume": 123396700
+    },
+    {
+      "close": 182.0297393798828,
+      "date": "2025-08-11",
+      "high": 183.80944232526838,
+      "low": 180.2200426409657,
+      "open": 182.01974653412333,
+      "volume": 138323200
+    },
+    {
+      "close": 183.1295623779297,
+      "date": "2025-08-12",
+      "high": 184.44933506001817,
+      "low": 179.4301803710301,
+      "open": 182.9295986692803,
+      "volume": 145485700
+    },
+    {
+      "close": 181.559814453125,
+      "date": "2025-08-13",
+      "high": 183.93942375779682,
+      "low": 179.3201965252013,
+      "open": 182.5896420373941,
+      "volume": 179871700
+    },
+    {
+      "close": 181.98974609375,
+      "date": "2025-08-14",
+      "high": 182.98957985829236,
+      "low": 179.43017409752198,
+      "open": 179.72011917648817,
+      "volume": 129554000
+    },
+    {
+      "close": 180.42001342773438,
+      "date": "2025-08-15",
+      "high": 181.86976944489334,
+      "low": 178.01041021115256,
+      "open": 181.84978375259033,
+      "volume": 156602200
+    },
+    {
+      "close": 181.979736328125,
+      "date": "2025-08-18",
+      "high": 182.90958965389834,
+      "low": 180.55997422620712,
+      "open": 180.56998232776263,
+      "volume": 132008000
+    },
+    {
+      "close": 175.61080932617188,
+      "date": "2025-08-19",
+      "high": 182.46966985536903,
+      "low": 175.46084035755914,
+      "open": 182.39967416584764,
+      "volume": 185229200
+    },
+    {
+      "close": 175.370849609375,
+      "date": "2025-08-20",
+      "high": 175.9707560164781,
+      "low": 168.77195541250927,
+      "open": 175.1408920976954,
+      "volume": 215142700
+    },
+    {
+      "close": 174.95091247558594,
+      "date": "2025-08-21",
+      "high": 176.87059152353538,
+      "low": 173.78110877087863,
+      "open": 174.8209444570093,
+      "volume": 140040900
+    },
+    {
+      "close": 177.96043395996094,
+      "date": "2025-08-22",
+      "high": 178.56032512128596,
+      "low": 171.17155351749952,
+      "open": 172.58132291943235,
+      "volume": 172789400
+    },
+    {
+      "close": 179.78012084960938,
+      "date": "2025-08-25",
+      "high": 181.87977802218637,
+      "low": 176.54066896263805,
+      "open": 178.3203719824875,
+      "volume": 163012800
+    },
+    {
+      "close": 181.7397918701172,
+      "date": "2025-08-26",
+      "high": 182.35968393651802,
+      "low": 178.7802771456414,
+      "open": 180.03006938032237,
+      "volume": 168688200
+    },
+    {
+      "close": 181.56982421875,
+      "date": "2025-08-27",
+      "high": 182.45967569067753,
+      "low": 179.07023971825097,
+      "open": 181.94975068857377,
+      "volume": 235518900
+    },
+    {
+      "close": 180.1400604248047,
+      "date": "2025-08-28",
+      "high": 184.43934897141472,
+      "low": 176.3806906932069,
+      "open": 180.7899615720414,
+      "volume": 281787800
+    },
+    {
+      "close": 174.1510467529297,
+      "date": "2025-08-29",
+      "high": 178.12038822306508,
+      "low": 173.12121914292007,
+      "open": 178.08040158317536,
+      "volume": 243257900
+    },
+    {
+      "close": 170.75161743164062,
+      "date": "2025-09-02",
+      "high": 172.351357635579,
+      "low": 167.19221149694363,
+      "open": 169.9717482776903,
+      "volume": 231164900
+    },
+    {
+      "close": 170.59165954589844,
+      "date": "2025-09-03",
+      "high": 172.38137081666613,
+      "low": 168.851958278929,
+      "open": 171.03158891427162,
+      "volume": 164424900
+    },
+    {
+      "close": 171.63148498535156,
+      "date": "2025-09-04",
+      "high": 171.83144870716828,
+      "low": 169.381858788342,
+      "open": 170.54166973363456,
+      "volume": 141670100
+    },
+    {
+      "close": 166.9922637939453,
+      "date": "2025-09-05",
+      "high": 169.0019244592772,
+      "low": 164.04275681292185,
+      "open": 168.00209055003162,
+      "volume": 224441400
+    },
+    {
+      "close": 168.2820281982422,
+      "date": "2025-09-08",
+      "high": 170.93159698121408,
+      "low": 167.32219627229085,
+      "open": 167.5221599855096,
+      "volume": 163769100
+    },
+    {
+      "close": 170.7316131591797,
+      "date": "2025-09-09",
+      "high": 170.95157781434446,
+      "low": 166.71229229208453,
+      "open": 169.0618925540675,
+      "volume": 157548400
+    },
+    {
+      "close": 177.300537109375,
+      "date": "2025-09-10",
+      "high": 179.26020289704138,
+      "low": 175.44084555219968,
+      "open": 176.61064931709572,
+      "volume": 226852000
+    },
+    {
+      "close": 177.1505584716797,
+      "date": "2025-09-11",
+      "high": 180.26021784214308,
+      "low": 176.4606317396978,
+      "open": 179.66027757334626,
+      "volume": 151159300
+    },
+    {
+      "close": 177.80047607421875,
+      "date": "2025-09-12",
+      "high": 178.5803891806412,
+      "low": 176.43061617633268,
+      "open": 177.75047851465564,
+      "volume": 124911000
+    },
+    {
+      "close": 177.73048400878906,
+      "date": "2025-09-15",
+      "high": 178.830369337568,
+      "low": 174.49083425075145,
+      "open": 175.65071055071581,
+      "volume": 147061600
+    },
+    {
+      "close": 174.86080932617188,
+      "date": "2025-09-16",
+      "high": 177.4805168617991,
+      "low": 174.36086420825131,
+      "open": 176.98057174387853,
+      "volume": 140737800
+    },
+    {
+      "close": 170.27130126953125,
+      "date": "2025-09-17",
+      "high": 173.18098551277336,
+      "low": 168.39151800406466,
+      "open": 172.62104942275718,
+      "volume": 211843800
+    },
+    {
+      "close": 176.2206573486328,
+      "date": "2025-09-18",
+      "high": 177.08056354559588,
+      "low": 172.94101865721873,
+      "open": 173.96089569350613,
+      "volume": 191763300
+    },
+    {
+      "close": 176.6505889892578,
+      "date": "2025-09-19",
+      "high": 178.06043774665943,
+      "low": 175.16074718989944,
+      "open": 175.7506939671915,
+      "volume": 237182100
+    },
+    {
+      "close": 183.58984375,
+      "date": "2025-09-22",
+      "high": 184.52974299714734,
+      "low": 174.69082690233378,
+      "open": 175.28075846993005,
+      "volume": 269637000
+    },
+    {
+      "close": 178.410400390625,
+      "date": "2025-09-23",
+      "high": 182.3999677661597,
+      "low": 176.19065819152993,
+      "open": 181.95002022927713,
+      "volume": 192559600
+    },
+    {
+      "close": 176.9505615234375,
+      "date": "2025-09-24",
+      "high": 179.76025041106172,
+      "low": 175.38072666046574,
+      "open": 179.75025700209653,
+      "volume": 143564100
+    },
+    {
+      "close": 177.67050170898438,
+      "date": "2025-09-25",
+      "high": 180.2402117285651,
+      "low": 173.11100459099512,
+      "open": 174.4608472798892,
+      "volume": 191586700
+    },
+    {
+      "close": 178.17044067382812,
+      "date": "2025-09-26",
+      "high": 179.750269051669,
+      "low": 174.91078879333958,
+      "open": 178.15043859744398,
+      "volume": 148573700
+    },
+    {
+      "close": 181.83004760742188,
+      "date": "2025-09-29",
+      "high": 183.97980553666213,
+      "low": 180.30021674934378,
+      "open": 180.41019002973698,
+      "volume": 193063500
+    },
+    {
+      "close": 186.55950927734375,
+      "date": "2025-09-30",
+      "high": 187.32942897828707,
+      "low": 181.4600633204032,
+      "open": 182.06000352373024,
+      "volume": 236981000
+    },
+    {
+      "close": 187.21945190429688,
+      "date": "2025-10-01",
+      "high": 188.11934700723293,
+      "low": 183.87980694521147,
+      "open": 185.21967144700423,
+      "volume": 173844900
+    },
+    {
+      "close": 188.8692626953125,
+      "date": "2025-10-02",
+      "high": 191.0290292282152,
+      "low": 188.03935198339767,
+      "open": 189.57919146332628,
+      "volume": 136805800
+    },
+    {
+      "close": 187.59939575195312,
+      "date": "2025-10-03",
+      "high": 190.33910041164867,
+      "low": 185.35965145286306,
+      "open": 189.1692307003317,
+      "volume": 137596900
+    },
+    {
+      "close": 185.51962280273438,
+      "date": "2025-10-06",
+      "high": 187.20943969833962,
+      "low": 183.3098739831843,
+      "open": 185.4796339074747,
+      "volume": 157678100
+    },
+    {
+      "close": 185.01968383789062,
+      "date": "2025-10-07",
+      "high": 189.03924688644503,
+      "low": 183.97980469837793,
+      "open": 186.20955566811082,
+      "volume": 140088000
+    },
+    {
+      "close": 189.0892333984375,
+      "date": "2025-10-08",
+      "high": 189.57918508139647,
+      "low": 186.51950830089396,
+      "open": 186.5495190429729,
+      "volume": 130168900
+    },
+    {
+      "close": 192.54885864257812,
+      "date": "2025-10-09",
+      "high": 195.27855455286462,
+      "low": 191.039014711271,
+      "open": 192.20888438710807,
+      "volume": 182997200
+    },
+    {
+      "close": 183.139892578125,
+      "date": "2025-10-10",
+      "high": 195.59851591827854,
+      "low": 182.03001384654092,
+      "open": 193.4887469873255,
+      "volume": 268774400
+    },
+    {
+      "close": 188.29933166503906,
+      "date": "2025-10-13",
+      "high": 190.08912842775598,
+      "low": 185.93959015922437,
+      "open": 187.9493639887039,
+      "volume": 153482800
+    },
+    {
+      "close": 180.01022338867188,
+      "date": "2025-10-14",
+      "high": 184.77970370013514,
+      "low": 179.6802578066599,
+      "open": 184.74970821605342,
+      "volume": 205641400
+    },
+    {
+      "close": 179.8102569580078,
+      "date": "2025-10-15",
+      "high": 184.84969686580231,
+      "low": 177.2705272995106,
+      "open": 184.77971248532194,
+      "volume": 214450500
+    },
+    {
+      "close": 181.7900390625,
+      "date": "2025-10-16",
+      "high": 183.2598789113643,
+      "low": 179.75026972003684,
+      "open": 182.20999112544493,
+      "volume": 179723300
+    },
+    {
+      "close": 183.19989013671875,
+      "date": "2025-10-17",
+      "high": 184.07979842608083,
+      "low": 179.7302697995737,
+      "open": 180.1602152773484,
+      "volume": 173135200
+    },
+    {
+      "close": 182.6199493408203,
+      "date": "2025-10-20",
+      "high": 185.1796658652692,
+      "low": 181.7100455780644,
+      "open": 183.10990104163824,
+      "volume": 128544700
+    },
+    {
+      "close": 181.14010620117188,
+      "date": "2025-10-21",
+      "high": 182.76991679751694,
+      "low": 179.7802549646251,
+      "open": 182.76991679751694,
+      "volume": 124240200
+    },
+    {
+      "close": 180.2602081298828,
+      "date": "2025-10-22",
+      "high": 183.4198648953589,
+      "low": 176.74059027394597,
+      "open": 181.12011433169937,
+      "volume": 162249600
+    },
+    {
+      "close": 182.13999938964844,
+      "date": "2025-10-23",
+      "high": 183.0098989665471,
+      "low": 179.7702492811968,
+      "open": 180.4001849787377,
+      "volume": 111363700
+    },
+    {
+      "close": 186.23953247070312,
+      "date": "2025-10-24",
+      "high": 187.44940625639555,
+      "low": 183.47984116964938,
+      "open": 183.81980015643103,
+      "volume": 131296700
+    },
+    {
+      "close": 191.46897888183594,
+      "date": "2025-10-27",
+      "high": 191.97891738858848,
+      "low": 188.4093020699799,
+      "open": 189.9691435897376,
+      "volume": 153452700
+    },
+    {
+      "close": 201.0079345703125,
+      "date": "2025-10-28",
+      "high": 203.12769700573313,
+      "low": 191.8889404255143,
+      "open": 193.0288146936141,
+      "volume": 297986200
+    },
+    {
+      "close": 207.01727294921875,
+      "date": "2025-10-29",
+      "high": 212.1667169482571,
+      "low": 204.7575264516481,
+      "open": 207.95717223581016,
+      "volume": 308829600
+    },
+    {
+      "close": 202.8677215576172,
+      "date": "2025-10-30",
+      "high": 206.13736677538768,
+      "low": 201.38788833732997,
+      "open": 205.12746791137428,
+      "volume": 178864400
+    },
+    {
+      "close": 202.4677734375,
+      "date": "2025-10-31",
+      "high": 207.94716749796044,
+      "low": 202.04782138155986,
+      "open": 206.42733011185774,
+      "volume": 179802200
+    },
+    {
+      "close": 206.85728454589844,
+      "date": "2025-11-03",
+      "high": 211.31678618801203,
+      "low": 205.53742218982754,
+      "open": 208.05714970598171,
+      "volume": 180267300
+    },
+    {
+      "close": 198.66818237304688,
+      "date": "2025-11-04",
+      "high": 203.9476013046771,
+      "low": 197.90825607143535,
+      "open": 202.9777066091775,
+      "volume": 188919300
+    },
+    {
+      "close": 195.18858337402344,
+      "date": "2025-11-05",
+      "high": 202.89772869539195,
+      "low": 194.6286320152979,
+      "open": 198.7481902403631,
+      "volume": 171350300
+    },
+    {
+      "close": 188.05935668945312,
+      "date": "2025-11-06",
+      "high": 197.59830279082226,
+      "low": 186.35954634625867,
+      "open": 196.39843756369172,
+      "volume": 223029800
+    },
+    {
+      "close": 188.1293487548828,
+      "date": "2025-11-07",
+      "high": 188.29934352754728,
+      "low": 178.8903723972709,
+      "open": 184.87970536775757,
+      "volume": 264942300
+    },
+    {
+      "close": 199.0281524658203,
+      "date": "2025-11-10",
+      "high": 199.91805415635875,
+      "low": 193.76872011438098,
+      "open": 195.08858253564551,
+      "volume": 198897100
+    },
+    {
+      "close": 193.1387939453125,
+      "date": "2025-11-11",
+      "high": 195.3985402959953,
+      "low": 191.2789975702345,
+      "open": 195.13857433756354,
+      "volume": 176483300
+    },
+    {
+      "close": 193.7787322998047,
+      "date": "2025-11-12",
+      "high": 195.86849924763862,
+      "low": 191.1090271797132,
+      "open": 195.69851973704638,
+      "volume": 154935300
+    },
+    {
+      "close": 186.8394775390625,
+      "date": "2025-11-13",
+      "high": 191.4189763426968,
+      "low": 183.82981362374773,
+      "open": 191.02901978717685,
+      "volume": 207423100
+    },
+    {
+      "close": 190.1491241455078,
+      "date": "2025-11-14",
+      "high": 190.98902828114038,
+      "low": 180.56018045425046,
+      "open": 182.8399289693184,
+      "volume": 186591900
+    },
+    {
+      "close": 186.5795135498047,
+      "date": "2025-11-17",
+      "high": 188.9792438771453,
+      "low": 184.29976516169708,
+      "open": 185.9495778546046,
+      "volume": 173628900
+    },
+    {
+      "close": 181.340087890625,
+      "date": "2025-11-18",
+      "high": 184.7797126313021,
+      "low": 179.6302689297591,
+      "open": 183.3598703733926,
+      "volume": 213598900
+    },
+    {
+      "close": 186.49951171875,
+      "date": "2025-11-19",
+      "high": 187.8393608341106,
+      "low": 182.80991469001526,
+      "open": 184.76969080502667,
+      "volume": 247246400
+    },
+    {
+      "close": 180.6201629638672,
+      "date": "2025-11-20",
+      "high": 195.97847686300787,
+      "low": 179.83025642841662,
+      "open": 195.92847930218133,
+      "volume": 343504800
+    },
+    {
+      "close": 178.86036682128906,
+      "date": "2025-11-21",
+      "high": 184.5397359279593,
+      "low": 172.91100782704066,
+      "open": 181.22010834266524,
+      "volume": 346926200
+    },
+    {
+      "close": 182.52996826171875,
+      "date": "2025-11-24",
+      "high": 183.4798609481747,
+      "low": 176.4606271183833,
+      "open": 179.47030653663683,
+      "volume": 256618300
+    },
+    {
+      "close": 177.80047607421875,
+      "date": "2025-11-25",
+      "high": 178.14043506786686,
+      "low": 169.53138015579162,
+      "open": 174.89079203873564,
+      "volume": 320600300
+    },
+    {
+      "close": 180.24020385742188,
+      "date": "2025-11-26",
+      "high": 182.8899220695924,
+      "low": 178.22043661727494,
+      "open": 181.6100638206842,
+      "volume": 183852000
+    },
+    {
+      "close": 176.98056030273438,
+      "date": "2025-11-28",
+      "high": 179.2703020816569,
+      "low": 176.48061521713345,
+      "open": 178.99033405428943,
+      "volume": 121332800
+    },
+    {
+      "close": 179.90025329589844,
+      "date": "2025-12-01",
+      "high": 180.2802164760195,
+      "low": 173.66093259662904,
+      "open": 174.7408159055669,
+      "volume": 188131000
+    },
+    {
+      "close": 181.44007873535156,
+      "date": "2025-12-02",
+      "high": 185.63961443898967,
+      "low": 179.98023235974816,
+      "open": 181.7400335835938,
+      "volume": 182632200
+    },
+    {
+      "close": 179.57028198242188,
+      "date": "2025-12-03",
+      "high": 182.4299686383783,
+      "low": 179.09033894604931,
+      "open": 181.06012391136443,
+      "volume": 165138000
+    },
+    {
+      "close": 183.37008666992188,
+      "date": "2025-12-04",
+      "high": 184.51002440204854,
+      "low": 179.95027347354184,
+      "open": 181.61017209543593,
+      "volume": 167364900
+    },
+    {
+      "close": 182.40013122558594,
+      "date": "2025-12-05",
+      "high": 184.6500094505641,
+      "low": 180.9002124089338,
+      "open": 183.88004685245298,
+      "volume": 143971100
+    },
+    {
+      "close": 185.5399627685547,
+      "date": "2025-12-08",
+      "high": 187.98982714518382,
+      "low": 182.39012406320575,
+      "open": 182.6301165694494,
+      "volume": 204378100
+    },
+    {
+      "close": 184.95999145507812,
+      "date": "2025-12-09",
+      "high": 185.70995086836587,
+      "low": 183.31008684903045,
+      "open": 185.54995586495326,
+      "volume": 144719700
+    },
+    {
+      "close": 183.77005004882812,
+      "date": "2025-12-10",
+      "high": 185.46995496958337,
+      "low": 182.03013874897007,
+      "open": 184.9599880707457,
+      "volume": 162785400
+    },
+    {
+      "close": 180.92019653320312,
+      "date": "2025-12-11",
+      "high": 181.31019006496976,
+      "low": 176.61043233199788,
+      "open": 180.27023782951787,
+      "volume": 182136600
+    },
+    {
+      "close": 175.01052856445312,
+      "date": "2025-12-12",
+      "high": 182.81010931847595,
+      "low": 174.61054106596097,
+      "open": 181.10019518559332,
+      "volume": 204274900
+    },
+    {
+      "close": 176.28045654296875,
+      "date": "2025-12-15",
+      "high": 178.4103461991077,
+      "low": 175.02053019793698,
+      "open": 177.93037643785232,
+      "volume": 164775600
+    },
+    {
+      "close": 177.71038818359375,
+      "date": "2025-12-16",
+      "high": 178.48035080582065,
+      "low": 174.8905333961456,
+      "open": 176.25046044282257,
+      "volume": 148588100
+    },
+    {
+      "close": 170.93075561523438,
+      "date": "2025-12-17",
+      "high": 176.12047730871902,
+      "low": 170.30078481189744,
+      "open": 176.0904801521757,
+      "volume": 222775500
+    },
+    {
+      "close": 174.1305694580078,
+      "date": "2025-12-18",
+      "high": 176.14045512074784,
+      "low": 171.8107030234881,
+      "open": 174.52054772862792,
+      "volume": 176096000
+    },
+    {
+      "close": 180.98020935058594,
+      "date": "2025-12-19",
+      "high": 181.4401759084778,
+      "low": 176.3304518785618,
+      "open": 176.6604358481607,
+      "volume": 324925900
+    },
+    {
+      "close": 183.6800537109375,
+      "date": "2025-12-22",
+      "high": 184.15002947616998,
+      "low": 182.34012994783166,
+      "open": 183.91003698180788,
+      "volume": 129064400
+    },
+    {
+      "close": 189.19976806640625,
+      "date": "2025-12-23",
+      "high": 189.31975669034466,
+      "low": 182.89009670029142,
+      "open": 182.96010023623109,
+      "volume": 174873600
+    },
+    {
+      "close": 188.59979248046875,
+      "date": "2025-12-24",
+      "high": 188.899779295176,
+      "low": 186.57989753660073,
+      "open": 187.92983057380172,
+      "volume": 65528500
+    },
+    {
+      "close": 190.51968383789062,
+      "date": "2025-12-26",
+      "high": 192.67957056140054,
+      "low": 187.98982202804387,
+      "open": 189.9097162518428,
+      "volume": 139740300
+    },
+    {
+      "close": 188.20980834960938,
+      "date": "2025-12-29",
+      "high": 188.749772392931,
+      "low": 185.8999358866866,
+      "open": 187.6998414610299,
+      "volume": 120006100
+    },
+    {
+      "close": 187.52984619140625,
+      "date": "2025-12-30",
+      "high": 188.9797799436452,
+      "low": 186.91987858592935,
+      "open": 188.22982052336855,
+      "volume": 97687300
+    },
+    {
+      "close": 186.4899139404297,
+      "date": "2025-12-31",
+      "high": 190.54969193131708,
+      "low": 186.47991997410415,
+      "open": 189.55975523635485,
+      "volume": 120100500
+    },
+    {
+      "close": 188.83978271484375,
+      "date": "2026-01-02",
+      "high": 192.91954841717475,
+      "low": 188.24980305842183,
+      "open": 189.82971935613102,
+      "volume": 148240500
+    },
+    {
+      "close": 188.1098175048828,
+      "date": "2026-01-05",
+      "high": 193.61952916959007,
+      "low": 186.13992286460274,
+      "open": 191.74961996436147,
+      "volume": 183529700
+    },
+    {
+      "close": 187.22987365722656,
+      "date": "2026-01-06",
+      "high": 192.15959956375178,
+      "low": 186.80989821500853,
+      "open": 190.50969495089785,
+      "volume": 176862600
+    },
+    {
+      "close": 189.09976196289062,
+      "date": "2026-01-07",
+      "high": 191.35963411085106,
+      "low": 186.54989697142676,
+      "open": 188.55979791265688,
+      "volume": 153543200
+    },
+    {
+      "close": 185.0299835205078,
+      "date": "2026-01-08",
+      "high": 189.53974931649188,
+      "low": 183.70006889406122,
+      "open": 189.09977067708235,
+      "volume": 172457000
+    },
+    {
+      "close": 184.84999084472656,
+      "date": "2026-01-09",
+      "high": 186.32990643372668,
+      "low": 183.66005283935564,
+      "open": 185.06998015284367,
+      "volume": 131327500
+    },
+    {
+      "close": 184.92999267578125,
+      "date": "2026-01-12",
+      "high": 187.10986736077922,
+      "low": 183.010098425574,
+      "open": 183.2100845491025,
+      "volume": 137968500
+    },
+    {
+      "close": 185.79994201660156,
+      "date": "2026-01-13",
+      "high": 188.0998205983224,
+      "low": 183.3900687774691,
+      "open": 184.9899882929175,
+      "volume": 160128900
+    },
+    {
+      "close": 183.1300811767578,
+      "date": "2026-01-14",
+      "high": 184.45001701406107,
+      "low": 180.79021156477043,
+      "open": 184.3100252062831,
+      "volume": 159586100
+    },
+    {
+      "close": 187.03988647460938,
+      "date": "2026-01-15",
+      "high": 189.6897370464893,
+      "low": 186.31992419508657,
+      "open": 186.48991316970114,
+      "volume": 206188600
+    },
+    {
+      "close": 186.21990966796875,
+      "date": "2026-01-16",
+      "high": 190.4296883714215,
+      "low": 186.06992389502736,
+      "open": 189.06976141755646,
+      "volume": 187967200
+    },
+    {
+      "close": 178.06036376953125,
+      "date": "2026-01-20",
+      "high": 182.37012791600927,
+      "low": 177.60038196777572,
+      "open": 181.89014292514364,
+      "volume": 223345300
+    },
+    {
+      "close": 183.31008911132812,
+      "date": "2026-01-21",
+      "high": 185.3699752173061,
+      "low": 178.3903418724365,
+      "open": 179.04031586008543,
+      "volume": 200381000
+    },
+    {
+      "close": 184.82998657226562,
+      "date": "2026-01-22",
+      "high": 186.15991637882954,
+      "low": 183.92003219020145,
+      "open": 184.7399951080077,
+      "volume": 139636600
+    },
+    {
+      "close": 187.6598358154297,
+      "date": "2026-01-23",
+      "high": 189.58973923983262,
+      "low": 186.80989099781206,
+      "open": 187.48984685190618,
+      "volume": 142748100
+    },
+    {
+      "close": 186.4599151611328,
+      "date": "2026-01-26",
+      "high": 189.1097657209082,
+      "low": 185.97994539629804,
+      "open": 187.1498802806874,
+      "volume": 124799600
+    },
+    {
+      "close": 188.50979614257812,
+      "date": "2026-01-27",
+      "high": 189.9897117301412,
+      "low": 185.6899415183402,
+      "open": 187.22986667366473,
+      "volume": 143711600
+    },
+    {
+      "close": 191.5096435546875,
+      "date": "2026-01-28",
+      "high": 192.33960048487265,
+      "low": 189.82972650403363,
+      "open": 191.25965707901594,
+      "volume": 148552700
+    },
+    {
+      "close": 192.49957275390625,
+      "date": "2026-01-29",
+      "high": 193.46952146246272,
+      "low": 186.04992498376654,
+      "open": 191.32963792417547,
+      "volume": 171764400
+    },
+    {
+      "close": 191.11965942382812,
+      "date": "2026-01-30",
+      "high": 194.47947816452233,
+      "low": 189.45974561417185,
+      "open": 191.19965692455457,
+      "volume": 179489500
+    },
+    {
+      "close": 185.59996032714844,
+      "date": "2026-02-02",
+      "high": 190.2897090701948,
+      "low": 184.87000408758857,
+      "open": 187.1898706566695,
+      "volume": 165794100
+    },
+    {
+      "close": 180.33023071289062,
+      "date": "2026-02-03",
+      "high": 186.25991753048794,
+      "low": 176.22045266395375,
+      "open": 186.22992037566058,
+      "volume": 204019600
+    },
+    {
+      "close": 174.18057250976562,
+      "date": "2026-02-04",
+      "high": 179.57028010697434,
+      "low": 171.90069716024271,
+      "open": 179.45029148582987,
+      "volume": 207014100
+    },
+    {
+      "close": 171.87069702148438,
+      "date": "2026-02-05",
+      "high": 176.81043194569037,
+      "low": 171.020736948564,
+      "open": 174.92051964769362,
+      "volume": 206312900
+    },
+    {
+      "close": 185.39996337890625,
+      "date": "2026-02-06",
+      "high": 186.98987361565233,
+      "low": 174.59055120100808,
+      "open": 176.6804343618602,
+      "volume": 231346200
+    },
+    {
+      "close": 190.0297088623047,
+      "date": "2026-02-09",
+      "high": 193.64952333361757,
+      "low": 183.9400420976916,
+      "open": 184.25002288009932,
+      "volume": 196387400
+    },
+    {
+      "close": 188.52978515625,
+      "date": "2026-02-10",
+      "high": 192.46957427391544,
+      "low": 188.10980972728564,
+      "open": 191.36964298604585,
+      "volume": 136764800
+    },
+    {
+      "close": 190.0397186279297,
+      "date": "2026-02-11",
+      "high": 193.24953637655122,
+      "low": 188.75978911487715,
+      "open": 192.43958265041238,
+      "volume": 144192700
+    },
+    {
+      "close": 186.9298858642578,
+      "date": "2026-02-12",
+      "high": 193.5995230748733,
+      "low": 186.49990120030046,
+      "open": 193.01955263160718,
+      "volume": 189932500
+    },
+    {
+      "close": 182.80010986328125,
+      "date": "2026-02-13",
+      "high": 187.4898586352177,
+      "low": 181.58017462912434,
+      "open": 187.4698554447334,
+      "volume": 161888000
+    },
+    {
+      "close": 184.95999145507812,
+      "date": "2026-02-17",
+      "high": 187.13986615921206,
+      "low": 179.17029624003743,
+      "open": 181.74016448672575,
+      "volume": 162276900
+    },
+    {
+      "close": 187.96981811523438,
+      "date": "2026-02-18",
+      "high": 190.3596881055438,
+      "low": 186.7498829478333,
+      "open": 188.73978069812654,
+      "volume": 164749100
+    },
+    {
+      "close": 187.88983154296875,
+      "date": "2026-02-19",
+      "high": 188.41980165789556,
+      "low": 185.64996245587088,
+      "open": 187.04988063530703,
+      "volume": 126554500
+    },
+    {
+      "close": 189.8097381591797,
+      "date": "2026-02-20",
+      "high": 190.31970507557438,
+      "low": 185.92994318264132,
+      "open": 186.5599139825128,
+      "volume": 178422300
+    },
+    {
+      "close": 191.53964233398438,
+      "date": "2026-02-23",
+      "high": 193.93950641757905,
+      "low": 189.56974766836524,
+      "open": 191.3896412925324,
+      "volume": 171584800
+    },
+    {
+      "close": 192.83956909179688,
+      "date": "2026-02-24",
+      "high": 193.75951747058733,
+      "low": 187.38985183856119,
+      "open": 191.47964208446245,
+      "volume": 175123600
+    },
+    {
+      "close": 195.54940795898438,
+      "date": "2026-02-25",
+      "high": 197.61930319203404,
+      "low": 193.77949953248776,
+      "open": 194.43946745531196,
+      "volume": 250637100
+    },
+    {
+      "close": 184.87998962402344,
+      "date": "2026-02-26",
+      "high": 194.27947461393586,
+      "low": 184.31002841741252,
+      "open": 194.25948668244985,
+      "volume": 360807900
+    },
+    {
+      "close": 177.180419921875,
+      "date": "2026-02-27",
+      "high": 182.5801217841234,
+      "low": 176.3704661683341,
+      "open": 181.2401979138715,
+      "volume": 311636500
+    },
+    {
+      "close": 182.47012329101562,
+      "date": "2026-03-02",
+      "high": 183.45008125730604,
+      "low": 174.63055110847353,
+      "open": 175.00052620838028,
+      "volume": 209095300
+    },
+    {
+      "close": 180.04025268554688,
+      "date": "2026-03-03",
+      "high": 180.8901975001603,
+      "low": 176.91041730394699,
+      "open": 178.4803396065267,
+      "volume": 178099400
+    },
+    {
+      "close": 183.03009033203125,
+      "date": "2026-03-04",
+      "high": 184.69000418349444,
+      "low": 180.0502558302461,
+      "open": 180.4302401537762,
+      "volume": 177731200
+    },
+    {
+      "close": 183.330078125,
+      "date": "2026-03-05",
+      "high": 184.05004039552568,
+      "low": 177.87038204113773,
+      "open": 181.1601973472636,
+      "volume": 198779700
+    },
+    {
+      "close": 177.8103790283203,
+      "date": "2026-03-06",
+      "high": 182.7500987288974,
+      "low": 176.81043317462274,
+      "open": 179.83025866705609,
+      "volume": 189021900
+    },
+    {
+      "close": 182.64010620117188,
+      "date": "2026-03-09",
+      "high": 182.90010189125664,
+      "low": 175.55049367782217,
+      "open": 176.82042919903367,
+      "volume": 177213600
+    },
+    {
+      "close": 184.760009765625,
+      "date": "2026-03-10",
+      "high": 186.42991760168223,
+      "low": 182.00014929336922,
+      "open": 182.39012758732315,
+      "volume": 179118500
+    },
+    {
+      "close": 186.02999877929688,
+      "date": "2026-03-11",
+      "high": 187.6199951171875,
+      "low": 184.4499969482422,
+      "open": 185.91000366210938,
+      "volume": 145280400
+    },
+    {
+      "close": 183.13999938964844,
+      "date": "2026-03-12",
+      "high": 184.94000244140625,
+      "low": 181.75,
+      "open": 184.0500030517578,
+      "volume": 155762700
+    },
+    {
+      "close": 180.25,
+      "date": "2026-03-13",
+      "high": 186.08999633789062,
+      "low": 179.94000244140625,
+      "open": 184.9199981689453,
+      "volume": 160988400
+    },
+    {
+      "close": 183.22000122070312,
+      "date": "2026-03-16",
+      "high": 188.8800048828125,
+      "low": 181.41000366210938,
+      "open": 182.97000122070312,
+      "volume": 217307400
+    },
+    {
+      "close": 181.92999267578125,
+      "date": "2026-03-17",
+      "high": 185.39999389648438,
+      "low": 181.67999267578125,
+      "open": 185.05999755859375,
+      "volume": 182497800
+    },
+    {
+      "close": 180.39999389648438,
+      "date": "2026-03-18",
+      "high": 183.3800048828125,
+      "low": 180.3300018310547,
+      "open": 182.47999572753906,
+      "volume": 156683100
+    },
+    {
+      "close": 178.55999755859375,
+      "date": "2026-03-19",
+      "high": 179.97999572753906,
+      "low": 175.7899932861328,
+      "open": 178.00999450683594,
+      "volume": 170968500
+    },
+    {
+      "close": 172.6999969482422,
+      "date": "2026-03-20",
+      "high": 178.25999450683594,
+      "low": 171.72000122070312,
+      "open": 178.0,
+      "volume": 241323500
+    },
+    {
+      "close": 175.63999938964844,
+      "date": "2026-03-23",
+      "high": 178.3699951171875,
+      "low": 174.75999450683594,
+      "open": 177.25999450683594,
+      "volume": 182836300
+    },
+    {
+      "close": 175.1999969482422,
+      "date": "2026-03-24",
+      "high": 176.22000122070312,
+      "low": 173.97999572753906,
+      "open": 174.8300018310547,
+      "volume": 147667800
+    },
+    {
+      "close": 178.67999267578125,
+      "date": "2026-03-25",
+      "high": 181.22000122070312,
+      "low": 176.85000610351562,
+      "open": 177.10000610351562,
+      "volume": 162602100
+    },
+    {
+      "close": 171.24000549316406,
+      "date": "2026-03-26",
+      "high": 176.50999450683594,
+      "low": 171.13999938964844,
+      "open": 176.07000732421875,
+      "volume": 186152200
+    },
+    {
+      "close": 167.52000427246094,
+      "date": "2026-03-27",
+      "high": 170.97000122070312,
+      "low": 167.00999450683594,
+      "open": 170.0,
+      "volume": 196212700
+    },
+    {
+      "close": 165.1699981689453,
+      "date": "2026-03-30",
+      "high": 169.4499969482422,
+      "low": 164.27000427246094,
+      "open": 168.77999877929688,
+      "volume": 185627000
+    },
+    {
+      "close": 174.39999389648438,
+      "date": "2026-03-31",
+      "high": 174.6199951171875,
+      "low": 166.9600067138672,
+      "open": 166.97000122070312,
+      "volume": 226181300
+    },
+    {
+      "close": 175.75,
+      "date": "2026-04-01",
+      "high": 177.3699951171875,
+      "low": 174.75,
+      "open": 176.0,
+      "volume": 168132000
+    },
+    {
+      "close": 177.38999938964844,
+      "date": "2026-04-02",
+      "high": 177.49000549316406,
+      "low": 171.3699951171875,
+      "open": 172.17999267578125,
+      "volume": 143143200
+    },
+    {
+      "close": 177.63999938964844,
+      "date": "2026-04-06",
+      "high": 177.7899932861328,
+      "low": 175.75999450683594,
+      "open": 177.16000366210938,
+      "volume": 107564300
+    },
+    {
+      "close": 178.10000610351562,
+      "date": "2026-04-07",
+      "high": 178.22999572753906,
+      "low": 173.66000366210938,
+      "open": 175.72999572753906,
+      "volume": 132534900
+    },
+    {
+      "close": 182.0800018310547,
+      "date": "2026-04-08",
+      "high": 185.25999450683594,
+      "low": 180.3000030517578,
+      "open": 184.5,
+      "volume": 147732700
+    },
+    {
+      "close": 183.91000366210938,
+      "date": "2026-04-09",
+      "high": 184.0800018310547,
+      "low": 180.6199951171875,
+      "open": 181.83999633789062,
+      "volume": 116428500
+    },
+    {
+      "close": 188.6300048828125,
+      "date": "2026-04-10",
+      "high": 190.0,
+      "low": 184.3000030517578,
+      "open": 184.30999755859375,
+      "volume": 160459500
+    },
+    {
+      "close": 189.30999755859375,
+      "date": "2026-04-13",
+      "high": 189.66000366210938,
+      "low": 185.74000549316406,
+      "open": 186.02999877929688,
+      "volume": 133648200
+    },
+    {
+      "close": 196.50999450683594,
+      "date": "2026-04-14",
+      "high": 196.50999450683594,
+      "low": 190.77000427246094,
+      "open": 190.83999633789062,
+      "volume": 161307000
+    },
+    {
+      "close": 198.8699951171875,
+      "date": "2026-04-15",
+      "high": 200.39999389648438,
+      "low": 195.74000549316406,
+      "open": 196.5399932861328,
+      "volume": 185338400
+    },
+    {
+      "close": 198.35000610351562,
+      "date": "2026-04-16",
+      "high": 199.85000610351562,
+      "low": 195.80999755859375,
+      "open": 197.42999267578125,
+      "volume": 134012900
+    },
+    {
+      "close": 201.67999267578125,
+      "date": "2026-04-17",
+      "high": 201.6999969482422,
+      "low": 199.27000427246094,
+      "open": 199.89999389648438,
+      "volume": 160324400
+    },
+    {
+      "close": 202.05999755859375,
+      "date": "2026-04-20",
+      "high": 202.1699981689453,
+      "low": 197.83999633789062,
+      "open": 199.97999572753906,
+      "volume": 119381400
+    },
+    {
+      "close": 199.8800048828125,
+      "date": "2026-04-21",
+      "high": 202.75,
+      "low": 199.0,
+      "open": 202.1300048828125,
+      "volume": 107945300
+    },
+    {
+      "close": 202.5,
+      "date": "2026-04-22",
+      "high": 202.5,
+      "low": 199.0,
+      "open": 200.99000549316406,
+      "volume": 107501000
+    },
+    {
+      "close": 199.63999938964844,
+      "date": "2026-04-23",
+      "high": 203.8300018310547,
+      "low": 197.22000122070312,
+      "open": 202.4600067138672,
+      "volume": 113561800
+    },
+    {
+      "close": 208.27000427246094,
+      "date": "2026-04-24",
+      "high": 210.9499969482422,
+      "low": 199.80999755859375,
+      "open": 199.9600067138672,
+      "volume": 214134400
+    },
+    {
+      "close": 216.61000061035156,
+      "date": "2026-04-27",
+      "high": 216.8300018310547,
+      "low": 207.3800048828125,
+      "open": 209.64999389648438,
+      "volume": 187172400
+    },
+    {
+      "close": 213.1699981689453,
+      "date": "2026-04-28",
+      "high": 214.72999572753906,
+      "low": 208.1999969482422,
+      "open": 209.49000549316406,
+      "volume": 180275400
+    },
+    {
+      "close": 209.25,
+      "date": "2026-04-29",
+      "high": 212.72000122070312,
+      "low": 207.5800018310547,
+      "open": 212.6999969482422,
+      "volume": 123711800
+    },
+    {
+      "close": 199.57000732421875,
+      "date": "2026-04-30",
+      "high": 210.3000030517578,
+      "low": 198.6999969482422,
+      "open": 209.92999267578125,
+      "volume": 225239200
+    },
+    {
+      "close": 198.4499969482422,
+      "date": "2026-05-01",
+      "high": 203.0,
+      "low": 197.1199951171875,
+      "open": 201.27999877929688,
+      "volume": 128257500
+    },
+    {
+      "close": 198.47999572753906,
+      "date": "2026-05-04",
+      "high": 201.72999572753906,
+      "low": 194.74000549316406,
+      "open": 199.5399932861328,
+      "volume": 124170649
+    }
+  ],
   "persona_signals": [],
-  "position_signal": null,
+  "position_signal": {
+    "action_hint": "consider_add",
+    "computed_at": "2026-05-04T22:02:08.793698Z",
+    "confidence": 50,
+    "consensus_score": -0.20427300961160824,
+    "data_unavailable": false,
+    "evidence": [
+      "RSI(14) 53.0 \u2014 neutral band",
+      "Bollinger position +0.01 \u2014 within bands",
+      "z-score vs MA50: +0.92 \u2014 near trend",
+      "Stochastic %K 16.9 \u2014 oversold (below 20)",
+      "Williams %R -83 \u2014 oversold (below -80)",
+      "MACD histogram z=-0.87 \u2014 bearish momentum",
+      "ADX 24 \u2014 ambiguous regime",
+      "3 of 6 indicators agree (oversold consensus)"
+    ],
+    "indicators": {
+      "adx_14": 23.89492350269152,
+      "bb_position": 0.010754026997576906,
+      "macd_histogram": -0.8694050578037759,
+      "rsi_14": 53.011781322898145,
+      "stoch_k": 16.930696488889197,
+      "williams_r": -83.0693035111108,
+      "zscore_50": 0.9216939164422617
+    },
+    "state": "oversold",
+    "ticker": "NVDA",
+    "trend_regime": false
+  },
   "schema_version": 2,
   "ticker": "NVDA",
   "ticker_decision": null
