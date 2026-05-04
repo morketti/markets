@@ -1,0 +1,487 @@
+"""Tests for routine.storage — three-phase atomic write per Pattern #4.
+
+Locked behaviors verified:
+  * _atomic_write_json: tempfile + os.replace + sort_keys=True; mkdir parents;
+    no orphan .tmp on os.replace OSError.
+  * write_daily_snapshot: per-ticker JSONs FIRST → _index.json SECOND →
+    _status.json LAST. Per-ticker write OSError populates failed_tickers
+    WITHOUT aborting the loop (LLM-08 cascade-prevention).
+  * _index.json schema: {date, schema_version=1, run_started_at,
+    run_completed_at, tickers (only completed), lite_mode,
+    total_token_count_estimate}.
+  * _status.json schema (LLM-08): {success, partial, completed_tickers,
+    failed_tickers, skipped_tickers, llm_failure_count, lite_mode}.
+  * llm_failure_count formula: count persona AgentSignals with
+    data_unavailable=True + (1 per ticker where ticker_decision is None
+    AND lite_mode=False).
+"""
+from __future__ import annotations
+
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
+
+
+# ---------------------------------------------------------------------------
+# Builder helpers — produce minimal valid TickerResult fixtures.
+# ---------------------------------------------------------------------------
+
+FROZEN_DT = datetime(2026, 5, 4, 13, 30, 0, tzinfo=timezone.utc)
+RUN_STARTED = datetime(2026, 5, 4, 11, 0, 0, tzinfo=timezone.utc)
+RUN_COMPLETED = datetime(2026, 5, 4, 11, 14, 32, tzinfo=timezone.utc)
+
+
+def _make_agent_signal(ticker: str, analyst_id: str, *, data_unavailable: bool = False):
+    from analysts.signals import AgentSignal
+
+    if data_unavailable:
+        return AgentSignal(
+            ticker=ticker,
+            analyst_id=analyst_id,
+            computed_at=FROZEN_DT,
+            verdict="neutral",
+            confidence=0,
+            evidence=["schema_failure"],
+            data_unavailable=True,
+        )
+    return AgentSignal(
+        ticker=ticker,
+        analyst_id=analyst_id,
+        computed_at=FROZEN_DT,
+        verdict="bullish",
+        confidence=70,
+        evidence=["sample evidence"],
+    )
+
+
+def _make_position_signal(ticker: str):
+    from analysts.position_signal import PositionSignal
+
+    return PositionSignal(
+        ticker=ticker, computed_at=FROZEN_DT,
+        state="fair", consensus_score=0.05, confidence=60,
+        action_hint="hold_position",
+    )
+
+
+def _make_ticker_decision(ticker: str):
+    from synthesis.decision import DissentSection, TickerDecision, TimeframeBand
+
+    return TickerDecision(
+        ticker=ticker,
+        computed_at=FROZEN_DT,
+        recommendation="hold",
+        conviction="medium",
+        short_term=TimeframeBand(summary="ST summary", drivers=[], confidence=50),
+        long_term=TimeframeBand(summary="LT summary", drivers=[], confidence=55),
+        open_observation="",
+        dissent=DissentSection(),
+    )
+
+
+def _make_ticker_result(
+    ticker: str,
+    *,
+    n_personas_unavailable: int = 0,
+    decision_present: bool = True,
+    persona_count: int = 6,
+):
+    """Build a minimal TickerResult with controllable persona/decision shape."""
+    from routine.run_for_watchlist import TickerResult
+
+    analytical = [
+        _make_agent_signal(ticker, "fundamentals"),
+        _make_agent_signal(ticker, "technicals"),
+        _make_agent_signal(ticker, "news_sentiment"),
+        _make_agent_signal(ticker, "valuation"),
+    ]
+    pos = _make_position_signal(ticker)
+    persona_ids = ["buffett", "munger", "wood", "burry", "lynch", "claude_analyst"]
+    personas = [
+        _make_agent_signal(
+            ticker, persona_ids[i],
+            data_unavailable=(i < n_personas_unavailable),
+        )
+        for i in range(persona_count)
+    ]
+    decision = _make_ticker_decision(ticker) if decision_present else None
+    return TickerResult(
+        ticker=ticker,
+        analytical_signals=analytical,
+        position_signal=pos,
+        persona_signals=personas,
+        ticker_decision=decision,
+        errors=[],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Test 1: _atomic_write_json — basic write + sort_keys serialization.
+# ---------------------------------------------------------------------------
+
+def test_atomic_write_json_creates_file_and_serializes_sort_keys(tmp_path: Path) -> None:
+    """payload {b:1, a:2} → file content has 'a' before 'b' (sort_keys=True locked)."""
+    from routine.storage import _atomic_write_json
+
+    target = tmp_path / "out.json"
+    payload = {"b": 1, "a": 2}
+    _atomic_write_json(target, payload)
+
+    text = target.read_text(encoding="utf-8")
+    expected = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    assert text == expected
+    # First key in the rendered output must be 'a' (sort_keys lock).
+    a_idx = text.index('"a"')
+    b_idx = text.index('"b"')
+    assert a_idx < b_idx
+
+
+# ---------------------------------------------------------------------------
+# Test 2: _atomic_write_json — mkdir parents.
+# ---------------------------------------------------------------------------
+
+def test_atomic_write_json_creates_parent_dir(tmp_path: Path) -> None:
+    """When parent dir doesn't exist, mkdir(parents=True) bootstraps it."""
+    from routine.storage import _atomic_write_json
+
+    target = tmp_path / "missing" / "subdir" / "out.json"
+    assert not target.parent.exists()
+    _atomic_write_json(target, {"x": 1})
+    assert target.exists()
+    assert target.parent.is_dir()
+
+
+# ---------------------------------------------------------------------------
+# Test 3: _atomic_write_json — no orphan .tmp on os.replace OSError.
+# ---------------------------------------------------------------------------
+
+def test_atomic_write_json_no_orphan_tmp_on_replace_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """os.replace OSError → tmp file is unlinked; original raise propagates."""
+    from routine import storage
+
+    target = tmp_path / "out.json"
+
+    def _fake_replace(src, dst):
+        raise OSError("simulated replace failure")
+
+    monkeypatch.setattr(os, "replace", _fake_replace)
+    monkeypatch.setattr(storage, "os", os)  # ensure storage uses patched os
+
+    with pytest.raises(OSError, match="simulated replace failure"):
+        storage._atomic_write_json(target, {"x": 1})
+
+    # No orphan .tmp files in tmp_path.
+    leftovers = [p for p in tmp_path.glob("*.tmp")]
+    assert leftovers == [], f"orphan tmp files: {leftovers}"
+
+
+# ---------------------------------------------------------------------------
+# Test 4: write_daily_snapshot — three-phase write order.
+# ---------------------------------------------------------------------------
+
+def test_three_phase_write_order(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Per-ticker JSONs FIRST → _index.json SECOND → _status.json LAST (Pattern #4 lock)."""
+    from routine import storage
+
+    call_order: list[str] = []
+    real_write = storage._atomic_write_json
+
+    def _spy(path: Path, payload):
+        call_order.append(path.name)
+        return real_write(path, payload)
+
+    monkeypatch.setattr(storage, "_atomic_write_json", _spy)
+
+    results = [
+        _make_ticker_result("AAPL"),
+        _make_ticker_result("MSFT"),
+        _make_ticker_result("NVDA"),
+    ]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        run_completed_at=RUN_COMPLETED,
+        lite_mode=False,
+        total_token_count_estimate=58_400,
+        snapshots_root=tmp_path,
+    )
+    # Expected order: 3 per-ticker JSONs (any per-ticker order is fine — Pattern
+    # #4 only locks the A→B→C phase boundaries, NOT per-ticker order); then
+    # _index.json; then _status.json LAST.
+    assert call_order[-2:] == ["_index.json", "_status.json"], (
+        f"_index.json + _status.json must be the LAST two writes; got {call_order}"
+    )
+    # The first 3 writes must be the per-ticker JSONs.
+    per_ticker = call_order[:3]
+    assert sorted(per_ticker) == sorted(["AAPL.json", "MSFT.json", "NVDA.json"])
+
+
+# ---------------------------------------------------------------------------
+# Test 5: _index.json schema.
+# ---------------------------------------------------------------------------
+
+def test_index_json_schema(tmp_path: Path) -> None:
+    """_index.json carries date + schema_version=1 + run timestamps + tickers + lite + tokens."""
+    from routine import storage
+
+    results = [_make_ticker_result("AAPL"), _make_ticker_result("MSFT")]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        run_completed_at=RUN_COMPLETED,
+        lite_mode=False,
+        total_token_count_estimate=39_600,
+        snapshots_root=tmp_path,
+    )
+    idx_path = tmp_path / "2026-05-04" / "_index.json"
+    assert idx_path.exists()
+    idx = json.loads(idx_path.read_text(encoding="utf-8"))
+    assert idx["date"] == "2026-05-04"
+    assert idx["schema_version"] == 1
+    assert idx["run_started_at"] == RUN_STARTED.isoformat()
+    assert idx["run_completed_at"] == RUN_COMPLETED.isoformat()
+    assert sorted(idx["tickers"]) == ["AAPL", "MSFT"]
+    assert idx["lite_mode"] is False
+    assert idx["total_token_count_estimate"] == 39_600
+
+
+# ---------------------------------------------------------------------------
+# Test 6: _status.json happy-path schema (LLM-08).
+# ---------------------------------------------------------------------------
+
+def test_status_json_schema_success(tmp_path: Path) -> None:
+    """5-ticker successful run → success=True; partial=lite_mode; failed/skipped empty."""
+    from routine import storage
+
+    results = [_make_ticker_result(t) for t in
+               ("AAPL", "MSFT", "NVDA", "GOOG", "AMZN")]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        run_completed_at=RUN_COMPLETED,
+        lite_mode=False,
+        total_token_count_estimate=99_000,
+        snapshots_root=tmp_path,
+    )
+    status_path = tmp_path / "2026-05-04" / "_status.json"
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+
+    # All 7 LLM-08 keys present.
+    expected_keys = {
+        "success", "partial", "completed_tickers", "failed_tickers",
+        "skipped_tickers", "llm_failure_count", "lite_mode",
+    }
+    assert set(status.keys()) >= expected_keys
+
+    assert status["success"] is True
+    assert status["partial"] is False  # lite_mode=False, no failures
+    assert sorted(status["completed_tickers"]) == [
+        "AAPL", "AMZN", "GOOG", "MSFT", "NVDA",
+    ]
+    assert status["failed_tickers"] == []
+    assert status["skipped_tickers"] == []
+    assert status["llm_failure_count"] == 0
+    assert status["lite_mode"] is False
+
+
+# ---------------------------------------------------------------------------
+# Test 7: failed_tickers populated on per-ticker OSError, loop continues.
+# ---------------------------------------------------------------------------
+
+def test_status_json_failed_tickers_populated_on_OSError(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """If _atomic_write_json raises on the 2nd ticker, run continues for the 3rd."""
+    from routine import storage
+
+    real_write = storage._atomic_write_json
+    call_count = {"n": 0}
+
+    def _flaky_write(path: Path, payload):
+        # Raise OSError ONLY when writing MSFT.json (the 2nd ticker).
+        if path.name == "MSFT.json":
+            raise OSError("disk full")
+        call_count["n"] += 1
+        return real_write(path, payload)
+
+    monkeypatch.setattr(storage, "_atomic_write_json", _flaky_write)
+
+    results = [
+        _make_ticker_result("AAPL"),
+        _make_ticker_result("MSFT"),
+        _make_ticker_result("NVDA"),
+    ]
+    outcome = storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        run_completed_at=RUN_COMPLETED,
+        lite_mode=False,
+        total_token_count_estimate=58_400,
+        snapshots_root=tmp_path,
+    )
+
+    # AAPL + NVDA written successfully; MSFT in failed_tickers.
+    assert sorted(outcome.completed) == ["AAPL", "NVDA"]
+    assert outcome.failed == ["MSFT"]
+
+    # _status.json reflects the failure.
+    status_path = tmp_path / "2026-05-04" / "_status.json"
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    assert status["success"] is False  # failed_tickers non-empty
+    assert status["partial"] is True
+    assert status["failed_tickers"] == ["MSFT"]
+    assert sorted(status["completed_tickers"]) == ["AAPL", "NVDA"]
+
+
+# ---------------------------------------------------------------------------
+# Test 8: llm_failure_count from persona data_unavailable.
+# ---------------------------------------------------------------------------
+
+def test_llm_failure_count_persona_data_unavailable(tmp_path: Path) -> None:
+    """2 of 6 personas data_unavailable=True on a single ticker → +2 to llm_failure_count."""
+    from routine import storage
+
+    results = [_make_ticker_result("AAPL", n_personas_unavailable=2)]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        run_completed_at=RUN_COMPLETED,
+        lite_mode=False,
+        total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    status = json.loads(
+        (tmp_path / "2026-05-04" / "_status.json").read_text(encoding="utf-8"),
+    )
+    assert status["llm_failure_count"] == 2
+
+
+# ---------------------------------------------------------------------------
+# Test 9: llm_failure_count synthesizer failure outside lite mode.
+# ---------------------------------------------------------------------------
+
+def test_llm_failure_count_synthesizer_failure_outside_lite_mode(tmp_path: Path) -> None:
+    """ticker_decision=None + lite_mode=False → +1 (synth failure). lite_mode=True → +0."""
+    from routine import storage
+
+    # Outside lite mode: synthesizer failure counts.
+    results_a = [_make_ticker_result("AAPL", decision_present=False)]
+    storage.write_daily_snapshot(
+        results_a,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    status_a = json.loads(
+        (tmp_path / "2026-05-04" / "_status.json").read_text(encoding="utf-8"),
+    )
+    assert status_a["llm_failure_count"] == 1  # synth-only failure
+
+    # Inside lite mode: no decision is the design (skipped); not a failure.
+    results_b = [_make_ticker_result("MSFT", decision_present=False, persona_count=0)]
+    storage.write_daily_snapshot(
+        results_b,
+        date_str="2026-05-05",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=True, total_token_count_estimate=0,
+        snapshots_root=tmp_path,
+    )
+    status_b = json.loads(
+        (tmp_path / "2026-05-05" / "_status.json").read_text(encoding="utf-8"),
+    )
+    assert status_b["llm_failure_count"] == 0
+    assert status_b["lite_mode"] is True
+    assert status_b["partial"] is True
+
+
+# ---------------------------------------------------------------------------
+# Test 10: round-trip per-ticker JSON.
+# ---------------------------------------------------------------------------
+
+def test_round_trip_per_ticker_json(tmp_path: Path) -> None:
+    """Build TickerResult → write → read → assert key fields preserved."""
+    from routine import storage
+
+    results = [_make_ticker_result("AAPL")]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    body = json.loads(
+        (tmp_path / "2026-05-04" / "AAPL.json").read_text(encoding="utf-8"),
+    )
+    assert body["ticker"] == "AAPL"
+    assert body["schema_version"] == 1
+    assert len(body["analytical_signals"]) == 4
+    assert len(body["persona_signals"]) == 6
+    assert body["ticker_decision"] is not None
+    assert body["ticker_decision"]["recommendation"] == "hold"
+    assert body["errors"] == []
+    assert body["position_signal"] is not None
+    assert body["position_signal"]["state"] == "fair"
+
+
+# ---------------------------------------------------------------------------
+# Test 11 (extra coverage): lite_mode=True propagates lite_mode field on _index.json.
+# ---------------------------------------------------------------------------
+
+def test_lite_mode_field_surfaces_in_index_and_status(tmp_path: Path) -> None:
+    """lite_mode=True → both _index.json.lite_mode and _status.json.lite_mode are True."""
+    from routine import storage
+
+    results = [_make_ticker_result("AAPL", decision_present=False, persona_count=0)]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=True, total_token_count_estimate=613_800,
+        snapshots_root=tmp_path,
+    )
+    idx = json.loads(
+        (tmp_path / "2026-05-04" / "_index.json").read_text(encoding="utf-8"),
+    )
+    status = json.loads(
+        (tmp_path / "2026-05-04" / "_status.json").read_text(encoding="utf-8"),
+    )
+    assert idx["lite_mode"] is True
+    assert status["lite_mode"] is True
+    assert status["partial"] is True
+
+
+# ---------------------------------------------------------------------------
+# Test 12 (extra coverage): write_failure_status emits success=False shape.
+# ---------------------------------------------------------------------------
+
+def test_write_failure_status_emits_success_false(tmp_path: Path) -> None:
+    """write_failure_status writes _status.json with success=False + error field."""
+    from routine import storage
+
+    storage.write_failure_status(
+        snapshots_root=tmp_path,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED,
+        error_msg="boom: something went wrong",
+    )
+    status_path = tmp_path / "2026-05-04" / "_status.json"
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    assert status["success"] is False
+    assert status["partial"] is True
+    assert status["completed_tickers"] == []
+    assert status["failed_tickers"] == []
+    assert status["lite_mode"] is False
+    assert "error" in status
+    assert "boom" in status["error"]
