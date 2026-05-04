@@ -67,8 +67,8 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **VIEW-11**: Header shows snapshot date + staleness badge (GREEN < 6h, AMBER 6-24h, RED > 24h or partial)
 - [x] **VIEW-12**: All views are mobile-responsive; morning-scan and deep-dive have phone-optimized layouts (collapsed cards, swipeable tabs)
 - [x] **VIEW-13**: Search/add ticker via typeahead with company name fuzzy match
-- [ ] **VIEW-14**: Snapshot date selector lets user load historical snapshots from `data/YYYY-MM-DD/`
-- [ ] **VIEW-15**: All JSON reads from `raw.githubusercontent.com` are zod-validated; schema mismatches render error state, not crash
+- [x] **VIEW-14**: Snapshot date selector lets user load historical snapshots from `data/YYYY-MM-DD/`
+- [x] **VIEW-15**: All JSON reads from `raw.githubusercontent.com` are zod-validated; schema mismatches render error state, not crash
 
 ### Mid-Day Refresh (REFRESH)
 
@@ -89,7 +89,7 @@ Requirements for initial release. Each maps to a roadmap phase.
 - [x] **INFRA-02**: Routine entrypoint logs estimated token cost up front; if estimate exceeds available quota, runs in lite mode (analyticals only, no persona LLM, no synthesizer LLM)
 - [x] **INFRA-03**: Daily snapshots committed to `data/YYYY-MM-DD/` with one JSON per ticker (`AAPL.json`, etc.) plus `_index.json` listing tickers + run metadata
 - [x] **INFRA-04**: Routine commits and pushes via git from within the routine; auth token stored as routine env var (not in repo)
-- [ ] **INFRA-05**: Frontend deployed to Vercel; builds triggered on `main` branch push; reads from `raw.githubusercontent.com` via public repo URL
+- [x] **INFRA-05**: Frontend deployed to Vercel; builds triggered on `main` branch push; reads from `raw.githubusercontent.com` via public repo URL
 - [ ] **INFRA-06**: Memory layer writes append-only `memory/historical_signals.jsonl` per run with `{date, ticker, persona_id, signal, confidence}` records (used in v1.x for trend surfacing)
 - [ ] **INFRA-07**: Provenance: every code file adapted from reference repos (`virattt/ai-hedge-fund` or `TauricResearch/TradingAgents`) carries a header comment naming the source file and modifications
 
@@ -196,8 +196,8 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | VIEW-11 | Phase 6 | Complete |
 | VIEW-12 | Phase 6 | Complete |
 | VIEW-13 | Phase 6 | Complete |
-| VIEW-14 | Phase 6 | Pending |
-| VIEW-15 | Phase 6 | Pending |
+| VIEW-14 | Phase 6 | Complete |
+| VIEW-15 | Phase 6 | Complete |
 | REFRESH-01 | Phase 8 | Pending |
 | REFRESH-02 | Phase 8 | Pending |
 | REFRESH-03 | Phase 8 | Pending |
@@ -209,7 +209,7 @@ Phase mapping per requirement. Updated by ROADMAP.md.
 | INFRA-02 | Phase 5 | Complete |
 | INFRA-03 | Phase 5 | Complete |
 | INFRA-04 | Phase 5 | Complete |
-| INFRA-05 | Phase 6 | Pending |
+| INFRA-05 | Phase 6 | Complete |
 | INFRA-06 | Phase 8 | Pending |
 | INFRA-07 | Phase 8 | Pending |
 
