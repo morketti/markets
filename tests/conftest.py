@@ -83,3 +83,20 @@ def large_watchlist_path(tmp_path: Path) -> Path:
     payload = json.dumps(wl.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
     path.write_text(payload, encoding="utf-8")
     return path
+
+
+# ---------------------------------------------------------------------------
+# Re-export Wave 2 (05-03) fixtures so tests/synthesis/ (Phase 5 / Wave 4)
+# can use them. tests/routine/conftest.py is a sibling-package conftest;
+# pytest does NOT auto-discover sibling conftests, so we lift the fixtures
+# to root level here. This also primes Wave 5 (05-06) tests/routine/
+# test_entrypoint.py to inherit the fixtures uniformly.
+#
+# noqa: F401 — these are re-exports; pytest discovers them by name.
+# ---------------------------------------------------------------------------
+from tests.routine.conftest import (  # noqa: E402, F401
+    MockAnthropicClient,
+    MockMessages,
+    isolated_failure_log,
+    mock_anthropic_client,
+)
