@@ -82,14 +82,55 @@ def _make_ticker_decision(ticker: str):
     )
 
 
+def _make_ohlc_history(n: int = 180) -> list:
+    """Build n synthetic OHLCBars ending at FROZEN_DT.date() (Phase 6 / Plan 06-01)."""
+    from datetime import date, timedelta
+
+    from analysts.data.prices import OHLCBar
+
+    end = FROZEN_DT.date()
+    bars: list = []
+    base = 100.0
+    for i in range(n):
+        d = end - timedelta(days=n - 1 - i)
+        c = base * (1.0 + 0.001 * i)  # gentle uptrend
+        bars.append(
+            OHLCBar(
+                date=d,
+                open=c * 0.998,
+                high=c * 1.01,
+                low=c * 0.99,
+                close=c,
+                volume=1_000_000 + i * 100,
+            )
+        )
+    return bars
+
+
+def _make_raw_headline(*, source: str = "yahoo-rss", title: str = "Apple beats", url: str = "https://x") -> dict:
+    """Build a raw-headline dict matching ingestion/news.fetch_news(return_raw=True) shape."""
+    return {
+        "source": source,
+        "published_at": "2026-05-04T10:00:00+00:00",
+        "title": title,
+        "url": url,
+    }
+
+
 def _make_ticker_result(
     ticker: str,
     *,
     n_personas_unavailable: int = 0,
     decision_present: bool = True,
     persona_count: int = 6,
+    ohlc_history: list | None = None,
+    headlines: list[dict] | None = None,
 ):
-    """Build a minimal TickerResult with controllable persona/decision shape."""
+    """Build a minimal TickerResult with controllable persona/decision shape.
+
+    Phase 6 / Plan 06-01: optional `ohlc_history` (list[OHLCBar]) and
+    `headlines` (list[dict]) — used by new payload tests.
+    """
     from routine.run_for_watchlist import TickerResult
 
     analytical = [
@@ -108,14 +149,19 @@ def _make_ticker_result(
         for i in range(persona_count)
     ]
     decision = _make_ticker_decision(ticker) if decision_present else None
-    return TickerResult(
-        ticker=ticker,
-        analytical_signals=analytical,
-        position_signal=pos,
-        persona_signals=personas,
-        ticker_decision=decision,
-        errors=[],
-    )
+    kwargs: dict = {
+        "ticker": ticker,
+        "analytical_signals": analytical,
+        "position_signal": pos,
+        "persona_signals": personas,
+        "ticker_decision": decision,
+        "errors": [],
+    }
+    if ohlc_history is not None:
+        kwargs["ohlc_history"] = ohlc_history
+    if headlines is not None:
+        kwargs["headlines"] = headlines
+    return TickerResult(**kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -410,7 +456,10 @@ def test_llm_failure_count_synthesizer_failure_outside_lite_mode(tmp_path: Path)
 # ---------------------------------------------------------------------------
 
 def test_round_trip_per_ticker_json(tmp_path: Path) -> None:
-    """Build TickerResult → write → read → assert key fields preserved."""
+    """Build TickerResult → write → read → assert key fields preserved.
+
+    Phase 6 / Plan 06-01: per-ticker JSON schema_version bumped 1→2.
+    """
     from routine import storage
 
     results = [_make_ticker_result("AAPL")]
@@ -425,7 +474,7 @@ def test_round_trip_per_ticker_json(tmp_path: Path) -> None:
         (tmp_path / "2026-05-04" / "AAPL.json").read_text(encoding="utf-8"),
     )
     assert body["ticker"] == "AAPL"
-    assert body["schema_version"] == 1
+    assert body["schema_version"] == 2
     assert len(body["analytical_signals"]) == 4
     assert len(body["persona_signals"]) == 6
     assert body["ticker_decision"] is not None
@@ -582,3 +631,205 @@ def test_status_json_both_writers_satisfy_llm_08_minimum_keys(
     assert "error" in failure_status
     assert "run_started_at" in failure_status
     assert "error" not in happy_status
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 / Plan 06-01: per-ticker payload extensions
+#
+# The Wave 0 amendment extends the per-ticker JSON shape with 4 new fields:
+#   * ohlc_history    — list of last 180 trading days
+#   * indicators      — dict of 5 series aligned to ohlc_history dates
+#   * headlines       — list of raw {source, published_at, title, url} dicts
+#   * schema_version  — bumped 1→2
+# Plus a new file at the repo root: data/_dates.json.
+# ---------------------------------------------------------------------------
+
+
+def test_per_ticker_payload_schema_version_is_2(tmp_path: Path) -> None:
+    """schema_version in per-ticker JSON bumped 1→2 (Plan 06-01)."""
+    from routine import storage
+
+    results = [_make_ticker_result("AAPL", ohlc_history=_make_ohlc_history(180))]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    body = json.loads(
+        (tmp_path / "2026-05-04" / "AAPL.json").read_text(encoding="utf-8"),
+    )
+    assert body["schema_version"] == 2
+
+
+def test_per_ticker_payload_contains_ohlc_history(tmp_path: Path) -> None:
+    """payload['ohlc_history'] is a list of 180 dicts with the 6 OHLC keys.
+
+    Frontend deep-dive chart (VIEW-06) reads this list directly to render the
+    OHLC candles + overlays.
+    """
+    from routine import storage
+
+    results = [_make_ticker_result("AAPL", ohlc_history=_make_ohlc_history(180))]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    body = json.loads(
+        (tmp_path / "2026-05-04" / "AAPL.json").read_text(encoding="utf-8"),
+    )
+    assert "ohlc_history" in body
+    assert isinstance(body["ohlc_history"], list)
+    assert len(body["ohlc_history"]) == 180
+    for bar in body["ohlc_history"]:
+        assert isinstance(bar, dict)
+        assert set(bar.keys()) >= {"date", "open", "high", "low", "close", "volume"}
+        assert isinstance(bar["date"], str)  # ISO date
+        # Close strictly positive (OHLCBar invariant).
+        assert isinstance(bar["close"], (int, float)) and bar["close"] > 0
+        assert isinstance(bar["volume"], int)
+
+
+def test_per_ticker_payload_contains_indicators_with_5_series(tmp_path: Path) -> None:
+    """payload['indicators'] is a dict with 5 keys aligned to ohlc_history.
+
+    Each series is a list of (float | None) where None marks the warmup
+    period at the head: ma20 first 19 entries None, ma50 first 49, bb_upper +
+    bb_lower first 19, rsi14 first 14.
+
+    The frontend chart (Phase 6 Wave 3) layers these as overlays on the OHLC
+    candles. Indicator math must be byte-identical to what the analyst verdicts
+    use at iloc[-1] — locked by tests/analysts/test_indicator_math.py series
+    helpers.
+    """
+    from routine import storage
+
+    history = _make_ohlc_history(180)
+    results = [_make_ticker_result("AAPL", ohlc_history=history)]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    body = json.loads(
+        (tmp_path / "2026-05-04" / "AAPL.json").read_text(encoding="utf-8"),
+    )
+    assert "indicators" in body
+    assert isinstance(body["indicators"], dict)
+    expected_keys = {"ma20", "ma50", "bb_upper", "bb_lower", "rsi14"}
+    assert set(body["indicators"].keys()) >= expected_keys
+
+    n = len(body["ohlc_history"])
+    for key in expected_keys:
+        series = body["indicators"][key]
+        assert isinstance(series, list), f"{key} must be a list"
+        assert len(series) == n, f"{key} length {len(series)} != ohlc_history length {n}"
+        # Each entry is float OR None (None during warmup window).
+        for v in series:
+            assert v is None or isinstance(v, (int, float)), (
+                f"{key} entries must be float-or-None"
+            )
+
+    # ma20 warmup: first 19 entries are None; entry 19 is the first real value.
+    ma20 = body["indicators"]["ma20"]
+    assert all(v is None for v in ma20[:19])
+    assert ma20[19] is not None
+
+    # ma50 warmup: first 49 None.
+    ma50 = body["indicators"]["ma50"]
+    assert all(v is None for v in ma50[:49])
+    assert ma50[49] is not None
+
+    # rsi14 warmup: first 14 None.
+    rsi = body["indicators"]["rsi14"]
+    assert all(v is None for v in rsi[:14])
+    assert rsi[14] is not None
+
+    # bb_upper / bb_lower warmup: first 19 None.
+    for key in ("bb_upper", "bb_lower"):
+        s = body["indicators"][key]
+        assert all(v is None for v in s[:19])
+        assert s[19] is not None
+
+
+def test_per_ticker_payload_contains_headlines(tmp_path: Path) -> None:
+    """payload['headlines'] is a list of raw-headline dicts with 4 required keys.
+
+    Frontend deep-dive news feed (VIEW-08) groups by source and renders these
+    directly. Sorted by published_at desc by virtue of fetch_news's existing
+    _sort_by_recency pass.
+    """
+    from routine import storage
+
+    raw_headlines = [
+        _make_raw_headline(source="yahoo-rss", title="Apple beats Q1", url="https://y/1"),
+        _make_raw_headline(source="google-news", title="AAPL guides up", url="https://g/2"),
+        _make_raw_headline(source="finviz", title="AAPL analyst upgrade", url="https://f/3"),
+    ]
+    results = [
+        _make_ticker_result(
+            "AAPL", ohlc_history=_make_ohlc_history(60), headlines=raw_headlines
+        )
+    ]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+    body = json.loads(
+        (tmp_path / "2026-05-04" / "AAPL.json").read_text(encoding="utf-8"),
+    )
+    assert "headlines" in body
+    assert isinstance(body["headlines"], list)
+    assert len(body["headlines"]) == 3
+    for h in body["headlines"]:
+        assert isinstance(h, dict)
+        assert set(h.keys()) >= {"source", "published_at", "title", "url"}
+
+
+def test_dates_index_written_at_repo_root(tmp_path: Path) -> None:
+    """write_daily_snapshot writes data/_dates.json at the snapshots root.
+
+    The frontend (Phase 6 Wave 1) fetches this single file to enumerate
+    available snapshot dates without making N GitHub directory-listing calls.
+    Sorted YYYY-MM-DD strings; populated by enumerating subfolders that
+    contain a `_status.json`.
+    """
+    from routine import storage
+
+    # Pre-create two prior date folders with _status.json sentinels.
+    for prior_date in ("2026-04-01", "2026-04-30"):
+        prior_folder = tmp_path / prior_date
+        prior_folder.mkdir(parents=True, exist_ok=True)
+        (prior_folder / "_status.json").write_text("{}", encoding="utf-8")
+
+    # Now call write_daily_snapshot for 2026-05-04.
+    results = [_make_ticker_result("AAPL", ohlc_history=_make_ohlc_history(60))]
+    storage.write_daily_snapshot(
+        results,
+        date_str="2026-05-04",
+        run_started_at=RUN_STARTED, run_completed_at=RUN_COMPLETED,
+        lite_mode=False, total_token_count_estimate=19_800,
+        snapshots_root=tmp_path,
+    )
+
+    dates_index_path = tmp_path / "_dates.json"
+    assert dates_index_path.exists(), (
+        f"data/_dates.json not written at snapshots root ({tmp_path})"
+    )
+    payload = json.loads(dates_index_path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == 1
+    assert "dates_available" in payload
+    assert isinstance(payload["dates_available"], list)
+    # All 3 dates present, sorted ascending.
+    assert payload["dates_available"] == ["2026-04-01", "2026-04-30", "2026-05-04"]
+    assert "updated_at" in payload
+    assert isinstance(payload["updated_at"], str)

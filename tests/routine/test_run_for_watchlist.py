@@ -378,3 +378,61 @@ async def test_default_snapshot_loader_branch(
     assert len(results) == 1
     r = results[0]
     assert r.errors and "NotImplementedError" in r.errors[0]
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 / Plan 06-01: TickerResult threads ohlc_history + headlines
+#
+# Wave 0 amendment: TickerResult gains ohlc_history (list[OHLCBar]) and
+# headlines (list[dict]). Both default to empty list to preserve all existing
+# call-site compatibility. routine/storage.py reads these fields when building
+# the per-ticker JSON payload (ohlc_history + indicators + headlines + Plan 06-01
+# schema_version=2).
+# ---------------------------------------------------------------------------
+
+
+def test_ticker_result_threads_ohlc_history_and_headlines() -> None:
+    """TickerResult model has ohlc_history (list[OHLCBar]) + headlines (list[dict]) fields.
+
+    Defaults are empty list so existing tests/call-sites that don't pass them
+    keep working. routine/storage._build_ticker_payload reads both into the
+    Wave 0 per-ticker JSON shape.
+    """
+    from datetime import date
+
+    from analysts.data.prices import OHLCBar
+    from routine.run_for_watchlist import TickerResult
+
+    # Field exists with default empty list.
+    r_default = TickerResult(ticker="AAPL")
+    assert r_default.ohlc_history == []
+    assert r_default.headlines == []
+
+    # Field can be populated with the expected shape.
+    bars = [
+        OHLCBar(
+            date=date(2026, 5, 1),
+            open=100.0, high=101.0, low=99.0, close=100.5, volume=1_000_000,
+        ),
+        OHLCBar(
+            date=date(2026, 5, 2),
+            open=100.5, high=102.0, low=100.0, close=101.5, volume=1_100_000,
+        ),
+    ]
+    headlines = [
+        {
+            "source": "yahoo-rss",
+            "published_at": "2026-05-04T10:00:00+00:00",
+            "title": "Apple beats Q1",
+            "url": "https://example.com/aapl",
+        }
+    ]
+    r = TickerResult(
+        ticker="AAPL",
+        ohlc_history=bars,
+        headlines=headlines,
+    )
+    assert len(r.ohlc_history) == 2
+    assert r.ohlc_history[0].close == 100.5
+    assert len(r.headlines) == 1
+    assert r.headlines[0]["source"] == "yahoo-rss"

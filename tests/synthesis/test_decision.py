@@ -80,7 +80,10 @@ def _decision(frozen_now: datetime, **overrides) -> TickerDecision:
 
 
 def test_minimum_valid_ticker_decision(frozen_now: datetime) -> None:
-    """Build a complete valid TickerDecision; verify every default + assigned field."""
+    """Build a complete valid TickerDecision; verify every default + assigned field.
+
+    Phase 6 / Plan 06-01: schema_version default bumped 1→2.
+    """
     d = _decision(
         frozen_now,
         recommendation="hold",
@@ -91,7 +94,7 @@ def test_minimum_valid_ticker_decision(frozen_now: datetime) -> None:
     )
     assert d.ticker == "AAPL"
     assert d.computed_at == frozen_now
-    assert d.schema_version == 1
+    assert d.schema_version == 2
     assert d.recommendation == "hold"
     assert d.conviction == "medium"
     assert d.short_term.summary == "short side ok"
@@ -110,15 +113,23 @@ def test_extra_field_forbidden(frozen_now: datetime) -> None:
     assert "metadata" in str(excinfo.value)
 
 
-def test_schema_version_default_is_1(frozen_now: datetime) -> None:
+def test_schema_version_default_bumped_to_2(frozen_now: datetime) -> None:
+    """Phase 6 / Plan 06-01: TickerDecision.schema_version default = 2.
+
+    Bumped from 1 → 2 because Wave 0 amendment adds new fields
+    (TimeframeBand.thesis_status, plus per-ticker JSON gains
+    ohlc_history/indicators/headlines). The frontend zod schemas (Wave 1)
+    will assert schema_version == 2; v1 snapshots become invalid by design
+    (forces a Phase 5 re-run before frontend renders).
+    """
     d = _decision(frozen_now)
-    assert d.schema_version == 1
+    assert d.schema_version == 2
 
 
 def test_schema_version_forward_compat(frozen_now: datetime) -> None:
-    """schema_version=2 is accepted (forward compat hook for Phase 9 + v1.x)."""
-    d = _decision(frozen_now, schema_version=2)
-    assert d.schema_version == 2
+    """schema_version=3 is accepted (forward compat hook for Phase 9 + v1.x)."""
+    d = _decision(frozen_now, schema_version=3)
+    assert d.schema_version == 3
 
 
 # ---------------------------------------------------------------------------
@@ -404,7 +415,8 @@ def test_json_round_trip_minimal(frozen_now: datetime) -> None:
     # The serialized form should be valid JSON with the expected ticker.
     payload = json.loads(raw)
     assert payload["ticker"] == "AAPL"
-    assert payload["schema_version"] == 1
+    # Phase 6 / Plan 06-01: schema_version default bumped 1→2.
+    assert payload["schema_version"] == 2
 
 
 def test_json_round_trip_full(frozen_now: datetime) -> None:
@@ -481,3 +493,61 @@ def test_computed_at_round_trip_preserves_utc(frozen_now: datetime) -> None:
     assert parsed.computed_at == frozen_now
     assert parsed.computed_at.tzinfo is not None
     assert parsed.computed_at.utcoffset() == timezone.utc.utcoffset(None)
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 / Plan 06-01: ThesisStatus + TimeframeBand.thesis_status
+#
+# `ThesisStatus = Literal["intact", "weakening", "broken", "improving", "n/a"]`
+# is the new field added to TimeframeBand. Default is "n/a" so existing
+# snapshots and lite-mode TimeframeBands deserialize without ValidationError.
+# The synthesizer (prompts/synthesizer.md) populates this per timeframe so the
+# frontend Long-Term Thesis Status lens (VIEW-04) can filter+sort by it.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "value", ["intact", "weakening", "broken", "improving", "n/a"]
+)
+def test_thesis_status_literal_accepts_5_values(value: str) -> None:
+    """ThesisStatus accepts exactly 5 enum values."""
+    band = TimeframeBand(summary="ok", drivers=[], confidence=50, thesis_status=value)
+    assert band.thesis_status == value
+
+
+def test_thesis_status_rejects_invalid() -> None:
+    """ThesisStatus rejects any non-enum value with 'thesis_status' in the validation error."""
+    with pytest.raises(ValidationError) as excinfo:
+        TimeframeBand(
+            summary="ok", drivers=[], confidence=50, thesis_status="garbage"
+        )
+    assert "thesis_status" in str(excinfo.value).lower()
+
+
+def test_thesis_status_default_is_na() -> None:
+    """TimeframeBand without explicit thesis_status defaults to 'n/a'.
+
+    Default 'n/a' is what makes the field addition non-breaking for every
+    existing TickerDecision deserialization (Phase 5 snapshots have no
+    thesis_status field; reading them with the new schema must not fail).
+    """
+    band = TimeframeBand(summary="ok", drivers=[], confidence=50)
+    assert band.thesis_status == "n/a"
+
+
+def test_timeframe_band_thesis_status_field_exists() -> None:
+    """TimeframeBand has a 'thesis_status' model field (introspectable for zod codegen)."""
+    assert "thesis_status" in TimeframeBand.model_fields
+
+
+def test_thesis_status_literal_arity_and_order() -> None:
+    """ThesisStatus exposes the 5 canonical values in the locked order."""
+    from synthesis.decision import ThesisStatus
+
+    assert get_args(ThesisStatus) == (
+        "intact",
+        "weakening",
+        "broken",
+        "improving",
+        "n/a",
+    )

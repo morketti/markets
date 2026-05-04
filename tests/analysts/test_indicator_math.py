@@ -7,9 +7,18 @@ Coverage map (per 04-01-foundation-PLAN.md):
     > 25 (trend regime) for synthetic_uptrend_history(252).
   * `_total_to_verdict` — strict > / < boundaries at ±0.6 / ±0.2 (parametrized
     over 10 cases including the boundary-exact values).
+
+Phase 6 / Plan 06-01 extension:
+  * `_ma_series` — series-form MA producing values byte-identical to
+    technicals._ma_alignment's iloc[-1] math at the same window.
+  * `_bb_series` — series-form (upper, lower) producing values byte-identical
+    to position_adjustment._bollinger_position's iloc[-1] math.
+  * `_rsi_series` — series-form Wilder RSI producing values byte-identical to
+    position_adjustment._rsi_14's iloc[-1] math.
 """
 from __future__ import annotations
 
+import math
 from datetime import date, timedelta
 
 import pandas as pd
@@ -26,7 +35,11 @@ from analysts._indicator_math import (
     _total_to_verdict,
 )
 from analysts.data.prices import OHLCBar
-from tests.analysts.conftest import synthetic_uptrend_history
+from tests.analysts.conftest import (
+    synthetic_oversold_history,
+    synthetic_overbought_history,
+    synthetic_uptrend_history,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -131,3 +144,119 @@ def test_adx_constants_are_locked() -> None:
     assert ADX_RANGE_BELOW == 20.0
     assert ADX_MIN_BARS == 27
     assert ADX_STABLE_BARS == 150
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 / Plan 06-01: series-form helpers
+#
+# These helpers are byte-identical at iloc[-1] to the existing single-point
+# computations used by analysts/technicals.py (MA20/MA50) and
+# analysts/position_adjustment.py (Bollinger position, RSI14). The frontend
+# (Phase 6 Wave 3 deep-dive chart overlays) reads the per-day series; the
+# analyst verdicts read iloc[-1]. They MUST agree, so the chart never shows
+# a different MA/BB/RSI than the verdicts use.
+# ---------------------------------------------------------------------------
+
+
+def test_ma_series_byte_identical_to_single_point() -> None:
+    """_ma_series(prices, 20).iloc[-1] == close.rolling(20).mean().iloc[-1] (technicals scalar)."""
+    from analysts._indicator_math import _ma_series
+
+    df = _build_df(synthetic_uptrend_history(252))
+    close = df["close"]
+
+    # Single-point reference (matches analysts/technicals._ma_alignment line 106).
+    expected_ma20 = close.rolling(20).mean().iloc[-1]
+    expected_ma50 = close.rolling(50).mean().iloc[-1]
+
+    actual_ma20_series = _ma_series(close, 20)
+    actual_ma50_series = _ma_series(close, 50)
+
+    assert isinstance(actual_ma20_series, pd.Series)
+    assert isinstance(actual_ma50_series, pd.Series)
+    assert len(actual_ma20_series) == len(close)
+    # First (window-1) entries are NaN (warmup); position 19 is first real value.
+    assert pd.isna(actual_ma20_series.iloc[18])
+    assert not pd.isna(actual_ma20_series.iloc[19])
+
+    # Byte-identical (within 1e-9) at iloc[-1].
+    assert math.isclose(
+        float(actual_ma20_series.iloc[-1]), float(expected_ma20), rel_tol=1e-9, abs_tol=1e-9
+    )
+    assert math.isclose(
+        float(actual_ma50_series.iloc[-1]), float(expected_ma50), rel_tol=1e-9, abs_tol=1e-9
+    )
+
+
+def test_bb_series_byte_identical_to_single_point() -> None:
+    """_bb_series(prices, 20, 2.0) at iloc[-1] reproduces position_adjustment._bollinger_position math.
+
+    Note: _bollinger_position computes (close - sma) / (2*std) — a scaled
+    POSITION value. _bb_series returns the (upper, lower) BAND values
+    upper = sma + sigma*std, lower = sma - sigma*std. Both consume the
+    SAME rolling sma + rolling std at iloc[-1]; this test asserts the
+    rolling primitives are byte-identical so the chart shows the same
+    bands the analyst uses to compute its position.
+    """
+    from analysts._indicator_math import _bb_series
+
+    df = _build_df(synthetic_overbought_history(252))
+    close = df["close"]
+
+    # Reference primitives (same expressions as position_adjustment._bollinger_position).
+    sma_ref = close.rolling(20).mean().iloc[-1]
+    std_ref = close.rolling(20).std().iloc[-1]
+    expected_upper = sma_ref + 2.0 * std_ref
+    expected_lower = sma_ref - 2.0 * std_ref
+
+    upper, lower = _bb_series(close, window=20, sigma=2.0)
+    assert isinstance(upper, pd.Series)
+    assert isinstance(lower, pd.Series)
+    assert len(upper) == len(close)
+    assert len(lower) == len(close)
+    # First 19 entries are NaN (warmup).
+    assert pd.isna(upper.iloc[18])
+    assert pd.isna(lower.iloc[18])
+    assert not pd.isna(upper.iloc[19])
+    assert not pd.isna(lower.iloc[19])
+
+    assert math.isclose(
+        float(upper.iloc[-1]), float(expected_upper), rel_tol=1e-9, abs_tol=1e-9
+    )
+    assert math.isclose(
+        float(lower.iloc[-1]), float(expected_lower), rel_tol=1e-9, abs_tol=1e-9
+    )
+
+
+def test_rsi_series_byte_identical_to_single_point() -> None:
+    """_rsi_series(prices, 14).iloc[-1] reproduces position_adjustment._rsi_14 math.
+
+    Wilder smoothing via .ewm(alpha=1/14, adjust=False). First 14 entries
+    (delta requires 1 prior bar; ewm warmup) are NaN.
+    """
+    from analysts._indicator_math import _rsi_series
+
+    df = _build_df(synthetic_oversold_history(252))
+    close = df["close"]
+
+    # Reference single-point computation — matches position_adjustment._rsi_14.
+    delta = close.diff()
+    gain = delta.clip(lower=0).ewm(alpha=1.0 / 14, adjust=False).mean()
+    loss = (-delta).clip(lower=0).ewm(alpha=1.0 / 14, adjust=False).mean()
+    g, l = gain.iloc[-1], loss.iloc[-1]
+    if l == 0.0:
+        expected_rsi = 100.0
+    else:
+        rs = g / l
+        expected_rsi = 100.0 - (100.0 / (1.0 + rs))
+
+    actual_series = _rsi_series(close, period=14)
+    assert isinstance(actual_series, pd.Series)
+    assert len(actual_series) == len(close)
+    # First 14 entries are NaN (period warmup).
+    assert pd.isna(actual_series.iloc[13])
+    assert not pd.isna(actual_series.iloc[14])
+
+    assert math.isclose(
+        float(actual_series.iloc[-1]), float(expected_rsi), rel_tol=1e-9, abs_tol=1e-9
+    )

@@ -364,6 +364,76 @@ def test_fetch_news_invalid_ticker_returns_empty():
     assert result == []
 
 
+# ---------- Phase 6 / Plan 06-01: return_raw flag ----------
+
+
+@responses.activate
+def test_fetch_news_with_raw_returns_tuple(fixtures_dir: Path):
+    """Plan 06-01: fetch_news(ticker, return_raw=True) returns (list[Headline], list[dict]).
+
+    The list[dict] is the raw `{source, published_at, title, url}` records used
+    by Phase 6 storage to persist headlines into per-ticker JSONs (Wave 0
+    amendment so the frontend deep-dive's news feed has source structured data
+    without re-parsing).
+    """
+    yahoo_path = fixtures_dir / "yahoo_rss_aapl.xml"
+    google_path = fixtures_dir / "google_news_aapl.xml"
+    finviz_html = (fixtures_dir / "finviz_aapl.html").read_text()
+
+    responses.add(
+        responses.GET,
+        FINVIZ_URL.format(ticker="AAPL"),
+        body=finviz_html,
+        status=200,
+        content_type="text/html",
+    )
+
+    import feedparser
+
+    real_parse = feedparser.parse
+
+    def fake_parse(url, *args, **kwargs):
+        if "yahoo" in str(url).lower():
+            return real_parse(str(yahoo_path))
+        if "google" in str(url).lower():
+            return real_parse(str(google_path))
+        return real_parse(url)
+
+    with patch("ingestion.news.feedparser.parse", side_effect=fake_parse):
+        result = fetch_news("AAPL", return_raw=True)
+
+    assert isinstance(result, tuple)
+    assert len(result) == 2
+    headlines, raw = result
+
+    assert isinstance(headlines, list)
+    assert all(isinstance(h, Headline) for h in headlines)
+    assert isinstance(raw, list)
+    assert len(raw) == len(headlines)
+    assert all(isinstance(d, dict) for d in raw)
+    # Each raw dict carries the 4 keys the frontend deep-dive needs.
+    for d in raw:
+        assert set(d.keys()) >= {"source", "published_at", "title", "url"}
+        assert isinstance(d["source"], str)
+        assert isinstance(d["title"], str)
+        assert isinstance(d["url"], str)
+        # published_at is an ISO 8601 str OR None (RSS feeds sometimes lack pubdate).
+        assert d["published_at"] is None or isinstance(d["published_at"], str)
+
+
+def test_fetch_news_default_signature_unchanged():
+    """fetch_news(ticker) (no return_raw flag) preserves the existing list[Headline] return.
+
+    Existing call sites (ingestion/refresh.py:98) MUST remain compatible —
+    Plan 06-01 adds an optional flag, NOT a breaking signature change.
+    """
+    # Bad ticker short-circuits to [] without any RSS fetch — exercises the
+    # default-shape path without needing fixture mocking.
+    result = fetch_news("not a ticker!")
+    assert isinstance(result, list)
+    assert result == []
+
+
 @responses.activate
 def test_fetch_news_continues_when_one_source_fails(fixtures_dir: Path):
     """Even if FinViz 500s, fetch_news still returns Yahoo + Google headlines."""
