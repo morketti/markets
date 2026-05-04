@@ -2,9 +2,9 @@
 gmd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: null
-status: phase_complete
-last_updated: "2026-05-04T19:36:55Z"
+current_plan: Not started
+status: completed
+last_updated: "2026-05-04T19:45:46.063Z"
 progress:
   total_phases: 9
   completed_phases: 9
@@ -29,8 +29,8 @@ See: `.planning/PROJECT.md` (last updated 2026-04-30)
 ## Current Phase
 
 **Phase:** 09-endorsement-capture **COMPLETE (1/1 plans complete)** — **v1 COMPLETE: 9/9 phases, 35/35 plans, 59/59 requirements**
-**Status:** phase_complete (v1 milestone closed — ready to archive)
-**Current Plan:** null
+**Status:** Milestone complete
+**Current Plan:** Not started
 **Total Plans in Phase:** 1
 **Next:** `/gmd:complete-milestone` to archive v1 and start v1.x. Manual verifications deferred to user (end-to-end CLI append + Vercel preview render at /decision/AAPL/today; Notion-Clean visual taste-check). v1.x successors deferred per CONTEXT.md `<deferred>`: ENDORSE-04..07 (corp-action-aware perf, vs-S&P alpha, perf rendering, corp-action notice surface), routine integration for auto-capture, edit/delete UI, CLI list_endorsements, endorsement source taxonomy, duplicate detection. **Phase 9 / Plan 09-01 just closed:** analysts/endorsement_schema.py (Pydantic v2 with schema_version: Literal[1] = 1 LOAD-BEARING lock + normalize_ticker reuse + extra='forbid'), endorsements/log.py (atomic JSONL append mirroring routine/memory_log.py verbatim), cli/add_endorsement.py (flag-only argparse + atomic-on-success), cli/main.py SUBCOMMANDS extension, endorsements.jsonl committed at repo root (NOT gitignored — first-class signal, diverges from memory_log.jsonl), frontend/src/schemas/endorsement.ts (zod with z.literal(1) + .strict()), frontend/src/lib/loadEndorsements.ts (90-day filter on `date` NOT captured_at + date-desc sort + useEndorsements TanStack hook), frontend/src/components/EndorsementsList.tsx (4-state render with Notion-Clean palette tokens only — zero inline hex; NO performance number anywhere — regex-guarded), DecisionRoute mount immediately AFTER DissentPanel, Playwright endorsements.spec.ts (3 specs locking empty/populated/90d-cutoff). Python pytest 704 → 738 (+34); vitest 260 → 291 (+31); Playwright 72 → 81 (+9 = 3 specs × 3 projects). 2 deviations auto-fixed (both Rule 1 — test-only bugs: strict datetime bracket → 60s recency window; "Seeking Alpha" fixture tripped own /alpha/i regex guard → renamed to "Stock Picks Weekly"). Zero scope creep — all plan locks held. — frontend/src/schemas/refresh.ts (zod discriminated union over the 3 envelope shapes locked by api/refresh.py + tests/api/test_refresh.py) + frontend/src/lib/useRefreshData.ts (TanStack hook with keepPreviousData + 5-min staleTime + retry: 1) + frontend/src/components/CurrentPriceDelta.tsx (preserves data-testid="current-price-placeholder"; covers loading + 4 happy + partial + full-failure + isError) + dual-route mount (TickerRoute + DecisionRoute replacing the Phase 7 PHASE-8-HOOK placeholder) + frontend/tests/e2e/resilience.spec.ts (3 specs: 500-on-ticker, 500-on-decision, partial-response). Plan 08-01 just closed: backend Vercel Python serverless `/api/refresh` (BaseHTTPRequestHandler + sys.path bootstrap; 3 locked envelope shapes — success / partial / full-failure-without-current-price-field), repo-root vercel.json maxDuration=30, **frontend/vercel.json SPA rewrite narrowed `/(.*)` → `/((?!api/).*)`** so /api/* requests stop silently returning the SPA shell, routine/memory_log.py + Phase E hook in run_for_watchlist (one record per (ticker, persona) per non-lite run; gated by `if result.persona_signals:`), scripts/check_provenance.py walking 6 source roots accepting 3 marker forms (case-insensitive on keyword phrases; either comment or docstring location), .pre-commit-config.yaml local hook entry, codebase audit pass adding 22+6 markers. Python pytest 704 (659 baseline + 45 new). REFRESH-01 + INFRA-06 + INFRA-07 closed; REFRESH-04 backend half closed (waiting on Wave 1 frontend resilience.spec.ts).
 
