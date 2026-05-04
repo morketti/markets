@@ -461,3 +461,229 @@ def test_provenance_header_references_virattt():
             or "cathie_wood.py" in src
             or "michael_burry.py" in src
             or "peter_lynch.py" in src)
+
+
+# ---------------------------------------------------------------------------
+# Test 15-19: coverage tests — exercise _summarize_snapshot / _format_signal /
+# _format_position_signal / _format_config branches + gather exception path
+# ---------------------------------------------------------------------------
+
+def test_build_user_context_with_populated_snapshot(frozen_now):
+    """Exercises _summarize_snapshot price+fundamentals branches."""
+    from datetime import date
+    from analysts.position_signal import PositionSignal
+    from analysts.schemas import TickerConfig
+    from analysts.data.snapshot import Snapshot
+    from analysts.data.prices import PriceSnapshot, OHLCBar
+    from analysts.data.fundamentals import FundamentalsSnapshot
+    from routine.persona_runner import build_persona_user_context
+
+    cfg = TickerConfig(
+        ticker="AAPL", short_term_focus=True, long_term_lens="value",
+        thesis_price=200.0, notes="user notes about AAPL",
+    )
+    prices = PriceSnapshot(
+        ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+        current_price=180.50,
+        history=[
+            OHLCBar(date=date(2026, 4, 1), open=170.0, high=171.0,
+                    low=169.0, close=170.5, volume=1000000),
+            OHLCBar(date=date(2026, 4, 2), open=170.5, high=181.0,
+                    low=170.0, close=180.5, volume=1100000),
+        ],
+    )
+    fund_snap = FundamentalsSnapshot(
+        ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+        pe=28.5, roe=0.42, debt_to_equity=0.55,
+    )
+    snap = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now,
+        prices=prices, fundamentals=fund_snap,
+    )
+    fund_sig = AgentSignal(
+        ticker="AAPL", analyst_id="fundamentals",
+        computed_at=frozen_now, verdict="bullish", confidence=70,
+        evidence=[],  # empty evidence to exercise '(no evidence)' branch
+    )
+    tech_sig = AgentSignal(
+        ticker="AAPL", analyst_id="technicals",
+        computed_at=frozen_now, verdict="neutral", confidence=0,
+        data_unavailable=True, evidence=["dark"],
+    )
+    nsen = AgentSignal(
+        ticker="AAPL", analyst_id="news_sentiment",
+        computed_at=frozen_now, verdict="bullish", confidence=55,
+        evidence=["headline pos"],
+    )
+    val = AgentSignal(
+        ticker="AAPL", analyst_id="valuation",
+        computed_at=frozen_now, verdict="neutral", confidence=50,
+        evidence=["price near thesis"],
+    )
+    pose = PositionSignal(
+        ticker="AAPL", computed_at=frozen_now,
+        state="overbought", consensus_score=0.5, confidence=70,
+        action_hint="consider_trim", trend_regime=True,
+    )
+    ctx = build_persona_user_context(snap, cfg, fund_sig, tech_sig, nsen, val, pose)
+    # Snapshot summary branches
+    assert "current_price=180.5" in ctx
+    assert "history: 2 bars" in ctx
+    assert "P/E=28.5" in ctx
+    assert "ROE=0.42" in ctx
+    assert "D/E=0.55" in ctx
+    # Signal branches
+    assert "(no evidence)" in ctx  # empty-evidence branch
+    assert "[data_unavailable]" in ctx  # data_unavailable branch
+    # Position branches
+    assert "consider_trim" in ctx
+    assert "trend_regime=True" in ctx
+    # Config branches
+    assert "thesis_price=200" in ctx
+    assert "user notes about AAPL" in ctx
+
+
+def test_build_user_context_with_dark_position_signal(frozen_now, sample_inputs):
+    """Exercises _format_position_signal data_unavailable branch."""
+    from analysts.position_signal import PositionSignal
+    from routine.persona_runner import build_persona_user_context
+    cfg, snap, fund, tech, nsen, val, _ = sample_inputs
+    dark_pose = PositionSignal(
+        ticker="AAPL", computed_at=frozen_now, data_unavailable=True,
+    )
+    ctx = build_persona_user_context(snap, cfg, fund, tech, nsen, val, dark_pose)
+    assert "# Position Signal\n[data_unavailable]" in ctx
+
+
+def test_build_user_context_with_empty_snapshot_data(frozen_now):
+    """Exercises _summarize_snapshot fall-through branch (no prices, no fundamentals)."""
+    from analysts.position_signal import PositionSignal
+    from analysts.schemas import TickerConfig
+    from analysts.data.snapshot import Snapshot
+    from routine.persona_runner import build_persona_user_context
+
+    cfg = TickerConfig(ticker="AAPL", long_term_lens="value")
+    # snapshot is NOT data_unavailable but has no prices/fundamentals
+    snap = Snapshot(ticker="AAPL", fetched_at=frozen_now)
+    fund = AgentSignal(ticker="AAPL", analyst_id="fundamentals",
+                       computed_at=frozen_now, evidence=["e1"])
+    tech = AgentSignal(ticker="AAPL", analyst_id="technicals",
+                      computed_at=frozen_now, evidence=["e1"])
+    nsen = AgentSignal(ticker="AAPL", analyst_id="news_sentiment",
+                       computed_at=frozen_now, evidence=["e1"])
+    val = AgentSignal(ticker="AAPL", analyst_id="valuation",
+                      computed_at=frozen_now, evidence=["e1"])
+    pose = PositionSignal(ticker="AAPL", computed_at=frozen_now)
+    ctx = build_persona_user_context(snap, cfg, fund, tech, nsen, val, pose)
+    assert "(no fundamentals/prices)" in ctx
+
+
+async def test_run_persona_slate_python_exception_isolated(
+    mock_anthropic_client, frozen_now, sample_inputs, monkeypatch,
+):
+    """A Python-level exception (not an LLM failure) in run_one for one persona
+    is isolated by asyncio.gather(return_exceptions=True); the slot collapses
+    to default_factory; other 5 succeed.
+    """
+    from routine import persona_runner as pr
+    from routine.persona_runner import run_persona_slate, PERSONA_IDS
+
+    cfg, snap, fund, tech, nsen, val, pose = sample_inputs
+
+    original_run_one = pr.run_one
+
+    async def faulty_run_one(client, persona_id, user_context, ticker, *,
+                              computed_at):
+        if persona_id == "burry":
+            raise RuntimeError("simulated python-level fault")
+        return await original_run_one(
+            client, persona_id, user_context, ticker, computed_at=computed_at,
+        )
+
+    monkeypatch.setattr(pr, "run_one", faulty_run_one)
+
+    # Queue 5 successful responses (one per non-burry persona)
+    for pid in PERSONA_IDS:
+        if pid == "burry":
+            continue
+        sig = AgentSignal(
+            ticker="AAPL", analyst_id=pid, computed_at=frozen_now,
+            verdict="bullish", confidence=50, evidence=[f"{pid} ev"],
+        )
+        mock_anthropic_client.messages.queue_response(sig)
+
+    results = await run_persona_slate(
+        mock_anthropic_client,
+        ticker="AAPL", snapshot=snap, config=cfg,
+        analytical_signals=[fund, tech, nsen, val],
+        position_signal=pose, computed_at=frozen_now,
+    )
+    assert len(results) == 6
+    burry_idx = PERSONA_IDS.index("burry")
+    assert results[burry_idx].verdict == "neutral"
+    assert results[burry_idx].data_unavailable is True
+    assert results[burry_idx].evidence == ["schema_failure"]
+    assert results[burry_idx].analyst_id == "burry"
+    # Other 5 succeeded with bullish
+    for i, pid in enumerate(PERSONA_IDS):
+        if pid == "burry":
+            continue
+        assert results[i].verdict == "bullish"
+
+
+def test_summarize_snapshot_partial_fundamentals(frozen_now):
+    """Exercises the 'value is None / value is set' partial-branch arms in
+    _summarize_snapshot — covers the False side of each `if X is not None`
+    guard."""
+    from analysts.position_signal import PositionSignal
+    from analysts.schemas import TickerConfig
+    from analysts.data.snapshot import Snapshot
+    from analysts.data.prices import PriceSnapshot
+    from analysts.data.fundamentals import FundamentalsSnapshot
+    from routine.persona_runner import build_persona_user_context
+
+    cfg = TickerConfig(ticker="AAPL", long_term_lens="value")
+    # PriceSnapshot with no current_price and no history (both Nones / empty)
+    prices = PriceSnapshot(
+        ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+        current_price=None, history=[],
+    )
+    # FundamentalsSnapshot with all 3 metrics None
+    fund_snap = FundamentalsSnapshot(
+        ticker="AAPL", fetched_at=frozen_now, source="yfinance",
+        pe=None, roe=None, debt_to_equity=None,
+    )
+    snap = Snapshot(
+        ticker="AAPL", fetched_at=frozen_now,
+        prices=prices, fundamentals=fund_snap,
+    )
+    fund_sig = AgentSignal(ticker="AAPL", analyst_id="fundamentals",
+                           computed_at=frozen_now, evidence=["e"])
+    tech = AgentSignal(ticker="AAPL", analyst_id="technicals",
+                       computed_at=frozen_now, evidence=["e"])
+    nsen = AgentSignal(ticker="AAPL", analyst_id="news_sentiment",
+                       computed_at=frozen_now, evidence=["e"])
+    val = AgentSignal(ticker="AAPL", analyst_id="valuation",
+                      computed_at=frozen_now, evidence=["e"])
+    pose = PositionSignal(ticker="AAPL", computed_at=frozen_now)
+    ctx = build_persona_user_context(snap, cfg, fund_sig, tech, nsen, val, pose)
+    # All metrics None -> falls through to "(no fundamentals/prices)"
+    assert "(no fundamentals/prices)" in ctx
+    assert "current_price=" not in ctx
+    assert "P/E=" not in ctx
+    assert "ROE=" not in ctx
+    assert "D/E=" not in ctx
+
+
+def test_load_persona_prompt_raises_file_not_found_when_file_missing(
+    tmp_path, monkeypatch,
+):
+    """If a valid persona id has no on-disk markdown, FileNotFoundError surfaces."""
+    from routine import persona_runner as pr
+    pr.load_persona_prompt.cache_clear()
+    # Redirect PROMPT_DIR to an empty tmp dir; the persona id is valid but
+    # the file doesn't exist there.
+    monkeypatch.setattr(pr, "PERSONA_PROMPT_DIR", tmp_path)
+    with pytest.raises(FileNotFoundError, match="persona prompt missing"):
+        pr.load_persona_prompt("buffett")
+    pr.load_persona_prompt.cache_clear()
