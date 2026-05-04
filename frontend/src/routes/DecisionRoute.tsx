@@ -5,6 +5,7 @@ import { RecommendationBanner } from '@/components/RecommendationBanner'
 import { DriversList } from '@/components/DriversList'
 import { DissentPanel } from '@/components/DissentPanel'
 import { CurrentPriceDelta } from '@/components/CurrentPriceDelta'
+import { EndorsementsList } from '@/components/EndorsementsList'
 import { Separator } from '@/components/ui/separator'
 import { FetchNotFoundError, SchemaMismatchError } from '@/lib/fetchSnapshot'
 
@@ -197,6 +198,12 @@ export default function DecisionRoute() {
 
       {/* 7. DissentPanel — ALWAYS rendered (Pitfall #12 lock) */}
       <DissentPanel dissent={dec.dissent} />
+
+      {/* 7b. EndorsementsList — Phase 9 / ENDORSE-03 mount lock. Renders
+          immediately AFTER DissentPanel, BEFORE the open_observation block.
+          Last 90 days for active ticker; date-desc; NO performance number
+          (deferred to v1.x ENDORSE-04..06). */}
+      <EndorsementsList symbol={symbol} />
 
       {/* 8. open_observation — accent-tinted (matches DissentPanel claude
           case + OpenClaudePin from Phase 6) when present. */}

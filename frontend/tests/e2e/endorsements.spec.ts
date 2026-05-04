@@ -81,9 +81,14 @@ test.describe('endorsements panel', () => {
   test('populated state — 3 records (2 AAPL within 90d + 1 MSFT) → 2 AAPL cards in date-desc; NO performance number', async ({
     page,
   }) => {
+    // NOTE: source names deliberately exclude "Seeking Alpha" / "Performance"
+    // / "% Daily Gains" etc. — those legitimate publication names would trip
+    // the regex guard below (which scans for performance vocabulary). The
+    // guard is a regression sentinel for the COMPONENT, so we use neutral
+    // newsletter names that don't accidentally introduce false positives.
     const records = [
       rec({ ticker: 'AAPL', source: 'Motley Fool', date: '2026-04-20' }),
-      rec({ ticker: 'AAPL', source: 'Seeking Alpha', date: '2026-04-15' }),
+      rec({ ticker: 'AAPL', source: 'Stock Picks Weekly', date: '2026-04-15' }),
       rec({ ticker: 'MSFT', source: 'Other Newsletter', date: '2026-04-15' }),
     ]
     await page.route(
@@ -112,7 +117,7 @@ test.describe('endorsements panel', () => {
     const card1 = cards.nth(1)
     await expect(card0).toContainText('Motley Fool')
     await expect(card0).toContainText('2026-04-20')
-    await expect(card1).toContainText('Seeking Alpha')
+    await expect(card1).toContainText('Stock Picks Weekly')
     await expect(card1).toContainText('2026-04-15')
 
     // NO performance number anywhere within the EndorsementsList region.
